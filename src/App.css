@@ -1,0 +1,505 @@
+/* =============================================
+   SMRITI — Landing Page Styles (App.css)
+   Styles for every component on the landing page
+   ============================================= */
+
+/* ---- App wrapper ---- */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==============================
+   HEADER / NAVBAR
+   ============================== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: rgba(253, 248, 243, 0.9);
+  /* Glass effect: slightly blurred background when scrolling */
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--clr-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;         /* stays on top of other content */
+}
+
+/* The "Smriti" brand name in the header */
+.header__brand {
+  font-family: var(--font-brand);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+/* The brain emoji next to the brand name */
+.header__brand-icon {
+  font-size: 1.6rem;
+}
+
+/* A small "SIH 2026" badge in the header */
+.header__badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--clr-secondary);
+  background: rgba(74, 124, 89, 0.12);
+  border: 1px solid rgba(74, 124, 89, 0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ==============================
+   HERO / INTRO SECTION
+   ============================== */
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 72px 24px 48px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Decorative tag above the main title */
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--clr-primary);
+  background: rgba(192, 98, 47, 0.1);
+  border: 1px solid rgba(192, 98, 47, 0.25);
+  border-radius: 20px;
+  padding: 6px 18px;
+  margin-bottom: 28px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Main heading: "Smriti" */
+.hero__title {
+  font-family: var(--font-brand);
+  font-size: clamp(3rem, 8vw, 5.5rem); /* scales with screen width */
+  font-weight: 700;
+  color: var(--clr-primary);
+  margin-bottom: 12px;
+  letter-spacing: -2px;
+}
+
+/* Subtitle: "AI Cognitive & Memory Companion" */
+.hero__subtitle {
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  font-weight: 500;
+  color: var(--clr-text-muted);
+  margin-bottom: 28px;
+  letter-spacing: 0.5px;
+}
+
+/* Description paragraph */
+.hero__desc {
+  font-size: 1.1rem;
+  color: var(--clr-text-muted);
+  max-width: 560px;
+  line-height: 1.75;
+  margin-bottom: 48px;
+}
+
+/* ==============================
+   FEATURE PILLS (small tags)
+   ============================== */
+.feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 56px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clr-text);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 20px;
+  padding: 8px 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==============================
+   MODE SELECTION HEADING
+   ============================== */
+.mode-heading {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--clr-text);
+  margin-bottom: 8px;
+}
+
+.mode-subheading {
+  font-size: 1rem;
+  color: var(--clr-text-muted);
+  margin-bottom: 32px;
+}
+
+/* ==============================
+   MODE CARDS GRID
+   ============================== */
+.mode-cards {
+  display: grid;
+  /* 2 columns on desktop, 1 column on mobile */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* ==============================
+   INDIVIDUAL MODE CARD
+   (styles for ModeCard component)
+   ============================== */
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 44px 32px;
+  background: var(--clr-surface);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+  /* width/min-height so both cards are equally large */
+  min-height: 260px;
+  width: 100%;
+}
+
+/* Patient Mode card colour theme — terracotta */
+.mode-card--patient:hover,
+.mode-card--patient:focus-visible {
+  border-color: var(--clr-primary);
+  box-shadow: 0 8px 32px rgba(192, 98, 47, 0.2);
+  transform: translateY(-4px);
+}
+
+/* Caregiver Mode card colour theme — sage green */
+.mode-card--caregiver:hover,
+.mode-card--caregiver:focus-visible {
+  border-color: var(--clr-secondary);
+  box-shadow: 0 8px 32px rgba(74, 124, 89, 0.2);
+  transform: translateY(-4px);
+}
+
+/* Emoji icon in the card */
+.mode-card__icon {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+/* Card title e.g. "Patient Mode" */
+.mode-card__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--clr-text);
+}
+
+/* Card description */
+.mode-card__desc {
+  font-size: 1rem;
+  color: var(--clr-text-muted);
+  line-height: 1.6;
+}
+
+/* "Enter →" button inside the card */
+.mode-card__btn {
+  margin-top: 8px;
+  padding: 12px 28px;
+  border-radius: 50px;      /* pill shape */
+  font-size: 1rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.mode-card--patient   .mode-card__btn {
+  background: var(--clr-primary);
+  color: #fff;
+}
+.mode-card--patient   .mode-card__btn:hover {
+  background: var(--clr-primary-dk);
+}
+
+.mode-card--caregiver .mode-card__btn {
+  background: var(--clr-secondary);
+  color: #fff;
+}
+.mode-card--caregiver .mode-card__btn:hover {
+  background: var(--clr-secondary-dk);
+}
+
+/* ==============================
+   SELECTED MODE BANNER
+   Shows after a card is clicked
+   ============================== */
+.selected-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 36px;
+  padding: 18px 28px;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 500;
+  animation: fadeInUp 0.4s ease;
+  max-width: 500px;
+  text-align: left;
+}
+
+.selected-banner--patient {
+  background: rgba(192, 98, 47, 0.1);
+  border: 1px solid rgba(192, 98, 47, 0.3);
+  color: var(--clr-primary-dk);
+}
+
+.selected-banner--caregiver {
+  background: rgba(74, 124, 89, 0.1);
+  border: 1px solid rgba(74, 124, 89, 0.3);
+  color: var(--clr-secondary-dk);
+}
+
+/* Fade-in animation for the banner */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ==============================
+   FOOTER
+   ============================== */
+.footer {
+  text-align: center;
+  padding: 28px 24px;
+  border-top: 1px solid var(--clr-border);
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+  margin-top: auto;    /* pushes footer to the bottom */
+}
+
+.footer strong {
+  color: var(--clr-primary);
+}
+
+/* ==============================
+   RESPONSIVE — Mobile styles
+   (screens narrower than 600px)
+   ============================== */
+@media (max-width: 600px) {
+  .header {
+    padding: 16px 20px;
+  }
+
+  .hero {
+    padding: 48px 20px 40px;
+  }
+
+  /* Stack cards vertically on mobile */
+  .mode-cards {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+  }
+
+  .mode-card {
+    min-height: 220px;
+    padding: 32px 24px;
+  }
+
+  .header__badge {
+    display: none;  /* hide on very small screens to save space */
+  }
+}
+
+
+.hero {
+  position: relative;
+
+  .base,
+  .framework,
+  .vite {
+    inset-inline: 0;
+    margin: 0 auto;
+  }
+
+  .base {
+    width: 170px;
+    position: relative;
+    z-index: 0;
+  }
+
+  .framework,
+  .vite {
+    position: absolute;
+  }
+
+  .framework {
+    z-index: 1;
+    top: 34px;
+    height: 28px;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
+      scale(1.4);
+  }
+
+  .vite {
+    z-index: 0;
+    top: 107px;
+    height: 26px;
+    width: auto;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
+      scale(0.8);
+  }
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+
+  @media (max-width: 1024px) {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
+
+#next-steps {
+  display: flex;
+  border-top: 1px solid var(--border);
+  text-align: left;
+
+  & > div {
+    flex: 1 1 0;
+    padding: 32px;
+    @media (max-width: 1024px) {
+      padding: 24px 20px;
+    }
+  }
+
+  .icon {
+    margin-bottom: 16px;
+    width: 22px;
+    height: 22px;
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+
+  @media (max-width: 1024px) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+#next-steps ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+
+  .logo {
+    height: 18px;
+  }
+
+  a {
+    color: var(--text-h);
+    font-size: 16px;
+    border-radius: 6px;
+    background: var(--social-bg);
+    display: flex;
+    padding: 6px 12px;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: box-shadow 0.3s;
+
+    &:hover {
+      box-shadow: var(--shadow);
+    }
+    .button-icon {
+      height: 18px;
+      width: 18px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    li {
+      flex: 1 1 calc(50% - 8px);
+    }
+
+    a {
+      width: 100%;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+  }
+}
+
+#spacer {
+  height: 88px;
+  border-top: 1px solid var(--border);
+  @media (max-width: 1024px) {
+    height: 48px;
+  }
+}
+
+.ticks {
+  position: relative;
+  width: 100%;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: -4.5px;
+    border: 5px solid transparent;
+  }
+
+  &::before {
+    left: 0;
+    border-left-color: var(--border);
+  }
+  &::after {
+    right: 0;
+    border-right-color: var(--border);
+  }
+}

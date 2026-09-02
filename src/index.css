@@ -1,0 +1,80 @@
+/* =============================================
+   SMRITI — Global Design System
+   Warm, trustworthy, accessible healthcare UI
+   ============================================= */
+
+/* CSS variables — named values you can reuse everywhere */
+:root {
+  /* Colours */
+  --clr-bg:         #fdf8f3;   /* warm off-white page background     */
+  --clr-surface:    #ffffff;   /* white card/panel surfaces          */
+  --clr-primary:    #c0622f;   /* terracotta — warm & trustworthy    */
+  --clr-primary-dk: #9e4e24;   /* darker terracotta for hover        */
+  --clr-secondary:  #4a7c59;   /* sage green — calm, medical         */
+  --clr-secondary-dk:#376047;  /* darker green for hover             */
+  --clr-accent:     #e8a838;   /* golden amber — warmth & positivity */
+  --clr-text:       #2c2417;   /* near-black, high contrast          */
+  --clr-text-muted: #6b5d4f;   /* softer text for descriptions       */
+  --clr-border:     #e8d9c8;   /* warm beige borders                 */
+
+  /* Typography */
+  --font-body:  'Inter', system-ui, sans-serif;
+  --font-brand: 'Noto Serif', Georgia, serif;
+
+  /* Spacing & shape */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px  rgba(44,36,23,0.08);
+  --shadow-md: 0 6px 24px rgba(44,36,23,0.12);
+  --shadow-lg: 0 12px 40px rgba(44,36,23,0.18);
+
+  /* Transitions */
+  --transition: all 0.25s ease;
+}
+
+/* Reset — remove browser default spacing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 18px;           /* larger base for elderly readability */
+  line-height: 1.65;
+  color: var(--clr-text);
+  background-color: var(--clr-bg);
+  /* Subtle warm gradient in the top-right corner */
+  background-image: radial-gradient(
+    ellipse at 70% 0%,
+    rgba(192,98,47,0.07) 0%,
+    transparent 60%
+  );
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+ul  { list-style: none; }
+
+/* Keyboard-navigation focus ring — important for accessibility */
+:focus-visible {
+  outline: 3px solid var(--clr-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+h1, h2, h3 { line-height: 1.2; color: var(--clr-text); }
+
+/* Reset button appearance so we can style freely */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
