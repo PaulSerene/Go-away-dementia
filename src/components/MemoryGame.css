@@ -1,0 +1,433 @@
+/* ==========================================================
+   MemoryGame.css — Styles for the "Remember the Objects" game
+   
+   All styles are prefixed with .mg- to avoid clashing with
+   the existing PatientHome (.ph-) or landing page styles.
+   
+   Design follows the same elderly-friendly principles:
+   • Large text and emoji
+   • Large touch targets (buttons ≥ 64px)
+   • High contrast, warm colour palette
+   • Clear selected / unselected states
+   ========================================================== */
+
+/* ── SCREEN WRAPPER ────────────────────────────────────────── */
+.mg-screen {
+  min-height: 100vh;
+  background: var(--ph-bg, #fff8f2);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, 'Nunito', system-ui, sans-serif);
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────────
+   A slim bar showing: Back button | Game title | Level badge
+   ────────────────────────────────────────────────────────── */
+.mg-topbar {
+  background: linear-gradient(135deg, #c0622f 0%, #e08050 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  flex-wrap: wrap;
+}
+
+.mg-back-btn {
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+  transition: background 0.15s;
+}
+
+.mg-back-btn:hover { background: rgba(255,255,255,0.35); }
+
+.mg-topbar__title {
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.mg-topbar__level {
+  background: rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── CENTRED CONTENT AREA ────────────────────────────────────
+   Used by every phase to centre its card/grid vertically.
+   ────────────────────────────────────────────────────────── */
+.mg-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 20px 48px;
+  gap: 24px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── GENERIC CARD ────────────────────────────────────────────
+   The white rounded card used on intro and result screens.
+   ────────────────────────────────────────────────────────── */
+.mg-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 28px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(192, 98, 47, 0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ── INTRO CARD ──────────────────────────────────────────────*/
+.mg-big-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.mg-heading {
+  font-size: clamp(1.4rem, 4vw, 1.85rem);
+  font-weight: 800;
+  color: #2d1f0e;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.mg-subtext {
+  font-size: clamp(1.05rem, 3vw, 1.2rem);
+  color: #6b4f36;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.mg-detail {
+  font-size: 1rem;
+  color: #6b4f36;
+  margin: 0;
+  background: #fff0e8;
+  border-radius: 10px;
+  padding: 10px 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────
+   Large, pill-shaped buttons. min-height: 64px for easy tapping.
+   ────────────────────────────────────────────────────────── */
+.mg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 0 32px;
+  border: none;
+  border-radius: 14px;
+  font-size: clamp(1.05rem, 3vw, 1.25rem);
+  font-weight: 800;
+  cursor: pointer;
+  width: 100%;
+  letter-spacing: 0.2px;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.mg-btn:active { transform: scale(0.98); filter: brightness(0.92); }
+
+.mg-btn--primary {
+  background: #c0622f;
+  color: #ffffff;
+}
+.mg-btn--primary:hover { filter: brightness(1.08); }
+
+.mg-btn--primary:disabled,
+.mg-btn--primary[aria-disabled="true"] {
+  background: #d4a98a;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+
+/* Extra top margin on the submit button */
+.mg-btn--submit { margin-top: 8px; }
+
+/* ── MEMORISE PHASE ──────────────────────────────────────────*/
+.mg-instruction {
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  font-weight: 700;
+  color: #c0622f;
+  margin: 0;
+  text-align: center;
+}
+
+/* Large countdown display */
+.mg-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #c0622f;
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 16px 32px;
+  min-width: 120px;
+}
+
+.mg-countdown__number {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.mg-countdown__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* Grid of objects shown during memorise phase */
+.mg-object-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.mg-object-tile {
+  background: #ffffff;
+  border: 3px solid #f0d9c8;
+  border-radius: 16px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(192, 98, 47, 0.10);
+}
+
+.mg-object-tile__emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.mg-object-tile__name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2d1f0e;
+}
+
+/* ── QUESTION PHASE ──────────────────────────────────────────*/
+.mg-question-heading {
+  font-size: clamp(1.3rem, 4vw, 1.65rem);
+  font-weight: 800;
+  color: #2d1f0e;
+  margin: 0;
+  text-align: center;
+}
+
+.mg-question-hint {
+  font-size: 1rem;
+  color: #6b4f36;
+  margin: 0;
+  text-align: center;
+}
+
+/* 3-column grid for 6 options */
+.mg-option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+/* Each selectable option tile */
+.mg-option-tile {
+  background: #ffffff;
+  border: 3px solid #e8d8cc;
+  border-radius: 14px;
+  padding: 18px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-height: 100px;
+  position: relative;      /* for the checkmark badge positioning */
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+
+.mg-option-tile:hover {
+  border-color: #c0622f;
+  background: #fff5ee;
+}
+
+.mg-option-tile:active { transform: scale(0.97); }
+
+/* SELECTED state — filled warm colour */
+.mg-option-tile--selected {
+  border-color: #c0622f;
+  background: #fff0e8;
+  box-shadow: 0 0 0 3px rgba(192, 98, 47, 0.25);
+}
+
+.mg-option-tile__emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.mg-option-tile__name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2d1f0e;
+  text-align: center;
+}
+
+/* Green checkmark badge — top-right corner when selected */
+.mg-option-tile__check {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #2f7a6e;
+  background: #d0f0e8;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Small "N objects selected" counter below the grid */
+.mg-selected-count {
+  font-size: 0.95rem;
+  color: #6b4f36;
+  margin: 0;
+  text-align: center;
+}
+
+/* ── RESULT PHASE ────────────────────────────────────────────*/
+.mg-result-emoji {
+  font-size: 4.5rem;
+  line-height: 1;
+}
+
+.mg-result-praise {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 900;
+  color: #c0622f;
+  margin: 0;
+}
+
+.mg-result-summary {
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  color: #2d1f0e;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 2×2 grid of stat boxes */
+.mg-result-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.mg-stat {
+  background: #fff0e8;
+  border: 2px solid #f0d9c8;
+  border-radius: 14px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.mg-stat__icon  { font-size: 1.6rem; line-height: 1; }
+.mg-stat__value { font-size: 1.4rem; font-weight: 900; color: #c0622f; }
+.mg-stat__label { font-size: 0.8rem; font-weight: 600; color: #6b4f36; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────
+   On very small screens, drop the option grid to 2 columns.
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .mg-option-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .mg-object-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 600px) {
+  .mg-center {
+    padding: 40px 36px 60px;
+  }
+  .mg-card {
+    padding: 48px 40px;
+  }
+}
+
+/* ── LEVEL BADGE (Intro screen) ──────────────────────────────
+   A prominent pill so the patient clearly sees which level
+   they are about to play.
+   ────────────────────────────────────────────────────────── */
+.mg-level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #c0622f;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 50px;
+  padding: 8px 24px;
+  text-transform: uppercase;
+}
+
+/* ── NEXT-LEVEL MESSAGE (Result screen) ──────────────────────
+   Warm, encouraging sentence below stats that tells the
+   patient what to expect next session — no clinical language.
+   ────────────────────────────────────────────────────────── */
+.mg-next-msg {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #2f7a6e;
+  text-align: center;
+  line-height: 1.55;
+  background: #eef7f5;
+  border: 2px solid #c5e6df;
+  border-radius: 14px;
+  padding: 14px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+}
+
