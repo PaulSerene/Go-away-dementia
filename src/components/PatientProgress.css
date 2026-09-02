@@ -1,0 +1,262 @@
+/* ==========================================================
+   PatientProgress.css — Styles for the "My Progress" screen
+
+   All styles are prefixed with .prog- to avoid clashing with
+   existing .ph- (PatientHome) or .mg- (MemoryGame) styles.
+
+   Reuses the CSS custom properties defined in PatientHome.css:
+     --ph-bg, --ph-text, --ph-text-soft, --ph-warm, --ph-teal,
+     --ph-rose, --ph-shadow, --ph-radius, etc.
+
+   Design follows the same elderly-friendly principles:
+   • Large text (nothing below 1rem)
+   • Large touch targets for the empty-state button
+   • High contrast, warm colour palette
+   • Clear section headings
+   ========================================================== */
+
+/* ── PAGE HEADER ─────────────────────────────────────────────
+   Warm gradient header — same style as Patient Home greeting.
+   ────────────────────────────────────────────────────────── */
+.prog-header {
+  background: linear-gradient(135deg, #2f7a6e 0%, #4aa898 100%);
+  color: #ffffff;
+  padding: 36px 28px 28px;
+  text-align: center;
+}
+
+.prog-header__title {
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 800;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.prog-header__sub {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  margin: 0;
+  opacity: 0.92;
+  font-weight: 500;
+}
+
+/* ── SCROLLABLE CONTENT AREA ──────────────────────────────────
+   Holds the summary cards and the recent activity list.
+   Bottom padding reserves space for the fixed bottom nav bar.
+   ────────────────────────────────────────────────────────── */
+.prog-content {
+  flex: 1;
+  padding: 28px 20px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── 2×2 SUMMARY CARD GRID ────────────────────────────────────
+   Four equal-sized stat cards arranged in a 2-column grid.
+   ────────────────────────────────────────────────────────── */
+.prog-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+/* ── INDIVIDUAL STAT CARD ─────────────────────────────────────
+   Each card shows: icon / big number or label / description text.
+   ────────────────────────────────────────────────────────── */
+.prog-stat-card {
+  background: #ffffff;
+  border-radius: var(--ph-radius, 20px);
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  box-shadow: var(--ph-shadow, 0 4px 20px rgba(192, 98, 47, 0.10));
+  border-top: 5px solid transparent;
+}
+
+/* Per-card colour accent via top border */
+.prog-stat-card--warm { border-top-color: var(--ph-warm, #c0622f); }
+.prog-stat-card--teal { border-top-color: var(--ph-teal, #2f7a6e); }
+.prog-stat-card--rose { border-top-color: var(--ph-rose, #b5404a); }
+.prog-stat-card--gold { border-top-color: #c9920a; }
+
+.prog-stat-card__icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.prog-stat-card__value {
+  font-size: clamp(1.4rem, 4vw, 1.75rem);
+  font-weight: 900;
+  color: var(--ph-text, #2d1f0e);
+  line-height: 1;
+}
+
+.prog-stat-card__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ph-text-soft, #6b4f36);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── SECTION HEADING ──────────────────────────────────────────
+   Used above the recent activity list.
+   ────────────────────────────────────────────────────────── */
+.prog-section-heading {
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+  margin: 0 0 16px;
+}
+
+/* ── EMPTY STATE ──────────────────────────────────────────────
+   Shown when smriti_game_results is empty.
+   ────────────────────────────────────────────────────────── */
+.prog-empty {
+  background: #ffffff;
+  border-radius: var(--ph-radius, 20px);
+  padding: 40px 24px;
+  text-align: center;
+  box-shadow: var(--ph-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.prog-empty__emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.prog-empty__msg {
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  font-weight: 700;
+  color: var(--ph-text, #2d1f0e);
+  margin: 0;
+}
+
+.prog-empty__hint {
+  font-size: 1rem;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Reuse the existing ph-btn sizing — just add extra top margin */
+.prog-empty__btn {
+  margin-top: 8px;
+}
+
+/* ── ACTIVITY LIST ─────────────────────────────────────────────
+   Vertical list of completed game cards, newest first.
+   ────────────────────────────────────────────────────────── */
+.prog-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Each individual game result card */
+.prog-list-item {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 2px 12px rgba(192, 98, 47, 0.08);
+  border-left: 5px solid var(--ph-teal, #2f7a6e);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Top row: brain emoji + game name + level badge */
+.prog-item__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.prog-item__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.prog-item__title {
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+}
+
+.prog-item__level {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--ph-teal-lt, #eef7f5);
+  color: var(--ph-teal, #2f7a6e);
+  border: 1px solid #b8dfd9;
+  border-radius: 20px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+/* Row of 3 stats (accuracy / objects / response time) */
+.prog-item__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.prog-item__stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.95rem;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+.prog-item__stat-icon {
+  font-size: 1rem;
+}
+
+/* Date/time shown at the bottom of each card */
+.prog-item__date {
+  font-size: 0.82rem;
+  color: #9a7060;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────
+   On wider screens, give the content more comfortable padding.
+   On very narrow screens, keep a single column for stat cards.
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .prog-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 600px) {
+  .prog-header {
+    padding: 44px 40px 36px;
+  }
+  .prog-content {
+    padding: 36px 40px 110px;
+  }
+  .prog-list-item {
+    padding: 24px 22px 18px;
+  }
+}

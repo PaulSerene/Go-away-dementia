@@ -13,7 +13,7 @@
  *   'landing'            → Landing page (mode selector)
  *   'patient-home'       → Patient Home dashboard
  *   'patient-activity'   → "Remember the Objects" memory game (MemoryGame)
- *   'patient-activities' → Activities tab (placeholder)
+ *   'patient-activities' → My Progress screen (PatientProgress)
  *   'patient-memories'   → Memories tab (placeholder)
  *   'patient-reminders'  → Reminders tab (placeholder)
  */
@@ -23,6 +23,7 @@ import ModeCard from './components/ModeCard';
 import PatientHome from './components/PatientHome';
 import PatientPlaceholder from './components/PatientPlaceholder';
 import MemoryGame from './components/MemoryGame';
+import PatientProgress from './components/PatientProgress';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -110,17 +111,9 @@ function App() {
     return <MemoryGame navigate={navigate} />;
   }
 
-  /* Activities tab placeholder */
+  /* Activities tab — My Progress */
   if (currentScreen === 'patient-activities') {
-    return (
-      <PatientPlaceholder
-        title="Activities"
-        emoji="🧩"
-        message="Memory games and cognitive exercises will appear here each day."
-        navigate={navigate}
-        activeTab="activities"
-      />
-    );
+    return <PatientProgress navigate={navigate} />;
   }
 
   /* Memories tab placeholder */
