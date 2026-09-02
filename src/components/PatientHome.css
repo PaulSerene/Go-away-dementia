@@ -1,0 +1,399 @@
+/* ==========================================================
+   PatientHome.css — Elderly-friendly styles for Patient Mode
+   
+   Design guidelines followed throughout:
+   • Large font sizes (nothing below 1rem; body text ≥ 1.15rem)
+   • Large touch targets (min-height: 64px for all buttons)
+   • High contrast — dark text on light/warm backgrounds
+   • Warm, reassuring colour palette
+   • Minimal decoration — clarity first
+   ========================================================== */
+
+/* ── COLOUR TOKENS ─────────────────────────────────────────
+   All Patient Mode colours are defined here so they can be
+   changed in one place.
+   ────────────────────────────────────────────────────────── */
+:root {
+  --ph-bg:          #fff8f2;   /* warm cream background                */
+  --ph-surface:     #ffffff;   /* card surface colour                  */
+  --ph-text:        #2d1f0e;   /* very dark brown — maximum readability */
+  --ph-text-soft:   #6b4f36;   /* slightly lighter, for secondary text  */
+
+  --ph-warm:        #c0622f;   /* terracotta — activity card accent     */
+  --ph-warm-lt:     #fff0e8;   /* light terracotta background           */
+  --ph-rose:        #b5404a;   /* rose red — memories card accent       */
+  --ph-rose-lt:     #fff0f1;   /* light rose background                 */
+  --ph-teal:        #2f7a6e;   /* teal — reminders card accent          */
+  --ph-teal-lt:     #eef7f5;   /* light teal background                 */
+
+  --ph-nav-bg:      #ffffff;   /* bottom nav background                 */
+  --ph-nav-active:  #c0622f;   /* active nav tab colour                 */
+  --ph-nav-border:  #f0d9c8;   /* nav top border                        */
+  --ph-nav-text:    #9a7060;   /* inactive nav label colour             */
+
+  --ph-radius:      20px;      /* card corner radius                    */
+  --ph-radius-sm:   12px;      /* button corner radius                  */
+  --ph-shadow:      0 4px 20px rgba(192, 98, 47, 0.10);
+}
+
+/* ── FULL-SCREEN WRAPPER ────────────────────────────────────
+   The outer shell for every Patient Mode screen.
+   Uses flex-column so header, content, and nav stack vertically.
+   ────────────────────────────────────────────────────────── */
+.ph-screen {
+  min-height: 100vh;
+  background: var(--ph-bg);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, 'Nunito', system-ui, sans-serif);
+  color: var(--ph-text);
+}
+
+/* ── GREETING HEADER ────────────────────────────────────────
+   The warm welcome at the top of the Patient Home screen.
+   Large, friendly, immediately readable.
+   ────────────────────────────────────────────────────────── */
+.ph-greeting {
+  background: linear-gradient(135deg, #c0622f 0%, #e08050 100%);
+  color: #ffffff;
+  padding: 36px 28px 32px;
+  text-align: center;
+}
+
+.ph-greeting__name {
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 800;
+  margin: 0 0 10px;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+
+.ph-greeting__sub {
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  margin: 0;
+  opacity: 0.92;
+  font-weight: 500;
+}
+
+/* ── SCROLLABLE CONTENT AREA ────────────────────────────────
+   The area that holds the three cards.
+   padding-bottom: 100px reserves space for the fixed bottom nav.
+   ────────────────────────────────────────────────────────── */
+.ph-content {
+  flex: 1;
+  padding: 28px 20px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── CARDS ──────────────────────────────────────────────────
+   Each card is a large, rounded, well-padded surface.
+   Cards must be easy to scan — icon + tag + title + desc + button.
+   ────────────────────────────────────────────────────────── */
+.ph-card {
+  background: var(--ph-surface);
+  border-radius: var(--ph-radius);
+  padding: 28px 24px 24px;
+  box-shadow: var(--ph-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 2px solid transparent;
+}
+
+/* Per-card left border + bg tint for quick visual distinction */
+.ph-card--activity  { border-left: 6px solid var(--ph-warm); background: var(--ph-warm-lt); }
+.ph-card--memories  { border-left: 6px solid var(--ph-rose); background: var(--ph-rose-lt); }
+.ph-card--reminders { border-left: 6px solid var(--ph-teal); background: var(--ph-teal-lt); }
+
+/* Top row: big emoji + small category tag */
+.ph-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ph-card__emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.ph-card__tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ph-text-soft);
+  margin: 0;
+}
+
+/* Card heading */
+.ph-card__title {
+  font-size: clamp(1.4rem, 4vw, 1.75rem);
+  font-weight: 800;
+  color: var(--ph-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Card description */
+.ph-card__desc {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  color: var(--ph-text-soft);
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ── CARD BUTTONS ───────────────────────────────────────────
+   All buttons have a minimum height of 64px so they are
+   easy to tap on a touchscreen, even with shaky hands.
+   ────────────────────────────────────────────────────────── */
+.ph-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 0 28px;
+  border: none;
+  border-radius: var(--ph-radius-sm);
+  font-size: clamp(1.05rem, 3vw, 1.2rem);
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 6px;
+  letter-spacing: 0.2px;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.ph-btn:active {
+  transform: scale(0.98);
+  filter: brightness(0.92);
+}
+
+/* Warm / terracotta button — Activity */
+.ph-btn--warm {
+  background: var(--ph-warm);
+  color: #ffffff;
+}
+.ph-btn--warm:hover { filter: brightness(1.08); }
+
+/* Rose button — Memories */
+.ph-btn--rose {
+  background: var(--ph-rose);
+  color: #ffffff;
+}
+.ph-btn--rose:hover { filter: brightness(1.08); }
+
+/* Teal button — Reminders */
+.ph-btn--teal {
+  background: var(--ph-teal);
+  color: #ffffff;
+}
+.ph-btn--teal:hover { filter: brightness(1.08); }
+
+/* ── REMINDER LIST ──────────────────────────────────────────
+   Three rows showing today's reminders inside the third card.
+   Each row is large and clearly spaced.
+   ────────────────────────────────────────────────────────── */
+.ph-reminder-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ph-reminder-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  min-height: 58px;        /* large touch target even for list items */
+  box-shadow: 0 2px 8px rgba(47, 122, 110, 0.08);
+}
+
+.ph-reminder-item__icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.ph-reminder-item__label {
+  flex: 1;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ph-text);
+}
+
+.ph-reminder-item__time {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ph-teal);
+  white-space: nowrap;
+}
+
+/* ── BOTTOM NAVIGATION ──────────────────────────────────────
+   Fixed bar pinned to the bottom.
+   Four large tabs — each is a full-bleed button for easy tapping.
+   ────────────────────────────────────────────────────────── */
+.ph-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: var(--ph-nav-bg);
+  border-top: 2px solid var(--ph-nav-border);
+  display: flex;
+  align-items: stretch;
+  box-shadow: 0 -4px 20px rgba(192, 98, 47, 0.10);
+  z-index: 200;
+}
+
+.ph-nav__btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px 4px;
+  color: var(--ph-nav-text);
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ph-nav__btn:hover {
+  background: rgba(192, 98, 47, 0.06);
+}
+
+/* Active (current page) tab */
+.ph-nav__btn--active {
+  color: var(--ph-nav-active);
+}
+
+.ph-nav__icon {
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.ph-nav__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* ── PLACEHOLDER SCREEN ─────────────────────────────────────
+   Styles for the PatientPlaceholder component shared by
+   Activity, Activities, Memories, and Reminders screens.
+   ────────────────────────────────────────────────────────── */
+.ph-ph-header {
+  background: var(--ph-warm);
+  color: #ffffff;
+  padding: 20px 24px 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.ph-back-btn {
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 48px;
+  transition: background 0.15s ease;
+}
+
+.ph-back-btn:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+.ph-ph-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.ph-ph-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 110px;
+}
+
+.ph-ph-card {
+  background: #ffffff;
+  border-radius: var(--ph-radius);
+  padding: 48px 32px;
+  text-align: center;
+  box-shadow: var(--ph-shadow);
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.ph-ph-big-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.ph-ph-heading {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--ph-text);
+  margin: 0;
+}
+
+.ph-ph-msg {
+  font-size: 1.15rem;
+  color: var(--ph-text-soft);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.ph-ph-coming {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ph-warm);
+  margin: 8px 0 0;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────
+   On larger screens, centre the content and cap the max width.
+   On small screens ensure text doesn't overflow.
+   ────────────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+  .ph-greeting {
+    padding: 44px 40px 40px;
+  }
+
+  .ph-content {
+    padding: 36px 40px 110px;
+  }
+
+  .ph-card {
+    padding: 32px 32px 28px;
+  }
+}

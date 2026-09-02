@@ -5,16 +5,25 @@
  * HTML-like code (called JSX). React builds the whole UI by
  * composing these components together like Lego blocks.
  *
- * This file assembles:
- *   <Header />    — sticky top bar with the brand name
- *   <Hero />      — main intro section
- *   <ModeCard />  — two clickable mode-selection cards
- *   <Footer />    — bottom bar
+ * This file manages app-level navigation using a simple
+ * "currentScreen" state string. No external router is needed
+ * for this stage — React's useState is enough.
+ *
+ * Screens:
+ *   'landing'            → Landing page (mode selector)
+ *   'patient-home'       → Patient Home dashboard
+ *   'patient-activity'   → Today's Activity (placeholder)
+ *   'patient-activities' → Activities tab (placeholder)
+ *   'patient-memories'   → Memories tab (placeholder)
+ *   'patient-reminders'  → Reminders tab (placeholder)
  */
 
-import { useState } from 'react';   // useState lets us track things that change
+import { useState } from 'react';
 import ModeCard from './components/ModeCard';
+import PatientHome from './components/PatientHome';
+import PatientPlaceholder from './components/PatientPlaceholder';
 import './App.css';
+import './components/PatientHome.css';
 
 /* ---- Small reusable Header component ---- */
 function Header() {
@@ -47,16 +56,21 @@ function Footer() {
 /* ---- The main App component ---- */
 function App() {
   /*
-   * useState is a React "hook" that lets us store data that can change.
-   * Here we store whichever mode the user clicked.
+   * currentScreen stores which screen to show.
+   * Starts as 'landing' — the mode-selection page.
    *
-   *   selectedMode = the current value (starts as null = nothing selected)
-   *   setSelectedMode = a function that updates selectedMode
-   *
-   * When setSelectedMode is called, React automatically re-renders
-   * the page to show the new state.
+   * When navigate() is called (e.g. navigate('patient-home')),
+   * React re-renders the page and shows the new screen.
+   * This is called "client-side navigation without a router".
    */
-  const [selectedMode, setSelectedMode] = useState(null);
+  const [currentScreen, setCurrentScreen] = useState('landing');
+
+  /*
+   * navigate is a helper function we pass down as a prop.
+   * Any child component can call navigate('screen-name')
+   * to switch screens — without needing access to useState directly.
+   */
+  const navigate = (screen) => setCurrentScreen(screen);
 
   /* Data for the two mode cards — stored as an array of objects */
   const modes = [
@@ -76,6 +90,73 @@ function App() {
     },
   ];
 
+  /* ── SCREEN ROUTER ────────────────────────────────────────
+   *
+   * We check currentScreen and return the matching component.
+   * This replaces React Router for this stage of the project.
+   *
+   * React concept used: "conditional rendering" — returning
+   * different JSX based on a state value.
+   * ─────────────────────────────────────────────────────── */
+
+  /* Patient Home */
+  if (currentScreen === 'patient-home') {
+    return <PatientHome navigate={navigate} />;
+  }
+
+  /* Today's Activity placeholder */
+  if (currentScreen === 'patient-activity') {
+    return (
+      <PatientPlaceholder
+        title="Remember the Objects"
+        emoji="🧠"
+        message="You will be shown pictures of everyday objects. Try to remember them!"
+        navigate={navigate}
+        activeTab="activities"
+      />
+    );
+  }
+
+  /* Activities tab placeholder */
+  if (currentScreen === 'patient-activities') {
+    return (
+      <PatientPlaceholder
+        title="Activities"
+        emoji="🧩"
+        message="Memory games and cognitive exercises will appear here each day."
+        navigate={navigate}
+        activeTab="activities"
+      />
+    );
+  }
+
+  /* Memories tab placeholder */
+  if (currentScreen === 'patient-memories') {
+    return (
+      <PatientPlaceholder
+        title="My Memories"
+        emoji="❤️"
+        message="Photos, names, and stories of the people and places you love will live here."
+        navigate={navigate}
+        activeTab="memories"
+      />
+    );
+  }
+
+  /* Reminders tab placeholder */
+  if (currentScreen === 'patient-reminders') {
+    return (
+      <PatientPlaceholder
+        title="Reminders"
+        emoji="⏰"
+        message="Medicine, water, walks — all your daily reminders in one place."
+        navigate={navigate}
+        activeTab="reminders"
+      />
+    );
+  }
+
+  /* ── LANDING PAGE (default) ───────────────────────────── */
   return (
     <div className="app">
       {/* Sticky header at the top */}
@@ -116,39 +197,34 @@ function App() {
 
         {/*
          * Mode cards grid.
-         * We use JavaScript's .map() to loop over the modes array
-         * and render one <ModeCard /> for each mode.
-         * This is cleaner than writing two separate card blocks by hand.
+         * We use .map() to loop over the modes array and render
+         * one <ModeCard /> per mode — cleaner than writing two
+         * separate card blocks by hand.
          */}
         <div className="mode-cards">
           {modes.map((mode) => (
             <ModeCard
-              key={mode.id}           /* React needs a unique key for each list item */
+              key={mode.id}
               icon={mode.icon}
               title={mode.title}
               desc={mode.desc}
               theme={mode.theme}
-              onClick={() => setSelectedMode(mode)} /* store the clicked mode */
+              /*
+               * When Patient Mode is clicked → go to patient-home.
+               * Caregiver Mode is not built yet so we fall back to a
+               * simple alert (will be replaced in a future session).
+               */
+              onClick={() => {
+                if (mode.id === 'patient') {
+                  navigate('patient-home');
+                } else {
+                  alert('Caregiver Mode is coming soon!');
+                }
+              }}
             />
           ))}
         </div>
 
-        {/*
-         * Selection banner — only shown after a card is clicked.
-         * The && operator means: "only render this if selectedMode is not null".
-         */}
-        {selectedMode && (
-          <div
-            className={`selected-banner selected-banner--${selectedMode.theme}`}
-            role="status"          /* tells screen readers this is a status message */
-            aria-live="polite"     /* screen reader reads this when it appears      */
-          >
-            <span aria-hidden="true">{selectedMode.icon}</span>
-            <span>
-              <strong>{selectedMode.title}</strong> selected — dashboard coming soon!
-            </span>
-          </div>
-        )}
       </main>
 
       <Footer />
@@ -157,4 +233,3 @@ function App() {
 }
 
 export default App;
-
