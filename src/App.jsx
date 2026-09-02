@@ -14,7 +14,7 @@
  *   'patient-home'       → Patient Home dashboard
  *   'patient-activity'   → "Remember the Objects" memory game (MemoryGame)
  *   'patient-activities' → My Progress screen (PatientProgress)
- *   'patient-memories'   → Memories tab (placeholder)
+ *   'patient-memories'   → My Memories screen (PatientMemories)
  *   'patient-reminders'  → Reminders tab (placeholder)
  */
 
@@ -24,6 +24,7 @@ import PatientHome from './components/PatientHome';
 import PatientPlaceholder from './components/PatientPlaceholder';
 import MemoryGame from './components/MemoryGame';
 import PatientProgress from './components/PatientProgress';
+import PatientMemories from './components/PatientMemories';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -116,17 +117,9 @@ function App() {
     return <PatientProgress navigate={navigate} />;
   }
 
-  /* Memories tab placeholder */
+  /* Memories tab — My Memories */
   if (currentScreen === 'patient-memories') {
-    return (
-      <PatientPlaceholder
-        title="My Memories"
-        emoji="❤️"
-        message="Photos, names, and stories of the people and places you love will live here."
-        navigate={navigate}
-        activeTab="memories"
-      />
-    );
+    return <PatientMemories navigate={navigate} />;
   }
 
   /* Reminders tab placeholder */

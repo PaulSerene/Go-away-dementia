@@ -1,0 +1,353 @@
+/* ==========================================================
+   PatientMemories.css — Styles for the "My Memories" screen
+
+   All styles are prefixed with .mem- to avoid collisions with
+   .ph- (PatientHome) and .prog- (PatientProgress) styles.
+
+   Reuses the CSS custom properties from PatientHome.css:
+     --ph-bg, --ph-text, --ph-text-soft, --ph-rose, --ph-rose-lt,
+     --ph-warm, --ph-teal, --ph-shadow, --ph-radius etc.
+
+   Elderly-friendly principles:
+   • Large readable text
+   • Large touch targets (filter buttons ≥ 48px; fav button ≥ 44px)
+   • High contrast; warm colour palette
+   • Clear visual separation between cards
+   ========================================================== */
+
+/* ── PAGE HEADER ─────────────────────────────────────────────
+   Rose-tinted gradient header — distinct from the teal Progress
+   header and terracotta Home header, so the patient knows
+   immediately which screen they are on.
+   ────────────────────────────────────────────────────────── */
+.mem-header {
+  background: linear-gradient(135deg, #b5404a 0%, #d9707a 100%);
+  color: #ffffff;
+  padding: 36px 28px 28px;
+  text-align: center;
+}
+
+.mem-header__title {
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 800;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.mem-header__sub {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  margin: 0;
+  opacity: 0.92;
+  font-weight: 500;
+}
+
+/* ── SCROLLABLE CONTENT AREA ─────────────────────────────────
+   Holds filters + cards. padding-bottom reserves space for
+   the fixed bottom nav bar.
+   ────────────────────────────────────────────────────────── */
+.mem-content {
+  flex: 1;
+  padding: 24px 20px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────
+   Shown when no memories exist at all.
+   ────────────────────────────────────────────────────────── */
+.mem-empty {
+  background: #ffffff;
+  border-radius: var(--ph-radius, 20px);
+  padding: 48px 28px;
+  text-align: center;
+  box-shadow: var(--ph-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.mem-empty__emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.mem-empty__heading {
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+  margin: 0;
+}
+
+.mem-empty__msg {
+  font-size: 1.1rem;
+  color: var(--ph-text, #2d1f0e);
+  font-weight: 600;
+  margin: 0;
+}
+
+.mem-empty__hint {
+  font-size: 1rem;
+  color: var(--ph-text-soft, #6b4f36);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── CATEGORY FILTER PILLS ───────────────────────────────────
+   Horizontally scrollable row of filter buttons.
+   Each button is at least 48px tall for easy tapping.
+   ────────────────────────────────────────────────────────── */
+.mem-filters {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;          /* space for scroll bar on desktop */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;        /* hide scrollbar on Firefox */
+}
+
+.mem-filters::-webkit-scrollbar {
+  display: none;                /* hide scrollbar on Chrome/Safari */
+}
+
+.mem-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 2px solid #e8d8cc;
+  background: #ffffff;
+  border-radius: 50px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ph-text-soft, #6b4f36);
+  cursor: pointer;
+  min-height: 48px;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mem-filter-btn:hover {
+  border-color: #b5404a;
+  color: #b5404a;
+}
+
+/* Active filter — filled rose/terracotta style */
+.mem-filter-btn--active {
+  background: #b5404a;
+  border-color: #b5404a;
+  color: #ffffff;
+}
+
+/* ── VISIBLE COUNT ───────────────────────────────────────────
+   Small text beneath filters showing how many memories match.
+   aria-live="polite" means screen readers announce changes.
+   ────────────────────────────────────────────────────────── */
+.mem-count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+}
+
+/* ── MEMORY LIST ─────────────────────────────────────────────
+   Vertical stack of memory cards.
+   ────────────────────────────────────────────────────────── */
+.mem-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mem-list-item {
+  display: block;
+}
+
+/* ── MEMORY CARD ─────────────────────────────────────────────
+   Each memory is a large white card with:
+     - image area at the top
+     - body with category, title, description, date, fav button
+   ────────────────────────────────────────────────────────── */
+.mem-card {
+  background: #ffffff;
+  border-radius: var(--ph-radius, 20px);
+  box-shadow: var(--ph-shadow);
+  overflow: hidden;             /* clip the image to the card's rounded corners */
+  border: 2px solid #f0ddd9;
+}
+
+/* ── IMAGE AREA ──────────────────────────────────────────────
+   Fixed-height block at the top of the card.
+   When no image is set, shows a warm placeholder with the
+   category emoji centred inside.
+   ────────────────────────────────────────────────────────── */
+.mem-card__image-area {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: var(--ph-rose-lt, #fff0f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mem-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mem-card__image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff0f1 0%, #fce8ea 100%);
+}
+
+.mem-card__placeholder-icon {
+  font-size: 4.5rem;
+  opacity: 0.6;
+}
+
+/* ── CARD BODY ───────────────────────────────────────────────*/
+.mem-card__body {
+  padding: 20px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Category label — small coloured tag */
+.mem-card__category {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #b5404a;
+  background: var(--ph-rose-lt, #fff0f1);
+  border: 1px solid #f0c0c5;
+  border-radius: 20px;
+  padding: 3px 12px;
+  align-self: flex-start;       /* don't stretch to full width */
+}
+
+/* Memory title */
+.mem-card__title {
+  font-size: clamp(1.2rem, 4vw, 1.45rem);
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+  margin: 0;
+  line-height: 1.25;
+}
+
+/* Description paragraph */
+.mem-card__desc {
+  font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+  color: var(--ph-text-soft, #6b4f36);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── CARD FOOTER — date + favorite button ────────────────────*/
+.mem-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.mem-card__date {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #9a7060;
+}
+
+/* ── FAVORITE BUTTON ─────────────────────────────────────────
+   Large tap target, no background chrome — just the heart emoji.
+   aria-pressed is used for accessibility state.
+   min-width/height: 44px ensures it's easy to tap.
+   ────────────────────────────────────────────────────────── */
+.mem-fav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.8rem;
+  line-height: 1;
+  padding: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mem-fav-btn:hover {
+  background: rgba(181, 64, 74, 0.08);
+}
+
+.mem-fav-btn:active {
+  transform: scale(0.9);
+}
+
+/* Active / favorited state gets a faint rose background */
+.mem-fav-btn--active {
+  background: rgba(181, 64, 74, 0.08);
+}
+
+/* ── EMPTY FILTER STATE ───────────────────────────────────────
+   Shown when a category is selected but has no memories.
+   ────────────────────────────────────────────────────────── */
+.mem-empty-filter {
+  text-align: center;
+  padding: 36px 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: var(--ph-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-size: 3rem;
+}
+
+.mem-empty-filter p {
+  font-size: 1.1rem;
+  color: var(--ph-text-soft, #6b4f36);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────
+   On wider screens, give more generous padding.
+   Image height stays fixed so cards are consistent regardless
+   of how long the description is.
+   ────────────────────────────────────────────────────────── */
+@media (min-width: 600px) {
+  .mem-header {
+    padding: 44px 40px 36px;
+  }
+  .mem-content {
+    padding: 32px 40px 110px;
+  }
+  .mem-card__image-area {
+    height: 200px;
+  }
+}
