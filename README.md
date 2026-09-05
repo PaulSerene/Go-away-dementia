@@ -1,7 +1,7 @@
 # Go-away-dementia
 <div align="center">
 
-# 🌸 Memora
+# 🩵 Memora
 
 ### *AI-Powered Cognitive Gaming & Memory Assistance Platform for Elderly Users*
 
