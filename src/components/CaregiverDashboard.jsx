@@ -54,6 +54,26 @@ function loadMemories() {
   }
 }
 
+function loadReminders() {
+  try {
+    const raw = localStorage.getItem("smriti_reminders");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function todayStr() {
+  const d = new Date();
+  return (
+    d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0')
+  );
+}
+
 /* ----------------------------------------------------------------
    PURE CALCULATION HELPERS
 ---------------------------------------------------------------- */
@@ -270,13 +290,39 @@ function MemorySection({ memories, navigate }) {
   );
 }
 
-function RemindersSection() {
+function RemindersSection({ reminders, navigate }) {
+  const today          = todayStr();
+  const todayPending   = reminders.filter((r) => !r.completed && r.date === today).length;
+  const totalPending   = reminders.filter((r) => !r.completed).length;
+  const completed      = reminders.filter((r) => r.completed).length;
+
   return (
     <section className="cgd-section" aria-labelledby="cgd-reminders-heading">
       <h2 id="cgd-reminders-heading" className="cgd-section__heading">⏰ Reminders</h2>
-      <div className="cgd-placeholder-card">
-        <span className="cgd-placeholder-card__emoji" aria-hidden="true">⏰</span>
-        <p className="cgd-placeholder-card__msg">Reminder management coming soon.</p>
+      <div className="cgd-reminders-card">
+        <div className="cgd-reminders-stats">
+          <div className="cgd-rem-stat">
+            <span className="cgd-rem-stat__value">{todayPending}</span>
+            <span className="cgd-rem-stat__label">Today Pending</span>
+          </div>
+          <div className="cgd-mem-divider" aria-hidden="true" />
+          <div className="cgd-rem-stat">
+            <span className="cgd-rem-stat__value">{totalPending}</span>
+            <span className="cgd-rem-stat__label">Total Pending</span>
+          </div>
+          <div className="cgd-mem-divider" aria-hidden="true" />
+          <div className="cgd-rem-stat">
+            <span className="cgd-rem-stat__value">✅ {completed}</span>
+            <span className="cgd-rem-stat__label">Completed</span>
+          </div>
+        </div>
+        <button
+          id="cgd-btn-manage-reminders"
+          className="cgd-btn cgd-btn--teal"
+          onClick={() => navigate("caregiver-reminders")}
+        >
+          ⏰  Manage Reminders
+        </button>
       </div>
     </section>
   );
@@ -311,13 +357,13 @@ function CaregiverNav({ navigate }) {
         <span className="cgd-nav__icon" aria-hidden="true">❤️</span>
         <span className="cgd-nav__label">Memories</span>
       </button>
+      <button id="cgd-nav-reminders" className="cgd-nav__btn" aria-label="Manage Reminders" onClick={() => navigate("caregiver-reminders")}>
+        <span className="cgd-nav__icon" aria-hidden="true">⏰</span>
+        <span className="cgd-nav__label">Reminders</span>
+      </button>
       <button id="cgd-nav-patient-mode" className="cgd-nav__btn" aria-label="Switch to Patient Mode" onClick={() => navigate("patient-home")}>
         <span className="cgd-nav__icon" aria-hidden="true">👴</span>
         <span className="cgd-nav__label">Patient View</span>
-      </button>
-      <button id="cgd-nav-home" className="cgd-nav__btn" aria-label="Return to Home" onClick={() => navigate("landing")}>
-        <span className="cgd-nav__icon" aria-hidden="true">🏠</span>
-        <span className="cgd-nav__label">Home</span>
       </button>
     </nav>
   );
@@ -337,6 +383,7 @@ function CaregiverDashboard({ navigate }) {
   const results      = loadGameResults();
   const currentLevel = loadDifficulty();
   const memories     = loadMemories();
+  const reminders    = loadReminders();
 
   return (
     <div className="cgd-screen">
@@ -367,7 +414,7 @@ function CaregiverDashboard({ navigate }) {
         <RecentActivitiesSection results={results} />
         <ActivityTrendSection results={results} />
         <MemorySection memories={memories} navigate={navigate} />
-        <RemindersSection />
+        <RemindersSection reminders={reminders} navigate={navigate} />
         <ActivityNotesSection results={results} />
 
       </main>
