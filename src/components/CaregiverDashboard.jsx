@@ -262,7 +262,7 @@ function MemorySection({ memories, navigate }) {
             <span className="cgd-mem-stat__label">Favourites</span>
           </div>
         </div>
-        <button id="cgd-btn-view-memories" className="cgd-btn cgd-btn--rose" onClick={() => navigate("patient-memories")}>
+        <button id="cgd-btn-view-memories" className="cgd-btn cgd-btn--rose" onClick={() => navigate("caregiver-memories")}>
           📖&nbsp; View Memories
         </button>
       </div>
@@ -307,7 +307,7 @@ function CaregiverNav({ navigate }) {
         <span className="cgd-nav__icon" aria-hidden="true">📊</span>
         <span className="cgd-nav__label">Dashboard</span>
       </button>
-      <button id="cgd-nav-memories" className="cgd-nav__btn" aria-label="View Memories" onClick={() => navigate("patient-memories")}>
+      <button id="cgd-nav-memories" className="cgd-nav__btn" aria-label="Manage Memories" onClick={() => navigate("caregiver-memories")}>
         <span className="cgd-nav__icon" aria-hidden="true">❤️</span>
         <span className="cgd-nav__label">Memories</span>
       </button>

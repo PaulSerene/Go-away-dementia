@@ -17,6 +17,7 @@
  *   'patient-memories'    → My Memories screen (PatientMemories)
  *   'patient-reminders'   → Reminders tab (placeholder)
  *   'caregiver-dashboard' → Caregiver Dashboard
+ *   'caregiver-memories'  → Caregiver Memory Management
  */
 
 import { useState } from 'react';
@@ -27,6 +28,7 @@ import MemoryGame from './components/MemoryGame';
 import PatientProgress from './components/PatientProgress';
 import PatientMemories from './components/PatientMemories';
 import CaregiverDashboard from './components/CaregiverDashboard';
+import CaregiverMemories from './components/CaregiverMemories';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -127,6 +129,11 @@ function App() {
   /* Caregiver Dashboard */
   if (currentScreen === 'caregiver-dashboard') {
     return <CaregiverDashboard navigate={navigate} />;
+  }
+
+  /* Caregiver Memory Management */
+  if (currentScreen === 'caregiver-memories') {
+    return <CaregiverMemories navigate={navigate} />;
   }
 
   /* Reminders tab placeholder */
