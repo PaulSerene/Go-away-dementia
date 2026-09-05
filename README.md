@@ -1,11 +1,7 @@
 # Go-away-dementia
 <div align="center">
 
-<<<<<<< HEAD
-# 🩵 Memora
-=======
 # 🌸 Memora
->>>>>>> reminders
 
 ### *AI-Powered Cognitive Gaming & Memory Assistance Platform for Elderly Users*
 
@@ -559,11 +555,7 @@ The specific license governing the use, modification, and distribution of this p
 
 <div align="center">
 
-<<<<<<< HEAD
-## 🩵 Memora
-=======
 ## 🌸 Memora
->>>>>>> reminders
 
 ### *Preserving memories. Encouraging cognition. Empowering caregivers.*
 
@@ -574,8 +566,4 @@ The specific license governing the use, modification, and distribution of this p
 **Smart India Hackathon**
 
 </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> reminders
 
