@@ -10,12 +10,13 @@
  * for this stage — React's useState is enough.
  *
  * Screens:
- *   'landing'            → Landing page (mode selector)
- *   'patient-home'       → Patient Home dashboard
- *   'patient-activity'   → "Remember the Objects" memory game (MemoryGame)
- *   'patient-activities' → My Progress screen (PatientProgress)
- *   'patient-memories'   → My Memories screen (PatientMemories)
- *   'patient-reminders'  → Reminders tab (placeholder)
+ *   'landing'             → Landing page (mode selector)
+ *   'patient-home'        → Patient Home dashboard
+ *   'patient-activity'    → "Remember the Objects" memory game (MemoryGame)
+ *   'patient-activities'  → My Progress screen (PatientProgress)
+ *   'patient-memories'    → My Memories screen (PatientMemories)
+ *   'patient-reminders'   → Reminders tab (placeholder)
+ *   'caregiver-dashboard' → Caregiver Dashboard
  */
 
 import { useState } from 'react';
@@ -25,6 +26,7 @@ import PatientPlaceholder from './components/PatientPlaceholder';
 import MemoryGame from './components/MemoryGame';
 import PatientProgress from './components/PatientProgress';
 import PatientMemories from './components/PatientMemories';
+import CaregiverDashboard from './components/CaregiverDashboard';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -122,6 +124,11 @@ function App() {
     return <PatientMemories navigate={navigate} />;
   }
 
+  /* Caregiver Dashboard */
+  if (currentScreen === 'caregiver-dashboard') {
+    return <CaregiverDashboard navigate={navigate} />;
+  }
+
   /* Reminders tab placeholder */
   if (currentScreen === 'patient-reminders') {
     return (
@@ -197,7 +204,7 @@ function App() {
                 if (mode.id === 'patient') {
                   navigate('patient-home');
                 } else {
-                  alert('Caregiver Mode is coming soon!');
+                  navigate('caregiver-dashboard');
                 }
               }}
             />

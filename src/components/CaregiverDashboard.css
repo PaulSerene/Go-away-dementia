@@ -1,0 +1,568 @@
+/* =============================================================
+   CaregiverDashboard.css
+   All classes prefixed with .cgd- to avoid collisions with
+   existing .ph- (PatientHome) and .prog- (PatientProgress) styles.
+   Reuses CSS variables from index.css and PatientHome.css.
+   ============================================================= */
+
+/* ---- Full-screen wrapper ---- */
+.cgd-screen {
+  min-height: 100vh;
+  background: var(--ph-bg, #fff8f2);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, "Inter", system-ui, sans-serif);
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* ================================================================
+   HEADER
+   ================================================================ */
+.cgd-header {
+  background: linear-gradient(135deg, #376047 0%, #4a7c59 100%);
+  color: #ffffff;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cgd-header-back-btn {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background 0.2s ease;
+}
+
+.cgd-header-back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.cgd-header__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cgd-header__title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.cgd-header__subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  margin: 0;
+  opacity: 0.88;
+  font-weight: 500;
+}
+
+.cgd-header__switch-btn {
+  background: rgba(255,255,255,0.18);
+  border: 1.5px solid rgba(255,255,255,0.4);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 9px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cgd-header__switch-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Patient info pill inside header */
+.cgd-patient-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+.cgd-patient-info__avatar {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cgd-patient-info__name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0 0 2px;
+}
+
+.cgd-patient-info__age {
+  font-size: 0.9rem;
+  opacity: 0.88;
+  margin: 0;
+}
+
+.cgd-demo-badge {
+  margin-left: auto;
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   SCROLLABLE CONTENT AREA
+   ================================================================ */
+.cgd-content {
+  flex: 1;
+  padding: 24px 20px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   PROTOTYPE DEMO BANNER
+   ================================================================ */
+.cgd-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(74, 124, 89, 0.09);
+  border: 1px solid rgba(74, 124, 89, 0.28);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 0.9rem;
+  color: #2d1f0e;
+  line-height: 1.5;
+}
+
+/* ================================================================
+   REFRESH BUTTON ROW
+   ================================================================ */
+.cgd-refresh-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cgd-btn-refresh {
+  background: #ffffff;
+  border: 1.5px solid var(--clr-border, #e8d9c8);
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ph-text, #2d1f0e);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 2px 8px rgba(44,36,23,0.07);
+}
+.cgd-btn-refresh:hover {
+  border-color: var(--clr-secondary, #4a7c59);
+  box-shadow: 0 4px 14px rgba(74, 124, 89, 0.18);
+}
+
+/* ================================================================
+   SECTION WRAPPER
+   ================================================================ */
+.cgd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cgd-section__heading {
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+  margin: 0;
+}
+
+/* ================================================================
+   OVERVIEW STAT CARDS (2x2 grid)
+   ================================================================ */
+.cgd-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.cgd-stat-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  box-shadow: 0 3px 14px rgba(44,36,23,0.09);
+  border-top: 5px solid transparent;
+  transition: transform 0.18s ease;
+}
+.cgd-stat-card:hover { transform: translateY(-2px); }
+
+.cgd-stat-card--teal { border-top-color: #2f7a6e; }
+.cgd-stat-card--warm { border-top-color: #c0622f; }
+.cgd-stat-card--rose { border-top-color: #b5404a; }
+.cgd-stat-card--gold { border-top-color: #c9920a; }
+
+.cgd-stat-card__icon  { font-size: 1.7rem; line-height: 1; }
+.cgd-stat-card__value {
+  font-size: clamp(1.15rem, 3.5vw, 1.5rem);
+  font-weight: 900;
+  color: var(--ph-text, #2d1f0e);
+  line-height: 1.1;
+  word-break: break-word;
+  text-align: center;
+}
+.cgd-stat-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ph-text-soft, #6b4f36);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ================================================================
+   EMPTY STATE
+   ================================================================ */
+.cgd-empty-state {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 36px 24px;
+  text-align: center;
+  box-shadow: 0 3px 14px rgba(44,36,23,0.09);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.cgd-empty-state__emoji { font-size: 3rem; }
+.cgd-empty-state__msg   { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.cgd-empty-state__hint  { font-size: 0.95rem; color: var(--ph-text-soft, #6b4f36); margin: 0; line-height: 1.6; }
+
+/* ================================================================
+   RECENT ACTIVITY LIST
+   ================================================================ */
+.cgd-activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cgd-activity-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 16px 14px;
+  box-shadow: 0 2px 10px rgba(44,36,23,0.08);
+  border-left: 5px solid #2f7a6e;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cgd-activity-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.cgd-activity-card__icon  { font-size: 1.3rem; flex-shrink: 0; }
+.cgd-activity-card__title { flex: 1; font-size: 1rem; font-weight: 800; color: var(--ph-text, #2d1f0e); }
+
+.cgd-activity-card__level {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #eef7f5;
+  color: #2f7a6e;
+  border: 1px solid #b8dfd9;
+  border-radius: 20px;
+  padding: 3px 11px;
+  white-space: nowrap;
+}
+
+.cgd-activity-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cgd-activity-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+.cgd-activity-card__date {
+  font-size: 0.78rem;
+  color: #9a7060;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ================================================================
+   ACCURACY TREND BARS
+   ================================================================ */
+.cgd-trend-empty {
+  font-size: 0.95rem;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+.cgd-trend-bars {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: 0 2px 10px rgba(44,36,23,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cgd-trend-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 44px;
+  align-items: center;
+  gap: 12px;
+}
+
+.cgd-trend-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ph-text-soft, #6b4f36);
+  white-space: nowrap;
+}
+
+.cgd-trend-bar-track {
+  background: #f0e6dc;
+  border-radius: 50px;
+  height: 14px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.cgd-trend-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a7c59, #72b38a);
+  border-radius: 50px;
+  transition: width 0.4s ease;
+  min-width: 3px;
+}
+
+.cgd-trend-pct {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   MEMORIES CARD
+   ================================================================ */
+.cgd-memories-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 2px 10px rgba(44,36,23,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cgd-memories-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.cgd-mem-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.cgd-mem-stat__value {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--ph-text, #2d1f0e);
+  line-height: 1;
+}
+.cgd-mem-stat__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+.cgd-mem-divider {
+  width: 1px;
+  height: 48px;
+  background: #e8d9c8;
+}
+
+/* ================================================================
+   SHARED BUTTON
+   ================================================================ */
+.cgd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+.cgd-btn--rose {
+  background: #b5404a;
+  color: #ffffff;
+}
+.cgd-btn--rose:hover {
+  background: #923039;
+  box-shadow: 0 4px 14px rgba(181,64,74,0.3);
+}
+
+/* ================================================================
+   PLACEHOLDER CARD (Reminders)
+   ================================================================ */
+.cgd-placeholder-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px 22px;
+  box-shadow: 0 2px 10px rgba(44,36,23,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  border: 2px dashed #e8d9c8;
+}
+.cgd-placeholder-card__emoji { font-size: 2.2rem; }
+.cgd-placeholder-card__msg {
+  font-size: 1rem;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+}
+
+/* ================================================================
+   ACTIVITY NOTES CARD
+   ================================================================ */
+.cgd-notes-card {
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 2px 10px rgba(44,36,23,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cgd-notes-card--positive  { background: #f0fbf4; border-left: 5px solid #4a7c59; }
+.cgd-notes-card--neutral   { background: #fef9f0; border-left: 5px solid #c9920a; }
+.cgd-notes-card--encourage { background: #fff4f0; border-left: 5px solid #c0622f; }
+
+.cgd-notes-card__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.cgd-notes-card__emoji   { font-size: 2rem; flex-shrink: 0; line-height: 1.2; }
+.cgd-notes-card__message { font-size: 1.05rem; font-weight: 700; color: var(--ph-text, #2d1f0e); margin: 0; line-height: 1.5; }
+
+.cgd-notes-disclaimer {
+  font-size: 0.82rem;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+  padding-top: 10px;
+  border-top: 1px solid rgba(44,36,23,0.1);
+}
+
+/* ================================================================
+   BOTTOM NAVIGATION BAR
+   ================================================================ */
+.cgd-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: #ffffff;
+  border-top: 1px solid #f0d9c8;
+  display: flex;
+  align-items: stretch;
+  z-index: 200;
+  box-shadow: 0 -4px 20px rgba(44,36,23,0.09);
+}
+
+.cgd-nav__btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9a7060;
+  padding: 8px 4px;
+  transition: color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cgd-nav__btn:hover { color: #4a7c59; }
+.cgd-nav__btn--active { color: #4a7c59; }
+
+.cgd-nav__icon  { font-size: 1.5rem; line-height: 1; }
+.cgd-nav__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 380px) {
+  .cgd-stat-grid { grid-template-columns: 1fr; }
+  .cgd-trend-row { grid-template-columns: 58px 1fr 38px; }
+}
+
+@media (min-width: 600px) {
+  .cgd-header { padding: 36px 40px 32px; }
+  .cgd-content { padding: 32px 40px 110px; }
+}
+
+@media (min-width: 760px) {
+  .cgd-stat-grid { grid-template-columns: repeat(4, 1fr); }
+}
