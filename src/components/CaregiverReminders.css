@@ -1,0 +1,420 @@
+/* =============================================================
+   CaregiverReminders.css
+   All classes prefixed with .cgrm- to avoid collisions.
+   Reuses CSS variables from index.css and PatientHome.css.
+   ============================================================= */
+
+/* ---- Full-screen wrapper ---- */
+.cgrm-screen {
+  min-height: 100vh;
+  background: var(--ph-bg, #fff8f2);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* ================================================================
+   HEADER — teal/blue-green to distinguish from other screens
+   ================================================================ */
+.cgrm-header {
+  background: linear-gradient(135deg, #1e5f74 0%, #2a7f9e 100%);
+  color: #ffffff;
+  padding: 28px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cgrm-header-back-btn {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.cgrm-header-back-btn:hover { background: rgba(255,255,255,0.25); }
+
+.cgrm-header__title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+.cgrm-header__subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  margin: 0;
+  opacity: 0.88;
+  font-weight: 500;
+}
+
+/* ================================================================
+   CONTENT AREA
+   ================================================================ */
+.cgrm-content {
+  flex: 1;
+  padding: 24px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   STATS ROW
+   ================================================================ */
+.cgrm-stats-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cgrm-stat-pill {
+  flex: 1;
+  min-width: 80px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(44,36,23,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-top: 4px solid transparent;
+}
+.cgrm-stat-pill--gold  { border-color: #d4a017; }
+.cgrm-stat-pill--teal  { border-color: #2f7a6e; }
+.cgrm-stat-pill--green { border-color: #3a7d44; }
+
+.cgrm-stat-pill__val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ph-text, #2d1f0e);
+}
+.cgrm-stat-pill__lbl {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+/* ================================================================
+   TOP BAR
+   ================================================================ */
+.cgrm-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cgrm-count {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.cgrm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+.cgrm-btn--primary {
+  background: #1e5f74;
+  color: #ffffff;
+}
+.cgrm-btn--primary:hover { background: #164d5f; box-shadow: 0 4px 12px rgba(30,95,116,0.3); }
+.cgrm-btn--secondary {
+  background: #ffffff;
+  color: var(--ph-text, #2d1f0e);
+  border: 1.5px solid #e8d9c8;
+}
+.cgrm-btn--secondary:hover { border-color: #c8b4a0; }
+.cgrm-btn--danger { background: #c0622f; color: #ffffff; }
+.cgrm-btn--danger:hover { background: #9e4e24; }
+.cgrm-btn--add { padding: 10px 24px; font-size: 1rem; }
+
+/* ================================================================
+   EMPTY STATE
+   ================================================================ */
+.cgrm-empty {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 48px 28px;
+  text-align: center;
+  box-shadow: 0 3px 14px rgba(44,36,23,0.09);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.cgrm-empty__emoji { font-size: 3rem; }
+.cgrm-empty__msg   { font-size: 1.1rem; font-weight: 800; margin: 0; }
+.cgrm-empty__hint  { font-size: 0.95rem; color: var(--ph-text-soft, #6b4f36); margin: 0; max-width: 320px; line-height: 1.6; }
+
+/* ================================================================
+   REMINDER LIST
+   ================================================================ */
+.cgrm-list      { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.cgrm-list-item { display: block; }
+
+/* Individual card */
+.cgrm-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(44,36,23,0.09);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 5px solid #1e5f74;
+}
+.cgrm-card--today { border-left-color: #d4a017; }
+.cgrm-card--done  { opacity: 0.7; border-left-color: #3a7d44; }
+
+.cgrm-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cgrm-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cgrm-card__category {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #1e5f74;
+  background: #e8f4f8;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.cgrm-today-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7a5800;
+  background: #fef3c7;
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+.cgrm-done-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #3a7d44;
+  background: #d1fae5;
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+.cgrm-complete-btn {
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.cgrm-complete-btn:hover { transform: scale(1.15); }
+
+.cgrm-card__title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--ph-text, #2d1f0e);
+  line-height: 1.3;
+}
+.cgrm-card__title--done {
+  text-decoration: line-through;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+.cgrm-card__desc {
+  font-size: 0.92rem;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.cgrm-card__datetime {
+  display: flex;
+  gap: 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #9a7060;
+  flex-wrap: wrap;
+}
+
+.cgrm-card__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.cgrm-action-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.cgrm-action-btn--edit   { background: #eef7f5; color: #2f7a6e; border-color: #b8dfd9; }
+.cgrm-action-btn--edit:hover { background: #d6f0ec; }
+.cgrm-action-btn--delete { background: #fff0f1; color: #b5404a; border-color: #f0c0c4; }
+.cgrm-action-btn--delete:hover { background: #fcd9db; }
+
+/* ================================================================
+   FORM OVERLAY
+   ================================================================ */
+.cgrm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 36, 23, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.cgrm-form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 16px 48px rgba(44,36,23,0.2);
+  margin: auto;
+}
+
+.cgrm-form-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 22px;
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* Fields */
+.cgrm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.cgrm-field-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.cgrm-field-row .cgrm-field { flex: 1; margin-bottom: 0; }
+
+.cgrm-label    { font-size: 0.9rem; font-weight: 700; color: var(--ph-text, #2d1f0e); }
+.cgrm-required { color: #b5404a; margin-left: 2px; }
+.cgrm-optional { font-weight: 400; color: var(--ph-text-soft, #6b4f36); font-size: 0.84rem; margin-left: 4px; }
+
+.cgrm-input {
+  padding: 10px 13px;
+  border: 1.5px solid #e8d9c8;
+  border-radius: 10px;
+  font-size: 0.97rem;
+  font-family: inherit;
+  color: var(--ph-text, #2d1f0e);
+  background: #fdf8f3;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+.cgrm-input:focus { border-color: #1e5f74; }
+.cgrm-input--error { border-color: #c0622f; background: #fff8f0; }
+.cgrm-select  { cursor: pointer; }
+.cgrm-textarea { resize: vertical; min-height: 80px; }
+
+.cgrm-error { font-size: 0.82rem; color: #c0622f; font-weight: 600; margin: 0; }
+
+.cgrm-form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* ================================================================
+   CONFIRM DIALOG
+   ================================================================ */
+.cgrm-confirm-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 16px 48px rgba(44,36,23,0.2);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: auto;
+}
+.cgrm-confirm-emoji { font-size: 2.5rem; margin: 0; }
+.cgrm-confirm-title { font-size: 1.2rem; font-weight: 800; margin: 0; }
+.cgrm-confirm-name  { font-size: 1rem; font-weight: 600; color: #1e5f74; margin: 0; font-style: italic; }
+.cgrm-confirm-msg   { font-size: 0.9rem; color: var(--ph-text-soft, #6b4f36); margin: 4px 0 12px; }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 480px) {
+  .cgrm-field-row { flex-direction: column; }
+  .cgrm-form-actions { justify-content: stretch; }
+  .cgrm-form-actions .cgrm-btn { flex: 1; }
+  .cgrm-top-bar { flex-direction: column; align-items: flex-start; }
+  .cgrm-btn--add { width: 100%; }
+  .cgrm-stats-row .cgrm-stat-pill { min-width: calc(33% - 8px); }
+}
+@media (min-width: 600px) {
+  .cgrm-header  { padding: 36px 40px 32px; }
+  .cgrm-content { padding: 32px 40px 48px; }
+}

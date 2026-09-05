@@ -1,0 +1,222 @@
+/* =============================================================
+   PatientReminders.css — Elderly-friendly styles for Reminders.
+   All classes prefixed with .prm- to avoid collisions.
+   Reuses .ph-nav from PatientHome.css for the bottom nav.
+   ============================================================= */
+
+/* ---- Full-screen wrapper ---- */
+.prm-screen {
+  min-height: 100vh;
+  background: var(--ph-bg, #fff8f2);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, 'Nunito', system-ui, sans-serif);
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* ================================================================
+   HEADER — Teal gradient (matches PatientHome reminders colour)
+   ================================================================ */
+.prm-header {
+  background: linear-gradient(135deg, #2f7a6e 0%, #4aada0 100%);
+  color: #ffffff;
+  padding: 40px 28px 34px;
+  text-align: center;
+}
+
+.prm-header__title {
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 800;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.prm-header__sub {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  margin: 0;
+  opacity: 0.92;
+  font-weight: 500;
+}
+
+/* ================================================================
+   CONTENT AREA
+   padding-bottom reserves space for fixed bottom nav
+   ================================================================ */
+.prm-content {
+  flex: 1;
+  padding: 28px 20px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   SECTION HEADINGS
+   ================================================================ */
+.prm-section-heading {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0 0 12px;
+  letter-spacing: 0.3px;
+}
+
+/* ================================================================
+   LIST
+   ================================================================ */
+.prm-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ================================================================
+   REMINDER CARD — large, accessible, elderly-friendly
+   ================================================================ */
+.prm-card {
+  background: #ffffff;
+  border-radius: var(--ph-radius, 20px);
+  box-shadow: var(--ph-shadow, 0 4px 20px rgba(192,98,47,0.1));
+  padding: 22px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 6px solid #2f7a6e;
+}
+
+/* Completed card */
+.prm-card--done {
+  opacity: 0.65;
+  border-left-color: #3a7d44;
+}
+
+/* Upcoming section — lighter border */
+.prm-card--upcoming {
+  border-left-color: #9a7060;
+}
+
+.prm-card__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.prm-card__emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.prm-card__category {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #2f7a6e;
+  background: #eef7f5;
+  border-radius: 20px;
+  padding: 3px 12px;
+}
+
+.prm-done-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #3a7d44;
+  background: #d1fae5;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+/* Title — minimum 1.3rem so elderly users can read easily */
+.prm-card__title {
+  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--ph-text, #2d1f0e);
+  line-height: 1.25;
+}
+
+.prm-card__title--done {
+  text-decoration: line-through;
+  color: var(--ph-text-soft, #6b4f36);
+}
+
+/* Description */
+.prm-card__desc {
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Time display */
+.prm-card__time {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #9a7060;
+  margin: 0;
+}
+
+/* Mark-done button — very large, easy to tap */
+.prm-complete-btn {
+  margin-top: 4px;
+  background: #eef7f5;
+  border: 2px solid #2f7a6e;
+  color: #2f7a6e;
+  border-radius: 14px;
+  padding: 14px 20px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background 0.2s ease, transform 0.12s ease;
+  min-height: 56px; /* large touch target */
+}
+
+.prm-complete-btn:hover {
+  background: #d6f0ec;
+  transform: translateY(-1px);
+}
+
+.prm-complete-btn--done {
+  background: #d1fae5;
+  border-color: #3a7d44;
+  color: #3a7d44;
+}
+
+.prm-complete-btn--done:hover {
+  background: #bbf7d0;
+}
+
+/* ================================================================
+   EMPTY STATE
+   ================================================================ */
+.prm-empty {
+  background: #ffffff;
+  border-radius: var(--ph-radius, 20px);
+  padding: 52px 28px;
+  text-align: center;
+  box-shadow: var(--ph-shadow, 0 4px 20px rgba(192,98,47,0.1));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.prm-empty__emoji { font-size: 3.5rem; }
+.prm-empty__msg   { font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: 800; margin: 0; }
+.prm-empty__hint  {
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 300px;
+}

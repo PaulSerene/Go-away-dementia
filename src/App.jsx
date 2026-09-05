@@ -10,12 +10,15 @@
  * for this stage — React's useState is enough.
  *
  * Screens:
- *   'landing'            → Landing page (mode selector)
- *   'patient-home'       → Patient Home dashboard
- *   'patient-activity'   → "Remember the Objects" memory game (MemoryGame)
- *   'patient-activities' → My Progress screen (PatientProgress)
- *   'patient-memories'   → My Memories screen (PatientMemories)
- *   'patient-reminders'  → Reminders tab (placeholder)
+ *   'landing'             → Landing page (mode selector)
+ *   'patient-home'        → Patient Home dashboard
+ *   'patient-activity'    → "Remember the Objects" memory game (MemoryGame)
+ *   'patient-activities'  → My Progress screen (PatientProgress)
+ *   'patient-memories'    → My Memories screen (PatientMemories)
+ *   'patient-reminders'   → Patient Reminders screen
+ *   'caregiver-dashboard' → Caregiver Dashboard
+ *   'caregiver-memories'  → Caregiver Memory Management
+ *   'caregiver-reminders' → Caregiver Reminder Management
  */
 
 import { useState } from 'react';
@@ -25,6 +28,10 @@ import PatientPlaceholder from './components/PatientPlaceholder';
 import MemoryGame from './components/MemoryGame';
 import PatientProgress from './components/PatientProgress';
 import PatientMemories from './components/PatientMemories';
+import CaregiverDashboard from './components/CaregiverDashboard';
+import CaregiverMemories from './components/CaregiverMemories';
+import CaregiverReminders from './components/CaregiverReminders';
+import PatientReminders from './components/PatientReminders';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -122,17 +129,24 @@ function App() {
     return <PatientMemories navigate={navigate} />;
   }
 
-  /* Reminders tab placeholder */
+  /* Caregiver Dashboard */
+  if (currentScreen === 'caregiver-dashboard') {
+    return <CaregiverDashboard navigate={navigate} />;
+  }
+
+  /* Caregiver Memory Management */
+  if (currentScreen === 'caregiver-memories') {
+    return <CaregiverMemories navigate={navigate} />;
+  }
+
+  /* Patient Reminders */
   if (currentScreen === 'patient-reminders') {
-    return (
-      <PatientPlaceholder
-        title="Reminders"
-        emoji="⏰"
-        message="Medicine, water, walks — all your daily reminders in one place."
-        navigate={navigate}
-        activeTab="reminders"
-      />
-    );
+    return <PatientReminders navigate={navigate} />;
+  }
+
+  /* Caregiver Reminder Management */
+  if (currentScreen === 'caregiver-reminders') {
+    return <CaregiverReminders navigate={navigate} />;
   }
 
   /* ── LANDING PAGE (default) ───────────────────────────── */
@@ -197,7 +211,7 @@ function App() {
                 if (mode.id === 'patient') {
                   navigate('patient-home');
                 } else {
-                  alert('Caregiver Mode is coming soon!');
+                  navigate('caregiver-dashboard');
                 }
               }}
             />

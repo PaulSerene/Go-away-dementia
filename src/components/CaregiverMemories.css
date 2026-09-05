@@ -1,0 +1,442 @@
+﻿/* =============================================================
+   CaregiverMemories.css
+   All classes prefixed with .cgm- to avoid collisions with
+   .ph- (PatientHome), .mem- (PatientMemories), .cgd- (CaregiverDashboard).
+   Reuses CSS variables defined in index.css and PatientHome.css.
+   ============================================================= */
+
+/* ---- Full-screen wrapper ---- */
+.cgm-screen {
+  min-height: 100vh;
+  background: var(--ph-bg, #fff8f2);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, "Inter", system-ui, sans-serif);
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* ================================================================
+   HEADER
+   Uses rose gradient to match Memories theme while being
+   visually distinct from the green Caregiver Dashboard header.
+   ================================================================ */
+.cgm-header {
+  background: linear-gradient(135deg, #923039 0%, #b5404a 100%);
+  color: #ffffff;
+  padding: 28px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cgm-header-back-btn {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.cgm-header-back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.cgm-header__title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.cgm-header__subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  margin: 0;
+  opacity: 0.88;
+  font-weight: 500;
+}
+
+/* ================================================================
+   CONTENT AREA
+   ================================================================ */
+.cgm-content {
+  flex: 1;
+  padding: 24px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   TOP BAR (count + Add button)
+   ================================================================ */
+.cgm-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cgm-count {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.cgm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 22px;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.cgm-btn--primary {
+  background: #b5404a;
+  color: #ffffff;
+}
+.cgm-btn--primary:hover {
+  background: #923039;
+  box-shadow: 0 4px 14px rgba(181,64,74,0.3);
+}
+
+.cgm-btn--secondary {
+  background: #ffffff;
+  color: var(--ph-text, #2d1f0e);
+  border: 1.5px solid #e8d9c8;
+  box-shadow: 0 2px 6px rgba(44,36,23,0.07);
+}
+.cgm-btn--secondary:hover {
+  border-color: #c8b4a0;
+}
+
+.cgm-btn--danger {
+  background: #c0622f;
+  color: #ffffff;
+}
+.cgm-btn--danger:hover {
+  background: #9e4e24;
+}
+
+.cgm-btn--add {
+  padding: 11px 26px;
+  font-size: 1rem;
+}
+
+/* ================================================================
+   EMPTY STATE
+   ================================================================ */
+.cgm-empty {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 48px 28px;
+  text-align: center;
+  box-shadow: 0 3px 14px rgba(44,36,23,0.09);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.cgm-empty__emoji { font-size: 3rem; }
+.cgm-empty__msg   { font-size: 1.15rem; font-weight: 800; margin: 0; }
+.cgm-empty__hint  { font-size: 0.95rem; color: var(--ph-text-soft, #6b4f36); margin: 0; max-width: 340px; line-height: 1.6; }
+
+/* ================================================================
+   MEMORY CARDS LIST
+   ================================================================ */
+.cgm-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cgm-list-item { display: block; }
+
+/* Individual card */
+.cgm-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(44,36,23,0.09);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-left: 5px solid #b5404a;
+}
+
+/* Optional visual / emoji strip */
+.cgm-card__visual {
+  background: #fff0f1;
+  font-size: 2.5rem;
+  text-align: center;
+  padding: 14px;
+  line-height: 1;
+}
+
+.cgm-card__body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cgm-card__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cgm-card__category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #b5404a;
+  background: #fff0f1;
+  border-radius: 20px;
+  padding: 3px 12px;
+}
+
+.cgm-fav-btn {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+.cgm-fav-btn:hover { transform: scale(1.2); }
+.cgm-fav-btn--active { /* active state shown via emoji itself */ }
+
+.cgm-card__title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ph-text, #2d1f0e);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.cgm-card__desc {
+  font-size: 0.95rem;
+  color: var(--ph-text-soft, #6b4f36);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.cgm-card__date {
+  font-size: 0.8rem;
+  color: #9a7060;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Edit / Delete action buttons */
+.cgm-card__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.cgm-action-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.cgm-action-btn--edit {
+  background: #eef7f5;
+  color: #2f7a6e;
+  border-color: #b8dfd9;
+}
+.cgm-action-btn--edit:hover {
+  background: #d6f0ec;
+}
+
+.cgm-action-btn--delete {
+  background: #fff0f1;
+  color: #b5404a;
+  border-color: #f0c0c4;
+}
+.cgm-action-btn--delete:hover {
+  background: #fcd9db;
+}
+
+/* ================================================================
+   FORM OVERLAY (Add / Edit)
+   ================================================================ */
+.cgm-form-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 36, 23, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.cgm-form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 16px 48px rgba(44,36,23,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: auto;
+}
+
+.cgm-form-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0 0 22px;
+  color: var(--ph-text, #2d1f0e);
+}
+
+/* ── FORM FIELDS ── */
+.cgm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.cgm-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ph-text, #2d1f0e);
+}
+
+.cgm-required { color: #b5404a; margin-left: 2px; }
+.cgm-optional { font-weight: 400; color: var(--ph-text-soft, #6b4f36); margin-left: 4px; font-size: 0.85rem; }
+
+.cgm-input {
+  padding: 11px 14px;
+  border: 1.5px solid #e8d9c8;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--ph-text, #2d1f0e);
+  background: #fdf8f3;
+  transition: border-color 0.18s ease;
+  outline: none;
+}
+.cgm-input:focus       { border-color: #b5404a; }
+.cgm-input--error      { border-color: #c0622f; background: #fff8f0; }
+.cgm-select            { cursor: pointer; appearance: auto; }
+.cgm-textarea          { resize: vertical; min-height: 100px; }
+
+.cgm-error {
+  font-size: 0.82rem;
+  color: #c0622f;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ── EMOJI SELECTOR ── */
+.cgm-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cgm-emoji-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 2px solid #e8d9c8;
+  background: #fdf8f3;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cgm-emoji-btn:hover         { border-color: #b5404a; background: #fff0f1; }
+.cgm-emoji-btn--selected     { border-color: #b5404a; background: #ffd9db; box-shadow: 0 0 0 2px rgba(181,64,74,0.25); }
+
+/* ── FORM ACTIONS ── */
+.cgm-form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+/* ================================================================
+   DELETE CONFIRMATION DIALOG
+   ================================================================ */
+.cgm-confirm-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 16px 48px rgba(44,36,23,0.2);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: auto;
+}
+.cgm-confirm-emoji  { font-size: 2.5rem; margin: 0; }
+.cgm-confirm-title  { font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--ph-text, #2d1f0e); }
+.cgm-confirm-name   { font-size: 1rem; font-weight: 600; color: #b5404a; margin: 0; font-style: italic; }
+.cgm-confirm-msg    { font-size: 0.9rem; color: var(--ph-text-soft, #6b4f36); margin: 4px 0 12px; }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 480px) {
+  .cgm-form-card, .cgm-confirm-card { padding: 22px 18px; }
+  .cgm-form-actions { justify-content: stretch; }
+  .cgm-form-actions .cgm-btn { flex: 1; }
+  .cgm-top-bar { flex-direction: column; align-items: flex-start; }
+  .cgm-btn--add { width: 100%; }
+}
+
+@media (min-width: 600px) {
+  .cgm-header { padding: 36px 40px 32px; }
+  .cgm-content { padding: 32px 40px 48px; }
+}
