@@ -555,7 +555,7 @@ The specific license governing the use, modification, and distribution of this p
 
 <div align="center">
 
-## 🌸 Memora
+## 🩵 Memora
 
 ### *Preserving memories. Encouraging cognition. Empowering caregivers.*
 
