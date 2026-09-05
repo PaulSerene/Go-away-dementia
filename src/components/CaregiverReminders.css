@@ -418,3 +418,67 @@
   .cgrm-header  { padding: 36px 40px 32px; }
   .cgrm-content { padding: 32px 40px 48px; }
 }
+
+/* ================================================================
+   TYPE SELECTOR (Every day / Specific date)
+   ================================================================ */
+.cgrm-type-selector {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cgrm-type-option {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 2px solid #e8d9c8;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #fdf8f3;
+  transition: border-color 0.18s ease, background 0.18s ease;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ph-text, #2d1f0e);
+}
+
+.cgrm-type-option:hover { border-color: #1e5f74; }
+
+.cgrm-type-option--selected {
+  border-color: #1e5f74;
+  background: #e8f4f8;
+}
+
+.cgrm-type-option__icon { font-size: 1.2rem; }
+
+.cgrm-radio {
+  /* Hidden but accessible */
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Daily card border */
+.cgrm-card--daily { border-left-color: #2f7a6e; }
+
+/* Badges */
+.cgrm-daily-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2f7a6e;
+  background: #eef7f5;
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+/* Reset note */
+.cgrm-card__reset-note {
+  font-size: 0.82rem;
+  color: #2f7a6e;
+  font-style: italic;
+  margin: 0;
+}

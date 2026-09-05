@@ -419,3 +419,23 @@
     padding: 32px 32px 28px;
   }
 }
+
+/* ── REMINDER CARD EXTRAS (real reminders from smriti_reminders) ─ */
+.ph-reminder-empty {
+  font-size: 1rem;
+  color: var(--ph-text-soft);
+  margin: 0 0 16px;
+  font-style: italic;
+}
+
+.ph-reminder-item--more {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ph-teal);
+  background: var(--ph-teal-lt);
+  border-radius: 20px;
+  padding: 4px 14px;
+  list-style: none;
+  display: inline-block;
+  margin-top: 4px;
+}

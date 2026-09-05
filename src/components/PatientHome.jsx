@@ -11,14 +11,29 @@
  *
  * Props:
  *   navigate — function passed from App to switch the current screen
+ *
+ * IMPORTANT: The reminders card reads from smriti_reminders (shared with
+ * CaregiverReminders). No hardcoded/sample reminder data is used.
  */
+import {
+  loadReminders,
+  loadDailyCompletions,
+  isReminderToday,
+  isReminderDoneToday,
+  CATEGORY_EMOJI,
+} from '../utils/reminderStorage';
+
 function PatientHome({ navigate }) {
-  /* Reminder items shown in the third card */
-  const reminders = [
-    { id: 'med',   icon: '💊', label: 'Medicine',    time: '8:00 AM'  },
-    { id: 'water', icon: '💧', label: 'Drink Water', time: '10:00 AM' },
-    { id: 'walk',  icon: '🚶', label: 'Walk',        time: '5:00 PM'  },
-  ];
+  /* Load real reminders from shared storage */
+  const allReminders    = loadReminders();
+  const dailyCompletions = loadDailyCompletions();
+
+  /* Only show today's pending reminders in the summary card */
+  const todayPendingReminders = allReminders
+    .filter((r) => isReminderToday(r) && !isReminderDoneToday(r, dailyCompletions))
+    .slice(0, 3); // cap at 3 for the summary preview
+
+  const todayTotalCount = allReminders.filter((r) => isReminderToday(r)).length;
 
   return (
     <div className="ph-screen">
@@ -77,7 +92,7 @@ function PatientHome({ navigate }) {
           </button>
         </article>
 
-        {/* CARD 3 — TODAY'S REMINDERS */}
+        {/* CARD 3 — TODAY'S REMINDERS (real data from smriti_reminders) */}
         <article className="ph-card ph-card--reminders">
           <div className="ph-card__header">
             <span className="ph-card__emoji" aria-hidden="true">⏰</span>
@@ -85,15 +100,33 @@ function PatientHome({ navigate }) {
           </div>
           <h2 className="ph-card__title">Today's Reminders</h2>
 
-          <ul className="ph-reminder-list" role="list">
-            {reminders.map((r) => (
-              <li key={r.id} className="ph-reminder-item">
-                <span className="ph-reminder-item__icon" aria-hidden="true">{r.icon}</span>
-                <span className="ph-reminder-item__label">{r.label}</span>
-                <span className="ph-reminder-item__time">{r.time}</span>
-              </li>
-            ))}
-          </ul>
+          {todayTotalCount === 0 ? (
+            /* No reminders at all today */
+            <p className="ph-reminder-empty">No reminders for today.</p>
+          ) : todayPendingReminders.length === 0 ? (
+            /* All done! */
+            <p className="ph-reminder-empty">✅ All done for today!</p>
+          ) : (
+            /* Show up to 3 pending reminders as a preview */
+            <ul className="ph-reminder-list" role="list">
+              {todayPendingReminders.map((r) => (
+                <li key={r.id} className="ph-reminder-item">
+                  <span className="ph-reminder-item__icon" aria-hidden="true">
+                    {CATEGORY_EMOJI[r.category] ?? '📝'}
+                  </span>
+                  <span className="ph-reminder-item__label">{r.title}</span>
+                  {r.time && (
+                    <span className="ph-reminder-item__time">{r.time}</span>
+                  )}
+                </li>
+              ))}
+              {todayTotalCount > 3 && (
+                <li className="ph-reminder-item ph-reminder-item--more">
+                  +{todayTotalCount - 3} more
+                </li>
+              )}
+            </ul>
+          )}
 
           <button
             id="btn-view-reminders"

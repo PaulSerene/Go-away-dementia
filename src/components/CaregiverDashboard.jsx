@@ -15,6 +15,12 @@
  */
 
 import { useState } from "react";
+import {
+  loadReminders,
+  loadDailyCompletions,
+  isReminderToday,
+  isReminderDoneToday,
+} from "../utils/reminderStorage";
 import "./CaregiverDashboard.css";
 
 /* ----------------------------------------------------------------
@@ -54,25 +60,7 @@ function loadMemories() {
   }
 }
 
-function loadReminders() {
-  try {
-    const raw = localStorage.getItem("smriti_reminders");
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function todayStr() {
-  const d = new Date();
-  return (
-    d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0')
-  );
-}
+// loadReminders and daily completion helpers are imported from reminderStorage
 
 /* ----------------------------------------------------------------
    PURE CALCULATION HELPERS
@@ -290,11 +278,17 @@ function MemorySection({ memories, navigate }) {
   );
 }
 
-function RemindersSection({ reminders, navigate }) {
-  const today          = todayStr();
-  const todayPending   = reminders.filter((r) => !r.completed && r.date === today).length;
-  const totalPending   = reminders.filter((r) => !r.completed).length;
-  const completed      = reminders.filter((r) => r.completed).length;
+function RemindersSection({ reminders, dailyCompletions, navigate }) {
+  // Correctly counts daily + specific reminders using shared helpers
+  const todayPending = reminders.filter(
+    (r) => isReminderToday(r) && !isReminderDoneToday(r, dailyCompletions)
+  ).length;
+  const totalPending = reminders.filter(
+    (r) => !isReminderDoneToday(r, dailyCompletions)
+  ).length;
+  const completed = reminders.filter(
+    (r) => isReminderDoneToday(r, dailyCompletions)
+  ).length;
 
   return (
     <section className="cgd-section" aria-labelledby="cgd-reminders-heading">
@@ -313,7 +307,7 @@ function RemindersSection({ reminders, navigate }) {
           <div className="cgd-mem-divider" aria-hidden="true" />
           <div className="cgd-rem-stat">
             <span className="cgd-rem-stat__value">✅ {completed}</span>
-            <span className="cgd-rem-stat__label">Completed</span>
+            <span className="cgd-rem-stat__label">Done Today</span>
           </div>
         </div>
         <button
@@ -321,12 +315,13 @@ function RemindersSection({ reminders, navigate }) {
           className="cgd-btn cgd-btn--teal"
           onClick={() => navigate("caregiver-reminders")}
         >
-          ⏰  Manage Reminders
+          ⏰  Manage Reminders
         </button>
       </div>
     </section>
   );
 }
+
 
 function ActivityNotesSection({ results }) {
   const notes = generateActivityNotes(results);
@@ -380,10 +375,11 @@ function CaregiverDashboard({ navigate }) {
   const [refreshKey, setRefreshKey] = useState(0);
   void refreshKey; // referenced so lint knows it is used
 
-  const results      = loadGameResults();
-  const currentLevel = loadDifficulty();
-  const memories     = loadMemories();
-  const reminders    = loadReminders();
+  const results          = loadGameResults();
+  const currentLevel     = loadDifficulty();
+  const memories         = loadMemories();
+  const reminders        = loadReminders();
+  const dailyCompletions = loadDailyCompletions();
 
   return (
     <div className="cgd-screen">
@@ -414,7 +410,7 @@ function CaregiverDashboard({ navigate }) {
         <RecentActivitiesSection results={results} />
         <ActivityTrendSection results={results} />
         <MemorySection memories={memories} navigate={navigate} />
-        <RemindersSection reminders={reminders} navigate={navigate} />
+        <RemindersSection reminders={reminders} dailyCompletions={dailyCompletions} navigate={navigate} />
         <ActivityNotesSection results={results} />
 
       </main>

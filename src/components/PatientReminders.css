@@ -220,3 +220,30 @@
   line-height: 1.6;
   max-width: 300px;
 }
+
+/* Daily / done badges */
+.prm-daily-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1e5f74;
+  background: #e0f2f8;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.prm-done-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #3a7d44;
+  background: #d1fae5;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+/* Small note for daily reminders that reset tomorrow */
+.prm-card__reset-note {
+  font-size: 0.85rem;
+  color: var(--ph-teal, #2f7a6e);
+  font-style: italic;
+  margin: 0;
+}

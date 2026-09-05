@@ -4,6 +4,11 @@
  * Caregivers can: view all reminders, add, edit, delete,
  * and toggle completion status.
  *
+ * Supports two reminder types:
+ *   "daily"    — repeats every day; completion tracked per-day in
+ *                smriti_daily_completions (never permanently done)
+ *   "specific" — has a fixed date; completion is permanent via reminder.completed
+ *
  * All data lives in smriti_reminders (localStorage).
  * PatientReminders reads the same key — no duplication.
  *
@@ -15,10 +20,15 @@ import { useState } from 'react';
 import {
   loadReminders,
   saveReminders,
+  loadDailyCompletions,
+  saveDailyCompletions,
+  toggleDailyCompletion,
   generateReminderId,
   REMINDER_CATEGORIES,
   CATEGORY_EMOJI,
   todayStr,
+  isReminderToday,
+  isReminderDoneToday,
 } from '../utils/reminderStorage';
 import './CaregiverReminders.css';
 
@@ -28,6 +38,7 @@ import './CaregiverReminders.css';
 const EMPTY_FORM = {
   title: '',
   description: '',
+  type: 'daily',      // "daily" | "specific"
   date: '',
   time: '',
   category: 'Daily',
@@ -36,14 +47,9 @@ const EMPTY_FORM = {
 /* ----------------------------------------------------------------
    HELPERS
 ---------------------------------------------------------------- */
-function isToday(dateStr) {
-  return dateStr === todayStr();
-}
-
 function formatDisplayDate(dateStr) {
   if (!dateStr) return '';
   try {
-    // dateStr is YYYY-MM-DD
     const [y, m, d] = dateStr.split('-').map(Number);
     const date = new Date(y, m - 1, d);
     return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -60,16 +66,23 @@ function ReminderForm({ initial, onSave, onCancel }) {
   const [errors, setErrors] = useState({});
 
   function handleChange(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => {
+      const updated = { ...prev, [field]: value };
+      // When switching to daily, clear date
+      if (field === 'type' && value === 'daily') {
+        updated.date = '';
+      }
+      return updated;
+    });
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
   }
 
   function validate() {
     const errs = {};
-    if (!form.title.trim())    errs.title    = 'Please enter a reminder title.';
-    if (!form.date)            errs.date     = 'Please select a date.';
-    if (!form.time)            errs.time     = 'Please select a time.';
-    if (!form.category)        errs.category = 'Please select a category.';
+    if (!form.title.trim())                       errs.title    = 'Please enter a reminder title.';
+    if (form.type === 'specific' && !form.date)   errs.date     = 'Please select a date.';
+    if (!form.time)                               errs.time     = 'Please select a time.';
+    if (!form.category)                           errs.category = 'Please select a category.';
     return errs;
   }
 
@@ -80,11 +93,44 @@ function ReminderForm({ initial, onSave, onCancel }) {
     onSave(form);
   }
 
+  const isDaily = form.type === 'daily';
+
   return (
     <div className="cgrm-overlay" role="dialog" aria-modal="true" aria-label="Reminder form">
       <div className="cgrm-form-card">
         <h2 className="cgrm-form-title">{initial ? 'Edit Reminder' : 'Add Reminder'}</h2>
         <form onSubmit={handleSubmit} noValidate>
+
+          {/* Reminder type selector */}
+          <div className="cgrm-field">
+            <p className="cgrm-label">Reminder type <span className="cgrm-required" aria-hidden="true">*</span></p>
+            <div className="cgrm-type-selector" role="group" aria-label="Reminder type">
+              <label className={'cgrm-type-option' + (isDaily ? ' cgrm-type-option--selected' : '')}>
+                <input
+                  type="radio"
+                  name="cgrm-type"
+                  value="daily"
+                  checked={isDaily}
+                  onChange={() => handleChange('type', 'daily')}
+                  className="cgrm-radio"
+                />
+                <span className="cgrm-type-option__icon">🔁</span>
+                <span className="cgrm-type-option__text">Every day</span>
+              </label>
+              <label className={'cgrm-type-option' + (!isDaily ? ' cgrm-type-option--selected' : '')}>
+                <input
+                  type="radio"
+                  name="cgrm-type"
+                  value="specific"
+                  checked={!isDaily}
+                  onChange={() => handleChange('type', 'specific')}
+                  className="cgrm-radio"
+                />
+                <span className="cgrm-type-option__icon">📅</span>
+                <span className="cgrm-type-option__text">Specific date</span>
+              </label>
+            </div>
+          </div>
 
           {/* Title */}
           <div className="cgrm-field">
@@ -120,21 +166,23 @@ function ReminderForm({ initial, onSave, onCancel }) {
             />
           </div>
 
-          {/* Date + Time row */}
+          {/* Date (only for specific) + Time row */}
           <div className="cgrm-field-row">
-            <div className="cgrm-field">
-              <label className="cgrm-label" htmlFor="cgrm-date">
-                Date <span className="cgrm-required" aria-hidden="true">*</span>
-              </label>
-              <input
-                id="cgrm-date"
-                className={'cgrm-input' + (errors.date ? ' cgrm-input--error' : '')}
-                type="date"
-                value={form.date}
-                onChange={(e) => handleChange('date', e.target.value)}
-              />
-              {errors.date && <p className="cgrm-error">{errors.date}</p>}
-            </div>
+            {!isDaily && (
+              <div className="cgrm-field">
+                <label className="cgrm-label" htmlFor="cgrm-date">
+                  Date <span className="cgrm-required" aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="cgrm-date"
+                  className={'cgrm-input' + (errors.date ? ' cgrm-input--error' : '')}
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => handleChange('date', e.target.value)}
+                />
+                {errors.date && <p className="cgrm-error">{errors.date}</p>}
+              </div>
+            )}
 
             <div className="cgrm-field">
               <label className="cgrm-label" htmlFor="cgrm-time">
@@ -210,13 +258,19 @@ function DeleteConfirm({ reminder, onConfirm, onCancel }) {
 /* ----------------------------------------------------------------
    REMINDER CARD (Caregiver view)
 ---------------------------------------------------------------- */
-function ReminderCard({ reminder, onEdit, onDelete, onToggleComplete }) {
-  const emoji = CATEGORY_EMOJI[reminder.category] ?? '📝';
-  const today = isToday(reminder.date);
+function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplete }) {
+  const emoji    = CATEGORY_EMOJI[reminder.category] ?? '📝';
+  const isDaily  = reminder.type === 'daily';
+  const isToday  = isReminderToday(reminder);
 
   return (
     <article
-      className={'cgrm-card' + (reminder.completed ? ' cgrm-card--done' : '') + (today ? ' cgrm-card--today' : '')}
+      className={
+        'cgrm-card' +
+        (isDoneToday ? ' cgrm-card--done' : '') +
+        (isToday && !isDaily ? ' cgrm-card--today' : '') +
+        (isDaily ? ' cgrm-card--daily' : '')
+      }
       aria-label={'Reminder: ' + reminder.title}
     >
       <div className="cgrm-card__top">
@@ -224,21 +278,22 @@ function ReminderCard({ reminder, onEdit, onDelete, onToggleComplete }) {
           <span className="cgrm-card__category">
             <span aria-hidden="true">{emoji}</span> {reminder.category}
           </span>
-          {today && <span className="cgrm-today-badge">Today</span>}
-          {reminder.completed && <span className="cgrm-done-badge">✅ Done</span>}
+          {isDaily   && <span className="cgrm-daily-badge">🔁 Every Day</span>}
+          {!isDaily && isToday && <span className="cgrm-today-badge">Today</span>}
+          {isDoneToday && <span className="cgrm-done-badge">✅ Done</span>}
         </div>
 
         <button
-          className={'cgrm-complete-btn' + (reminder.completed ? ' cgrm-complete-btn--done' : '')}
-          onClick={() => onToggleComplete(reminder.id)}
-          aria-pressed={reminder.completed}
-          aria-label={reminder.completed ? 'Mark as pending' : 'Mark as completed'}
+          className={'cgrm-complete-btn' + (isDoneToday ? ' cgrm-complete-btn--done' : '')}
+          onClick={() => onToggleComplete(reminder)}
+          aria-pressed={isDoneToday}
+          aria-label={isDoneToday ? 'Mark as pending' : 'Mark as completed'}
         >
-          {reminder.completed ? '✅' : '⭕'}
+          {isDoneToday ? '✅' : '⭕'}
         </button>
       </div>
 
-      <h3 className={'cgrm-card__title' + (reminder.completed ? ' cgrm-card__title--done' : '')}>
+      <h3 className={'cgrm-card__title' + (isDoneToday ? ' cgrm-card__title--done' : '')}>
         {reminder.title}
       </h3>
 
@@ -247,9 +302,20 @@ function ReminderCard({ reminder, onEdit, onDelete, onToggleComplete }) {
       )}
 
       <div className="cgrm-card__datetime">
-        <span>📅 {formatDisplayDate(reminder.date)}</span>
-        {reminder.time && <span>⏰ {reminder.time}</span>}
+        {isDaily
+          ? <span>⏰ Daily at {reminder.time}</span>
+          : (
+            <>
+              <span>📅 {formatDisplayDate(reminder.date)}</span>
+              {reminder.time && <span>⏰ {reminder.time}</span>}
+            </>
+          )
+        }
       </div>
+
+      {isDaily && isDoneToday && (
+        <p className="cgrm-card__reset-note">Resets tomorrow.</p>
+      )}
 
       <div className="cgrm-card__actions">
         <button
@@ -275,22 +341,29 @@ function ReminderCard({ reminder, onEdit, onDelete, onToggleComplete }) {
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function CaregiverReminders({ navigate }) {
-  const [reminders, setReminders]         = useState(() => loadReminders());
-  const [showForm, setShowForm]           = useState(false);
-  const [editingReminder, setEditingReminder] = useState(null);
+  const [reminders, setReminders]               = useState(() => loadReminders());
+  const [dailyCompletions, setDailyCompletions] = useState(() => loadDailyCompletions());
+  const [showForm, setShowForm]                 = useState(false);
+  const [editingReminder, setEditingReminder]   = useState(null);
   const [deletingReminder, setDeletingReminder] = useState(null);
 
-  /* ---- sort: today first, then by date, then by time ---- */
+  const today = todayStr();
+
+  /* ---- Sort: daily first, then specific by date, then by time ---- */
   const sorted = [...reminders].sort((a, b) => {
-    const today = todayStr();
-    const aToday = a.date === today ? 0 : 1;
-    const bToday = b.date === today ? 0 : 1;
-    if (aToday !== bToday) return aToday - bToday;
-    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    // daily always floats to the top
+    if (a.type !== b.type) return a.type === 'daily' ? -1 : 1;
+    // for specifics: today first, then future
+    if (a.date !== b.date) {
+      const aToday = a.date === today ? 0 : a.date > today ? 1 : 2;
+      const bToday = b.date === today ? 0 : b.date > today ? 1 : 2;
+      if (aToday !== bToday) return aToday - bToday;
+      return a.date.localeCompare(b.date);
+    }
     return (a.time || '').localeCompare(b.time || '');
   });
 
-  function persist(updated) {
+  function persistReminders(updated) {
     setReminders(updated);
     saveReminders(updated);
   }
@@ -310,25 +383,27 @@ function CaregiverReminders({ navigate }) {
               ...r,
               title:       formData.title.trim(),
               description: formData.description.trim(),
-              date:        formData.date,
+              type:        formData.type,
+              date:        formData.type === 'daily' ? null : formData.date,
               time:        formData.time,
               category:    formData.category,
             }
           : r
       );
-      persist(updated);
+      persistReminders(updated);
     } else {
       const newRem = {
         id:          generateReminderId(),
         title:       formData.title.trim(),
         description: formData.description.trim(),
-        date:        formData.date,
+        type:        formData.type,
+        date:        formData.type === 'daily' ? null : formData.date,
         time:        formData.time,
         category:    formData.category,
-        completed:   false,
+        completed:   false,   // for specific reminders
         createdAt:   new Date().toISOString(),
       };
-      persist([...reminders, newRem]);
+      persistReminders([...reminders, newRem]);
     }
     setShowForm(false);
     setEditingReminder(null);
@@ -351,7 +426,7 @@ function CaregiverReminders({ navigate }) {
   }
 
   function handleDeleteConfirm() {
-    persist(reminders.filter((r) => r.id !== deletingReminder.id));
+    persistReminders(reminders.filter((r) => r.id !== deletingReminder.id));
     setDeletingReminder(null);
   }
 
@@ -360,24 +435,36 @@ function CaregiverReminders({ navigate }) {
   }
 
   /* ---- TOGGLE COMPLETE ---- */
-  function handleToggleComplete(id) {
-    persist(reminders.map((r) => r.id === id ? { ...r, completed: !r.completed } : r));
+  function handleToggleComplete(reminder) {
+    if (reminder.type === 'daily') {
+      const updated = toggleDailyCompletion(dailyCompletions, reminder.id, today);
+      setDailyCompletions(updated);
+      saveDailyCompletions(updated);
+    } else {
+      persistReminders(reminders.map((r) =>
+        r.id === reminder.id ? { ...r, completed: !r.completed } : r
+      ));
+    }
   }
 
-  /* ---- formInitial for edit mode ---- */
+  /* ---- Stats for header pills ---- */
+  const todayCount     = reminders.filter((r) =>
+    isReminderToday(r) && !isReminderDoneToday(r, dailyCompletions)
+  ).length;
+  const pendingCount   = reminders.filter((r) => !isReminderDoneToday(r, dailyCompletions)).length;
+  const completedCount = reminders.filter((r) => isReminderDoneToday(r, dailyCompletions)).length;
+
+  /* ---- Form initial values for edit ---- */
   const formInitial = editingReminder
     ? {
         title:       editingReminder.title,
         description: editingReminder.description ?? '',
-        date:        editingReminder.date,
+        type:        editingReminder.type ?? 'specific',
+        date:        editingReminder.date ?? '',
         time:        editingReminder.time,
         category:    editingReminder.category,
       }
     : null;
-
-  const todayCount    = reminders.filter((r) => !r.completed && isToday(r.date)).length;
-  const pendingCount  = reminders.filter((r) => !r.completed).length;
-  const completedCount = reminders.filter((r) => r.completed).length;
 
   return (
     <div className="cgrm-screen">
@@ -414,7 +501,7 @@ function CaregiverReminders({ navigate }) {
           </div>
           <div className="cgrm-stat-pill cgrm-stat-pill--green">
             <span className="cgrm-stat-pill__val">{completedCount}</span>
-            <span className="cgrm-stat-pill__lbl">Completed</span>
+            <span className="cgrm-stat-pill__lbl">Done Today</span>
           </div>
         </div>
 
@@ -455,6 +542,7 @@ function CaregiverReminders({ navigate }) {
               <li key={rem.id} className="cgrm-list-item">
                 <ReminderCard
                   reminder={rem}
+                  isDoneToday={isReminderDoneToday(rem, dailyCompletions)}
                   onEdit={handleEdit}
                   onDelete={handleDeleteClick}
                   onToggleComplete={handleToggleComplete}

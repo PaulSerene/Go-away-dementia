@@ -7,6 +7,15 @@
  * Reads from smriti_reminders — the SAME key as CaregiverReminders.
  * Patient can mark reminders complete; caregivers see the update.
  *
+ * Daily reminders:
+ *   - Always appear in Today section.
+ *   - Completion is per-day via smriti_daily_completions.
+ *   - Tomorrow they are pending again — the reminder itself is NOT modified.
+ *
+ * Specific reminders:
+ *   - Appear only when date === today (upcoming shown in a Coming Up section).
+ *   - Completion is permanent (reminder.completed flag).
+ *
  * Props:
  *   navigate — function from App to switch screens
  */
@@ -15,6 +24,12 @@ import { useState } from 'react';
 import {
   loadReminders,
   saveReminders,
+  loadDailyCompletions,
+  saveDailyCompletions,
+  toggleDailyCompletion,
+  isReminderToday,
+  isReminderUpcoming,
+  isReminderDoneToday,
   CATEGORY_EMOJI,
   todayStr,
 } from '../utils/reminderStorage';
@@ -23,14 +38,6 @@ import './PatientReminders.css';
 /* ----------------------------------------------------------------
    HELPERS
 ---------------------------------------------------------------- */
-function isToday(dateStr) {
-  return dateStr === todayStr();
-}
-
-function isUpcoming(dateStr) {
-  return dateStr > todayStr();
-}
-
 function formatDisplayTime(timeStr) {
   if (!timeStr) return '';
   try {
@@ -55,25 +62,27 @@ function formatDisplayDate(dateStr) {
 }
 
 /* ----------------------------------------------------------------
-   REMINDER CARD (elderly-friendly)
+   REMINDER CARD (elderly-friendly — large touch target)
 ---------------------------------------------------------------- */
-function PatientReminderCard({ reminder, onToggleComplete }) {
+function PatientReminderCard({ reminder, isDone, onToggleComplete }) {
   const emoji = CATEGORY_EMOJI[reminder.category] ?? '📝';
+  const isDaily = reminder.type === 'daily';
 
   return (
     <article
-      className={'prm-card' + (reminder.completed ? ' prm-card--done' : '')}
+      className={'prm-card' + (isDone ? ' prm-card--done' : '')}
       aria-label={'Reminder: ' + reminder.title}
     >
-      {/* Category badge */}
+      {/* Category badge + Daily badge */}
       <div className="prm-card__top">
         <span className="prm-card__emoji" aria-hidden="true">{emoji}</span>
         <span className="prm-card__category">{reminder.category}</span>
-        {reminder.completed && <span className="prm-done-badge">✅ Done</span>}
+        {isDaily && <span className="prm-daily-badge">Every Day</span>}
+        {isDone && <span className="prm-done-badge">✅ Done</span>}
       </div>
 
       {/* Title */}
-      <h3 className={'prm-card__title' + (reminder.completed ? ' prm-card__title--done' : '')}>
+      <h3 className={'prm-card__title' + (isDone ? ' prm-card__title--done' : '')}>
         {reminder.title}
       </h3>
 
@@ -87,14 +96,19 @@ function PatientReminderCard({ reminder, onToggleComplete }) {
         <p className="prm-card__time">⏰ {formatDisplayTime(reminder.time)}</p>
       )}
 
+      {/* Daily: note it resets tomorrow */}
+      {isDaily && isDone && (
+        <p className="prm-card__reset-note">This reminder will appear again tomorrow.</p>
+      )}
+
       {/* Complete button — large touch target */}
       <button
-        className={'prm-complete-btn' + (reminder.completed ? ' prm-complete-btn--done' : '')}
-        onClick={() => onToggleComplete(reminder.id)}
-        aria-pressed={reminder.completed}
-        aria-label={reminder.completed ? 'Mark as not done' : 'Mark as done'}
+        className={'prm-complete-btn' + (isDone ? ' prm-complete-btn--done' : '')}
+        onClick={() => onToggleComplete(reminder)}
+        aria-pressed={isDone}
+        aria-label={isDone ? 'Mark as not done' : 'Mark as done'}
       >
-        {reminder.completed ? '✅  Done — Tap to undo' : '⭕  Mark as Done'}
+        {isDone ? '✅  Done — Tap to undo' : '⭕  Mark as Done'}
       </button>
     </article>
   );
@@ -104,30 +118,47 @@ function PatientReminderCard({ reminder, onToggleComplete }) {
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function PatientReminders({ navigate }) {
-  const [reminders, setReminders] = useState(() => loadReminders());
+  const [reminders, setReminders]             = useState(() => loadReminders());
+  const [dailyCompletions, setDailyCompletions] = useState(() => loadDailyCompletions());
 
-  function persist(updated) {
-    setReminders(updated);
-    saveReminders(updated);
+  const today = todayStr();
+
+  /* ---- Toggle completion ---- */
+  function handleToggleComplete(reminder) {
+    if (reminder.type === 'daily') {
+      /* Daily: toggle in the per-day completions map — reminder object unchanged */
+      const updated = toggleDailyCompletion(dailyCompletions, reminder.id, today);
+      setDailyCompletions(updated);
+      saveDailyCompletions(updated);
+    } else {
+      /* Specific: flip reminder.completed permanently */
+      const updated = reminders.map((r) =>
+        r.id === reminder.id ? { ...r, completed: !r.completed } : r
+      );
+      setReminders(updated);
+      saveReminders(updated);
+    }
   }
 
-  function handleToggleComplete(id) {
-    persist(reminders.map((r) => r.id === id ? { ...r, completed: !r.completed } : r));
-  }
+  /* ---- Split reminders into sections ---- */
+  const todayReminders    = reminders.filter((r) => isReminderToday(r));
+  const upcomingReminders = reminders.filter((r) => isReminderUpcoming(r));
+  // Past specific reminders: date < today && not daily — we simply don't show them
 
-  /* Split into today, upcoming */
-  const todayReminders    = reminders.filter((r) => isToday(r.date));
-  const upcomingReminders = reminders.filter((r) => isUpcoming(r.date));
-
-  /* Sort each group: incomplete first, then by time */
+  /* Sort each group: pending first (within today), then by time */
   const sortGroup = (arr) =>
     [...arr].sort((a, b) => {
-      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+      const aDone = isReminderDoneToday(a, dailyCompletions);
+      const bDone = isReminderDoneToday(b, dailyCompletions);
+      if (aDone !== bDone) return aDone ? 1 : -1;
       return (a.time || '').localeCompare(b.time || '');
     });
 
   const todaySorted    = sortGroup(todayReminders);
-  const upcomingSorted = sortGroup(upcomingReminders);
+  const upcomingSorted = [...upcomingReminders].sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return (a.time || '').localeCompare(b.time || '');
+  });
 
   const hasAny = reminders.length > 0;
 
@@ -170,6 +201,7 @@ function PatientReminders({ navigate }) {
                 <li key={rem.id}>
                   <PatientReminderCard
                     reminder={rem}
+                    isDone={isReminderDoneToday(rem, dailyCompletions)}
                     onToggleComplete={handleToggleComplete}
                   />
                 </li>
@@ -178,7 +210,7 @@ function PatientReminders({ navigate }) {
           </section>
         )}
 
-        {/* Upcoming reminders */}
+        {/* Upcoming specific-date reminders */}
         {upcomingSorted.length > 0 && (
           <section aria-labelledby="prm-upcoming-heading">
             <h2 id="prm-upcoming-heading" className="prm-section-heading">🔜 Coming Up</h2>
