@@ -40,13 +40,13 @@ function PatientHome({ navigate }) {
 
       {/* ── GREETING HEADER ──────────────────────────────── */}
       <header className="ph-greeting" aria-label="Greeting">
-        {/* Back to Smriti Home button */}
+        {/* Back to Memora Home button */}
         <button
           className="ph-header-back-btn"
           onClick={() => navigate('landing')}
-          aria-label="Return to Smriti Home"
+          aria-label="Return to Memora Home"
         >
-          ← Smriti Home
+          ← Memora Home
         </button>
 
         <p className="ph-greeting__name">Good Morning, Mrs. Das ❤️</p>

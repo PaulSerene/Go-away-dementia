@@ -125,13 +125,13 @@ function generateActivityNotes(results) {
 function DashboardHeader({ navigate }) {
   return (
     <header className="cgd-header" aria-label="Caregiver Dashboard header">
-      {/* Back to Smriti Home button */}
+      {/* Back to Memora Home button */}
       <button
         className="cgd-header-back-btn"
         onClick={() => navigate('landing')}
-        aria-label="Return to Smriti Home"
+        aria-label="Return to Memora Home"
       >
-        ← Smriti Home
+        ← Memora Home
       </button>
 
       <div className="cgd-header__top">

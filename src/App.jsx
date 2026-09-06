@@ -42,7 +42,7 @@ function Header() {
       {/* Brand / logo area */}
       <span className="header__brand">
         <span className="header__brand-icon">🧠</span>
-        Smriti
+        Memora
       </span>
 
       {/* Small badge on the right */}
@@ -56,7 +56,7 @@ function Footer() {
   return (
     <footer className="footer">
       <p>
-        <strong>Smriti</strong> · AI Cognitive &amp; Memory Companion ·
+        <strong>Memora</strong> · AI Cognitive &amp; Memory Companion ·
         Built for SIH 2026 Problem Statement SIH26003
       </p>
     </footer>
@@ -162,14 +162,14 @@ function App() {
         <span className="hero__tag">🇮🇳 North Eastern India</span>
 
         {/* Main title */}
-        <h1 className="hero__title">Smriti</h1>
+        <h1 className="hero__title">Memora</h1>
 
         {/* Subtitle */}
         <p className="hero__subtitle">AI Cognitive &amp; Memory Companion</p>
 
         {/* Description */}
         <p className="hero__desc">
-          Smriti supports elderly dementia patients with guided cognitive
+          Memora supports elderly dementia patients with guided cognitive
           activities, personalised memory assistance, and real-time caregiver
           tools — all in one accessible, compassionate platform.
         </p>
