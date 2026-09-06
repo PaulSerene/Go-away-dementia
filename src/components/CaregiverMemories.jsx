@@ -17,6 +17,7 @@
 import { useState, useEffect } from "react";
 import { memories as memoriesApi } from '../utils/api.js';
 import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
+import { enqueue } from '../utils/syncQueue.js';
 import "./CaregiverMemories.css";
 
 /* ----------------------------------------------------------------
@@ -391,15 +392,21 @@ function CaregiverMemories({ navigate }) {
       const { data, error } = await memoriesApi.list(patientId);
       if (error || !data?.memories || cancelled) return;
 
-      // Backend returned memories — merge with localStorage.
-      // Backend is authoritative; map DB rows back to our local shape,
-      // preserving the 'date' field from any existing local record.
       const localMems = loadMemories();
-      const localById = Object.fromEntries(localMems.map((m) => [m._dbId, m]));
 
-      const merged = data.memories.map((dbMem) => ({
-        // Preserve local fields that the DB doesn't store (date, image/emoji)
-        ...(localById[dbMem.id] ?? {}),
+      // Build a lookup of local records that have a server id.
+      // IMPORTANT: only include records that actually have _dbId set —
+      // records without _dbId were created offline and must be preserved.
+      const localByDbId = Object.fromEntries(
+        localMems
+          .filter((m) => m._dbId)
+          .map((m) => [m._dbId, m])
+      );
+
+      // Map DB records to local shape (DB is authoritative for its fields)
+      const fromDb = data.memories.map((dbMem) => ({
+        // Preserve local fields that the DB doesn't store (date, emoji image)
+        ...(localByDbId[dbMem.id] ?? {}),
         // Always use fresh DB fields for authoritative data
         _dbId:       dbMem.id,
         title:       dbMem.title,
@@ -409,10 +416,16 @@ function CaregiverMemories({ navigate }) {
         media_url:   dbMem.media_url,
         createdAt:   dbMem.created_at,
         // Keep image from local record (emoji visual not stored in DB)
-        image: localById[dbMem.id]?.image ?? dbMem.media_url ?? null,
+        image: localByDbId[dbMem.id]?.image ?? dbMem.media_url ?? null,
         // Keep date from local record (free-text date not stored in DB)
-        date:  localById[dbMem.id]?.date ?? '',
+        date:  localByDbId[dbMem.id]?.date ?? '',
       }));
+
+      // Preserve local-only records (offline-created, not yet synced to DB).
+      // These have no _dbId and must NOT be wiped by the backend response.
+      const localOnly = localMems.filter((m) => !m._dbId);
+
+      const merged = [...fromDb, ...localOnly];
 
       if (!cancelled) {
         setMemories(merged);
@@ -441,7 +454,7 @@ function CaregiverMemories({ navigate }) {
     const patientId = getCachedPatientId();
 
     if (editingMemory) {
-      // EDIT — preserve id, createdAt, favorite
+      // EDIT — persist local changes immediately
       const updated = memories.map((m) =>
         m.id === editingMemory.id
           ? {
@@ -456,30 +469,44 @@ function CaregiverMemories({ navigate }) {
       );
       persist(updated);
 
-      // Backend sync — fire-and-forget
-      if (patientId && editingMemory._dbId) {
-        memoriesApi.update(editingMemory._dbId, {
+      if (editingMemory._dbId) {
+        // Record exists on the server — update it
+        const updatePayload = {
           title:       formData.title.trim(),
           category:    formData.category,
           description: formData.description.trim(),
           is_favorite: editingMemory.favorite,
           media_url:   formData.image ?? null,
-        }).catch(() => {});
-      } else if (patientId && !editingMemory._dbId) {
-        // Was a local-only memory — create in DB now
-        const { data } = await memoriesApi.create({
+        };
+        const { error } = await memoriesApi.update(editingMemory._dbId, updatePayload);
+        if (error) {
+          enqueue('update_memory', { dbId: editingMemory._dbId, ...updatePayload });
+        }
+      } else {
+        // Was a local-only record (offline-created) — try to create on server now
+        const createPayload = {
           patient_id:  patientId,
           title:       formData.title.trim(),
           category:    formData.category,
           description: formData.description.trim(),
           is_favorite: editingMemory.favorite,
           media_url:   formData.image ?? null,
-        });
-        if (data?.memory?.id) {
-          const tagged = memories.map((m) =>
-            m.id === editingMemory.id ? { ...m, _dbId: data.memory.id } : m
-          );
-          persist(tagged);
+        };
+        if (patientId) {
+          const { data, error } = await memoriesApi.create(createPayload);
+          if (error) {
+            enqueue('create_memory', createPayload, editingMemory.id);
+          } else if (data?.memory?.id) {
+            // Tag the now-synced memory with its server id.
+            // Use `updated` (the already-edited array) so we don't revert edits.
+            const tagged = updated.map((m) =>
+              m.id === editingMemory.id ? { ...m, _dbId: data.memory.id } : m
+            );
+            persist(tagged);
+          }
+        } else {
+          // No patient identity yet — queue for when identity is established
+          enqueue('create_memory', createPayload, editingMemory.id);
         }
       }
     } else {
@@ -496,18 +523,21 @@ function CaregiverMemories({ navigate }) {
       };
       persist([...memories, newMemory]);
 
-      // Backend sync
+      const createPayload = {
+        patient_id:  patientId,
+        title:       newMemory.title,
+        category:    newMemory.category,
+        description: newMemory.description,
+        is_favorite: false,
+        media_url:   newMemory.image ?? null,
+      };
+
       if (patientId) {
-        const { data } = await memoriesApi.create({
-          patient_id:  patientId,
-          title:       newMemory.title,
-          category:    newMemory.category,
-          description: newMemory.description,
-          is_favorite: false,
-          media_url:   newMemory.image ?? null,
-        });
-        if (data?.memory?.id) {
-          // Tag the just-saved memory with its DB id
+        const { data, error } = await memoriesApi.create(createPayload);
+        if (error) {
+          enqueue('create_memory', createPayload, newMemory.id);
+        } else if (data?.memory?.id) {
+          // Tag with server id
           setMemories((prev) => {
             const tagged = prev.map((m) =>
               m.id === newMemory.id ? { ...m, _dbId: data.memory.id } : m
@@ -516,6 +546,8 @@ function CaregiverMemories({ navigate }) {
             return tagged;
           });
         }
+      } else {
+        enqueue('create_memory', createPayload, newMemory.id);
       }
     }
     setShowForm(false);
@@ -543,10 +575,15 @@ function CaregiverMemories({ navigate }) {
     const updated = memories.filter((m) => m.id !== deletingMemory.id);
     persist(updated);
 
-    // Backend delete — fire-and-forget
+    // Backend delete — enqueue on failure so it syncs when reconnected
     if (deletingMemory._dbId) {
-      memoriesApi.remove(deletingMemory._dbId).catch(() => {});
+      memoriesApi.remove(deletingMemory._dbId).then(({ error }) => {
+        if (error) {
+          enqueue('delete_memory', { dbId: deletingMemory._dbId });
+        }
+      });
     }
+    // If no _dbId, record was never synced — nothing to delete on server
 
     setDeletingMemory(null);
   }
@@ -563,9 +600,13 @@ function CaregiverMemories({ navigate }) {
     );
     persist(updated);
 
-    // Backend sync — fire-and-forget
+    // Backend sync — enqueue on failure
     if (target?._dbId) {
-      memoriesApi.update(target._dbId, { is_favorite: !target.favorite }).catch(() => {});
+      memoriesApi.update(target._dbId, { is_favorite: !target.favorite }).then(({ error }) => {
+        if (error) {
+          enqueue('update_memory', { dbId: target._dbId, is_favorite: !target.favorite });
+        }
+      });
     }
   }
 

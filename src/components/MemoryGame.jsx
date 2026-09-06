@@ -14,6 +14,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { gameResults as gameResultsApi } from '../utils/api.js';
 import { getCachedPatientId } from '../utils/identity.js';
+import { enqueue } from '../utils/syncQueue.js';
 import './MemoryGame.css';
 
 /* ── OBJECT POOL ─────────────────────────────────────────────────
@@ -302,20 +303,23 @@ function MemoryGame({ navigate }) {
     setResult(gameResult);
     setPhase('result');
 
-    // ── Backend sync (fire-and-forget) ──────────────────────
+    // ── Backend sync (fire-and-forget with offline fallback) ─────
     // Save to PostgreSQL in the background. If the API is down,
-    // the result is already in localStorage — nothing is lost.
+    // the result is queued and will sync when connectivity returns.
     const patientId = getCachedPatientId();
     if (patientId !== null) {
-      gameResultsApi.save({
+      const gamePayload = {
         patient_id:      patientId,
         accuracy:        accuracy,
         difficulty:      currentDifficultyNum,
         objects_shown:   totalCorrect,
         objects_correct: hits,
         duration_ms:     responseTime * 1000,
-      }).catch(() => {
-        // API unavailable — localStorage record is the fallback
+      };
+      gameResultsApi.save(gamePayload).then(({ error }) => {
+        if (error) {
+          enqueue('save_game_result', gamePayload);
+        }
       });
     }
   }

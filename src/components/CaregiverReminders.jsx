@@ -19,6 +19,7 @@
 import { useState, useEffect } from 'react';
 import { reminders as remindersApi } from '../utils/api.js';
 import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
+import { enqueue } from '../utils/syncQueue.js';
 import {
   loadReminders,
   saveReminders,
@@ -363,12 +364,18 @@ function CaregiverReminders({ navigate }) {
       if (error || !data?.reminders || cancelled) return;
 
       const localRems = loadReminders();
-      const localById = Object.fromEntries(localRems.map((r) => [r._dbId, r]));
 
-      const merged = data.reminders.map((dbRem) => ({
-        ...(localById[dbRem.id] ?? {}),
+      // Only build lookup from records that actually have a server id
+      const localByDbId = Object.fromEntries(
+        localRems
+          .filter((r) => r._dbId)
+          .map((r) => [r._dbId, r])
+      );
+
+      const fromDb = data.reminders.map((dbRem) => ({
+        ...(localByDbId[dbRem.id] ?? {}),
         _dbId:       dbRem.id,
-        id:          localById[dbRem.id]?.id ?? generateReminderId(),
+        id:          localByDbId[dbRem.id]?.id ?? generateReminderId(),
         title:       dbRem.title,
         description: dbRem.description ?? '',
         type:        dbRem.type,
@@ -378,6 +385,10 @@ function CaregiverReminders({ navigate }) {
         completed:   dbRem.completed,
         createdAt:   dbRem.created_at,
       }));
+
+      // Preserve offline-created reminders that haven't synced yet
+      const localOnly = localRems.filter((r) => !r._dbId);
+      const merged = [...fromDb, ...localOnly];
 
       if (!cancelled) {
         setReminders(merged);
@@ -434,16 +445,20 @@ function CaregiverReminders({ navigate }) {
       );
       persistReminders(updated);
 
-      // Backend sync
-      if (patientId && editingReminder._dbId) {
-        remindersApi.update(editingReminder._dbId, {
+      // Backend sync — enqueue on failure
+      if (editingReminder._dbId) {
+        const updatePayload = {
           title:       formData.title.trim(),
           description: formData.description.trim(),
           type:        formData.type,
           date_on:     formData.type === 'daily' ? null : formData.date,
           time_at:     formData.time || null,
           category:    formData.category,
-        }).catch(() => {});
+        };
+        const { error } = await remindersApi.update(editingReminder._dbId, updatePayload);
+        if (error) {
+          enqueue('update_reminder', { dbId: editingReminder._dbId, ...updatePayload });
+        }
       }
     } else {
       const newRem = {
@@ -459,18 +474,21 @@ function CaregiverReminders({ navigate }) {
       };
       persistReminders([...reminders, newRem]);
 
-      // Backend sync
+      const createPayload = {
+        patient_id:  patientId,
+        title:       newRem.title,
+        description: newRem.description,
+        type:        newRem.type,
+        date_on:     newRem.date || null,
+        time_at:     newRem.time || null,
+        category:    newRem.category,
+      };
+
       if (patientId) {
-        const { data } = await remindersApi.create({
-          patient_id:  patientId,
-          title:       newRem.title,
-          description: newRem.description,
-          type:        newRem.type,
-          date_on:     newRem.date || null,
-          time_at:     newRem.time || null,
-          category:    newRem.category,
-        });
-        if (data?.reminder?.id) {
+        const { data, error } = await remindersApi.create(createPayload);
+        if (error) {
+          enqueue('create_reminder', createPayload, newRem.id);
+        } else if (data?.reminder?.id) {
           setReminders((prev) => {
             const tagged = prev.map((r) =>
               r.id === newRem.id ? { ...r, _dbId: data.reminder.id } : r
@@ -479,6 +497,8 @@ function CaregiverReminders({ navigate }) {
             return tagged;
           });
         }
+      } else {
+        enqueue('create_reminder', createPayload, newRem.id);
       }
     }
     setShowForm(false);
@@ -505,10 +525,15 @@ function CaregiverReminders({ navigate }) {
     const target = deletingReminder;
     persistReminders(reminders.filter((r) => r.id !== target.id));
 
-    // Backend delete
+    // Backend delete — enqueue on failure
     if (target._dbId) {
-      remindersApi.remove(target._dbId).catch(() => {});
+      remindersApi.remove(target._dbId).then(({ error }) => {
+        if (error) {
+          enqueue('delete_reminder', { dbId: target._dbId });
+        }
+      });
     }
+    // If no _dbId, record was never synced — nothing to delete on server
 
     setDeletingReminder(null);
   }
@@ -527,22 +552,34 @@ function CaregiverReminders({ navigate }) {
       setDailyCompletions(updated);
       saveDailyCompletions(updated);
 
-      // Backend sync
+      // Backend sync — enqueue on failure
       if (patientId && reminder._dbId) {
         if (!wasDone) {
-          remindersApi.complete(reminder._dbId, patientId, today).catch(() => {});
+          remindersApi.complete(reminder._dbId, patientId, today).then(({ error }) => {
+            if (error) enqueue('complete_reminder',   { dbId: reminder._dbId, patientId, dateOn: today });
+          });
         } else {
-          remindersApi.uncomplete(reminder._dbId, patientId, today).catch(() => {});
+          remindersApi.uncomplete(reminder._dbId, patientId, today).then(({ error }) => {
+            if (error) enqueue('uncomplete_reminder', { dbId: reminder._dbId, patientId, dateOn: today });
+          });
         }
+      } else if (!reminder._dbId) {
+        // No server record yet — queue the completion for when it syncs
+        const op = !wasDone ? 'complete_reminder' : 'uncomplete_reminder';
+        enqueue(op, { dbId: null, patientId, dateOn: today });
       }
     } else {
       persistReminders(reminders.map((r) =>
         r.id === reminder.id ? { ...r, completed: !r.completed } : r
       ));
 
-      // Backend sync
+      // Backend sync — enqueue on failure
       if (patientId && reminder._dbId) {
-        remindersApi.update(reminder._dbId, { completed: !reminder.completed }).catch(() => {});
+        remindersApi.update(reminder._dbId, { completed: !reminder.completed }).then(({ error }) => {
+          if (error) {
+            enqueue('update_reminder', { dbId: reminder._dbId, completed: !reminder.completed });
+          }
+        });
       }
     }
   }

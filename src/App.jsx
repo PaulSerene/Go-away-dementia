@@ -21,7 +21,7 @@
  *   'caregiver-reminders' → Caregiver Reminder Management
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ModeCard from './components/ModeCard';
 import PatientHome from './components/PatientHome';
 import PatientPlaceholder from './components/PatientPlaceholder';
@@ -32,9 +32,23 @@ import CaregiverDashboard from './components/CaregiverDashboard';
 import CaregiverMemories from './components/CaregiverMemories';
 import CaregiverReminders from './components/CaregiverReminders';
 import PatientReminders from './components/PatientReminders';
-import { getOrCreatePatientId, getOrCreateCaregiverId } from './utils/identity.js';
+import { getOrCreatePatientId, getOrCreateCaregiverId, getCachedPatientId } from './utils/identity.js';
+import { useConnectivity } from './utils/connectivity.js';
+import { processQueue } from './utils/syncQueue.js';
 import './App.css';
 import './components/PatientHome.css';
+
+/* ── Offline banner ───────────────────────────────────────
+ * Rendered above every screen when connectivity is lost.
+ * Uses position:fixed so it floats above all existing layouts.
+ * ─────────────────────────────────────────────────────── */
+function OfflineBanner() {
+  return (
+    <div className="offline-banner" role="status" aria-live="polite">
+      📵 Offline — changes are saved locally and will sync when you reconnect.
+    </div>
+  );
+}
 
 /* ---- Small reusable Header component ---- */
 function Header() {
@@ -66,15 +80,13 @@ function Footer() {
 
 /* ---- The main App component ---- */
 function App() {
-  /*
-   * currentScreen stores which screen to show.
-   * Starts as 'landing' — the mode-selection page.
-   *
-   * When navigate() is called (e.g. navigate('patient-home')),
-   * React re-renders the page and shows the new screen.
-   * This is called "client-side navigation without a router".
-   */
   const [currentScreen, setCurrentScreen] = useState('landing');
+
+  /* Connectivity state — re-renders this component when it changes */
+  const isOnline = useConnectivity();
+
+  /* Track previous online state so we only process the queue on TRANSITION */
+  const prevOnlineRef = useRef(isOnline);
 
   /*
    * Seed demo user IDs in the DB on app first load.
@@ -85,6 +97,21 @@ function App() {
     getOrCreatePatientId();
     getOrCreateCaregiverId();
   }, []);
+
+  /*
+   * Process the offline sync queue whenever we come online.
+   * Also runs on mount (isOnline may already be true — handle items
+   * queued in a previous offline session that survived page refresh).
+   */
+  useEffect(() => {
+    if (isOnline) {
+      const patientId = getCachedPatientId();
+      if (patientId) {
+        processQueue(patientId).catch(() => {});
+      }
+    }
+    prevOnlineRef.current = isOnline;
+  }, [isOnline]);
 
 
   /*
@@ -112,53 +139,47 @@ function App() {
     },
   ];
 
-  /* ── SCREEN ROUTER ────────────────────────────────────────
-   *
-   * We check currentScreen and return the matching component.
-   * This replaces React Router for this stage of the project.
-   *
-   * React concept used: "conditional rendering" — returning
-   * different JSX based on a state value.
-   * ─────────────────────────────────────────────────────── */
+  /* Offline banner shown on ALL screens when connectivity is lost */
+  const banner = !isOnline ? <OfflineBanner /> : null;
 
   /* Patient Home */
   if (currentScreen === 'patient-home') {
-    return <PatientHome navigate={navigate} />;
+    return <>{banner}<PatientHome navigate={navigate} /></>;
   }
 
   /* Today's Activity — "Remember the Objects" memory game */
   if (currentScreen === 'patient-activity') {
-    return <MemoryGame navigate={navigate} />;
+    return <>{banner}<MemoryGame navigate={navigate} /></>;
   }
 
   /* Activities tab — My Progress */
   if (currentScreen === 'patient-activities') {
-    return <PatientProgress navigate={navigate} />;
+    return <>{banner}<PatientProgress navigate={navigate} /></>;
   }
 
   /* Memories tab — My Memories */
   if (currentScreen === 'patient-memories') {
-    return <PatientMemories navigate={navigate} />;
+    return <>{banner}<PatientMemories navigate={navigate} /></>;
   }
 
   /* Caregiver Dashboard */
   if (currentScreen === 'caregiver-dashboard') {
-    return <CaregiverDashboard navigate={navigate} />;
+    return <>{banner}<CaregiverDashboard navigate={navigate} /></>;
   }
 
   /* Caregiver Memory Management */
   if (currentScreen === 'caregiver-memories') {
-    return <CaregiverMemories navigate={navigate} />;
+    return <>{banner}<CaregiverMemories navigate={navigate} /></>;
   }
 
   /* Patient Reminders */
   if (currentScreen === 'patient-reminders') {
-    return <PatientReminders navigate={navigate} />;
+    return <>{banner}<PatientReminders navigate={navigate} /></>;
   }
 
   /* Caregiver Reminder Management */
   if (currentScreen === 'caregiver-reminders') {
-    return <CaregiverReminders navigate={navigate} />;
+    return <>{banner}<CaregiverReminders navigate={navigate} /></>;
   }
 
   /* ── LANDING PAGE (default) ───────────────────────────── */

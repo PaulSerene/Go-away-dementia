@@ -23,6 +23,7 @@
 import { useState, useEffect } from 'react';
 import { reminders as remindersApi } from '../utils/api.js';
 import { getCachedPatientId, getOrCreatePatientId } from '../utils/identity.js';
+import { enqueue } from '../utils/syncQueue.js';
 import {
   loadReminders,
   saveReminders,
@@ -137,12 +138,18 @@ function PatientReminders({ navigate }) {
       if (error || !data?.reminders || cancelled) return;
 
       const localRems = loadReminders();
-      const localById = Object.fromEntries(localRems.map((r) => [r._dbId, r]));
 
-      const merged = data.reminders.map((dbRem) => ({
-        ...(localById[dbRem.id] ?? {}),
+      // Only build lookup from records that have a server id
+      const localByDbId = Object.fromEntries(
+        localRems
+          .filter((r) => r._dbId)
+          .map((r) => [r._dbId, r])
+      );
+
+      const fromDb = data.reminders.map((dbRem) => ({
+        ...(localByDbId[dbRem.id] ?? {}),
         _dbId:       dbRem.id,
-        id:          localById[dbRem.id]?.id ?? String(dbRem.id),
+        id:          localByDbId[dbRem.id]?.id ?? String(dbRem.id),
         title:       dbRem.title,
         description: dbRem.description ?? '',
         type:        dbRem.type,
@@ -152,6 +159,10 @@ function PatientReminders({ navigate }) {
         completed:   dbRem.completed,
         createdAt:   dbRem.created_at,
       }));
+
+      // Preserve offline-created reminders that haven't synced yet
+      const localOnly = localRems.filter((r) => !r._dbId);
+      const merged = [...fromDb, ...localOnly];
 
       if (!cancelled) {
         setReminders(merged);
@@ -173,12 +184,16 @@ function PatientReminders({ navigate }) {
       setDailyCompletions(updated);
       saveDailyCompletions(updated);
 
-      // Backend sync
+      // Backend sync — enqueue on failure
       if (patientId && reminder._dbId) {
         if (!wasDone) {
-          remindersApi.complete(reminder._dbId, patientId, today).catch(() => {});
+          remindersApi.complete(reminder._dbId, patientId, today).then(({ error }) => {
+            if (error) enqueue('complete_reminder',   { dbId: reminder._dbId, patientId, dateOn: today });
+          });
         } else {
-          remindersApi.uncomplete(reminder._dbId, patientId, today).catch(() => {});
+          remindersApi.uncomplete(reminder._dbId, patientId, today).then(({ error }) => {
+            if (error) enqueue('uncomplete_reminder', { dbId: reminder._dbId, patientId, dateOn: today });
+          });
         }
       }
     } else {
@@ -188,9 +203,13 @@ function PatientReminders({ navigate }) {
       setReminders(updated);
       saveReminders(updated);
 
-      // Backend sync
+      // Backend sync — enqueue on failure
       if (patientId && reminder._dbId) {
-        remindersApi.update(reminder._dbId, { completed: !reminder.completed }).catch(() => {});
+        remindersApi.update(reminder._dbId, { completed: !reminder.completed }).then(({ error }) => {
+          if (error) {
+            enqueue('update_reminder', { dbId: reminder._dbId, completed: !reminder.completed });
+          }
+        });
       }
     }
   }

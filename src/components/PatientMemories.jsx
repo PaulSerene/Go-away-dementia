@@ -22,6 +22,7 @@
 import { useState, useEffect } from 'react';
 import { memories as memoriesApi } from '../utils/api.js';
 import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
+import { enqueue } from '../utils/syncQueue.js';
 import './PatientMemories.css';
 
 /* ── CONSTANTS ───────────────────────────────────────────────── */
@@ -296,20 +297,32 @@ function PatientMemories({ navigate }) {
       if (error || !data?.memories || cancelled) return;
 
       const localMems = loadMemories();
-      const localById = Object.fromEntries(localMems.map((m) => [m._dbId, m]));
 
-      const merged = data.memories.map((dbMem) => ({
-        ...(localById[dbMem.id] ?? {}),
+      // Build lookup only from records that have a server id.
+      // Records without _dbId were created offline and must be kept.
+      const localByDbId = Object.fromEntries(
+        localMems
+          .filter((m) => m._dbId)
+          .map((m) => [m._dbId, m])
+      );
+
+      // Map DB records to local shape
+      const fromDb = data.memories.map((dbMem) => ({
+        ...(localByDbId[dbMem.id] ?? {}),
         _dbId:       dbMem.id,
-        id:          localById[dbMem.id]?.id ?? String(dbMem.id),
+        id:          localByDbId[dbMem.id]?.id ?? String(dbMem.id),
         title:       dbMem.title,
         category:    dbMem.category,
         description: dbMem.description,
         favorite:    dbMem.is_favorite,
-        image:       localById[dbMem.id]?.image ?? dbMem.media_url ?? null,
-        date:        localById[dbMem.id]?.date ?? '',
+        image:       localByDbId[dbMem.id]?.image ?? dbMem.media_url ?? null,
+        date:        localByDbId[dbMem.id]?.date ?? '',
         createdAt:   dbMem.created_at,
       }));
+
+      // Preserve offline-created records that haven't synced yet
+      const localOnly = localMems.filter((m) => !m._dbId);
+      const merged = [...fromDb, ...localOnly];
 
       if (!cancelled) {
         setMemories(merged);
@@ -352,10 +365,14 @@ function PatientMemories({ navigate }) {
     setMemories(updated);
     saveMemories(updated);
 
-    // Backend sync — fire-and-forget
+    // Backend sync — enqueue on failure
     const patientId = getCachedPatientId();
     if (patientId && target?._dbId) {
-      memoriesApi.update(target._dbId, { is_favorite: !target.favorite }).catch(() => {});
+      memoriesApi.update(target._dbId, { is_favorite: !target.favorite }).then(({ error }) => {
+        if (error) {
+          enqueue('update_memory', { dbId: target._dbId, is_favorite: !target.favorite });
+        }
+      });
     }
   }
 
