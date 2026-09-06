@@ -82,7 +82,7 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════╗
-║   Smriti API server running                  ║
+║   Memora API server running                  ║
 ║   http://localhost:${PORT}/api/health           ║
 ║   http://localhost:${PORT}/api/health/db        ║
 ║   http://localhost:${PORT}/api/status           ║

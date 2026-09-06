@@ -51,7 +51,7 @@ router.get('/db', async (_req, res) => {
 /* ── GET /api/status ─────────────────────────────────────── */
 router.get('/status', (_req, res) => {
   res.json({
-    application: 'Smriti',
+    application: 'Memora',
     version:     '1.0.0',
     environment: process.env.NODE_ENV || 'development',
     node:        process.version,
