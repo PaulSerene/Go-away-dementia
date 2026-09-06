@@ -50,6 +50,14 @@ const QUEUE_KEY    = 'memora_sync_queue';
 const MEMORIES_KEY = 'smriti_memories';
 const MAX_RETRIES  = 5;
 
+/**
+ * Module-level flag: prevents two processQueue() runs from overlapping.
+ * Without this, a rapid online-event flicker can cause two concurrent runs
+ * to both read the same queue and replay the same create operations,
+ * producing duplicate server records.
+ */
+let isProcessing = false;
+
 /* ── Queue persistence helpers ──────────────────────────────── */
 
 function loadQueue() {
@@ -138,159 +146,174 @@ export function queueLength() {
  * @returns {Promise<number>} — count of items that still remain (failed)
  */
 export async function processQueue(patientId) {
+  // Guard: bail if already running to prevent duplicate server operations
+  // from rapid online-event flicker or double-mounts.
+  if (isProcessing) {
+    console.log('[syncQueue] processQueue already running — skipping concurrent call.');
+    return 0;
+  }
+
   const queue = loadQueue();
   if (queue.length === 0) return 0;
 
+  isProcessing = true;
   console.log(`[syncQueue] Processing ${queue.length} queued operation(s)…`);
 
   const failed = [];
 
-  for (const item of queue) {
-    if (item.retries >= MAX_RETRIES) {
-      console.warn(
-        `[syncQueue] Dropping after ${MAX_RETRIES} retries: ${item.operation} (${item.id})`
-      );
-      continue; // silently drop
-    }
-
-    let success = false;
-
-    try {
-      switch (item.operation) {
-
-        /* ── Memories ─────────────────────────────────────── */
-
-        case 'create_memory': {
-          const pid = item.payload.patient_id ?? patientId;
-          if (!pid) break; // patient identity not yet available — keep in queue
-          const { data, error } = await memoriesApi.create({ ...item.payload, patient_id: pid });
-          if (!error && data?.memory?.id) {
-            success = true;
-            // Write the server-assigned id back to the local record
-            const mems = loadLocalMemories();
-            const tagged = mems.map((m) =>
-              m.id === item.localId ? { ...m, _dbId: data.memory.id } : m
-            );
-            saveLocalMemories(tagged);
-            console.log(
-              `[syncQueue] create_memory: local "${item.localId}" → db ${data.memory.id}`
-            );
-          }
-          break;
-        }
-
-        case 'update_memory': {
-          const { dbId, ...body } = item.payload;
-          // No server id means the record was never synced — nothing to update on server
-          if (!dbId) { success = true; break; }
-          const { error } = await memoriesApi.update(dbId, body);
-          if (!error) success = true;
-          break;
-        }
-
-        case 'delete_memory': {
-          const { dbId } = item.payload;
-          // No server id means the record was never synced — nothing to delete on server
-          if (!dbId) { success = true; break; }
-          const { error } = await memoriesApi.remove(dbId);
-          if (!error) success = true;
-          break;
-        }
-
-        /* ── Reminders ────────────────────────────────────── */
-
-        case 'create_reminder': {
-          const pid = item.payload.patient_id ?? patientId;
-          if (!pid) break;
-          const { data, error } = await remindersApi.create({
-            ...item.payload,
-            patient_id: pid,
-          });
-          if (!error && data?.reminder?.id) {
-            success = true;
-            const rems = loadReminders();
-            const tagged = rems.map((r) =>
-              r.id === item.localId ? { ...r, _dbId: data.reminder.id } : r
-            );
-            saveReminders(tagged);
-            console.log(
-              `[syncQueue] create_reminder: local "${item.localId}" → db ${data.reminder.id}`
-            );
-          }
-          break;
-        }
-
-        case 'update_reminder': {
-          const { dbId, ...body } = item.payload;
-          if (!dbId) { success = true; break; }
-          const { error } = await remindersApi.update(dbId, body);
-          if (!error) success = true;
-          break;
-        }
-
-        case 'delete_reminder': {
-          const { dbId } = item.payload;
-          if (!dbId) { success = true; break; }
-          const { error } = await remindersApi.remove(dbId);
-          if (!error) success = true;
-          break;
-        }
-
-        case 'complete_reminder': {
-          const { dbId, patientId: pid, dateOn } = item.payload;
-          if (!dbId) { success = true; break; }
-          const effectivePid = pid ?? patientId;
-          if (!effectivePid) break;
-          const { error } = await remindersApi.complete(dbId, effectivePid, dateOn);
-          if (!error) success = true;
-          break;
-        }
-
-        case 'uncomplete_reminder': {
-          const { dbId, patientId: pid, dateOn } = item.payload;
-          if (!dbId) { success = true; break; }
-          const effectivePid = pid ?? patientId;
-          if (!effectivePid) break;
-          const { error } = await remindersApi.uncomplete(dbId, effectivePid, dateOn);
-          if (!error) success = true;
-          break;
-        }
-
-        /* ── Game results ─────────────────────────────────── */
-
-        case 'save_game_result': {
-          const pid = item.payload.patient_id ?? patientId;
-          if (!pid) break;
-          const { error } = await gameResultsApi.save({ ...item.payload, patient_id: pid });
-          if (!error) success = true;
-          break;
-        }
-
-        default:
-          console.warn('[syncQueue] Unknown operation — dropping:', item.operation);
-          success = true; // unknown ops are not retried
+  try {
+    for (const item of queue) {
+      if (item.retries >= MAX_RETRIES) {
+        console.warn(
+          `[syncQueue] Dropping after ${MAX_RETRIES} retries: ${item.operation} (${item.id})`
+        );
+        continue; // silently drop
       }
-    } catch (err) {
-      console.warn(
-        `[syncQueue] Unexpected error for "${item.operation}":`,
-        err.message ?? err
+
+      let success = false;
+
+      try {
+        switch (item.operation) {
+
+          /* ── Memories ─────────────────────────────────────── */
+
+          case 'create_memory': {
+            const pid = item.payload.patient_id ?? patientId;
+            if (!pid) break; // patient identity not yet available — keep in queue
+            const { data, error } = await memoriesApi.create({ ...item.payload, patient_id: pid });
+            if (!error && data?.memory?.id) {
+              success = true;
+              // Write the server-assigned id back to the local record
+              const mems = loadLocalMemories();
+              const tagged = mems.map((m) =>
+                m.id === item.localId ? { ...m, _dbId: data.memory.id } : m
+              );
+              saveLocalMemories(tagged);
+              console.log(
+                `[syncQueue] create_memory: local "${item.localId}" → db ${data.memory.id}`
+              );
+            }
+            break;
+          }
+
+          case 'update_memory': {
+            const { dbId, ...body } = item.payload;
+            // No server id means the record was never synced — nothing to update on server
+            if (!dbId) { success = true; break; }
+            const { error } = await memoriesApi.update(dbId, body);
+            if (!error) success = true;
+            break;
+          }
+
+          case 'delete_memory': {
+            const { dbId } = item.payload;
+            // No server id means the record was never synced — nothing to delete on server
+            if (!dbId) { success = true; break; }
+            const { error } = await memoriesApi.remove(dbId);
+            // Treat 404 as success — record already deleted on server
+            if (!error || error.includes('404') || error.includes('not found')) success = true;
+            break;
+          }
+
+          /* ── Reminders ────────────────────────────────────── */
+
+          case 'create_reminder': {
+            const pid = item.payload.patient_id ?? patientId;
+            if (!pid) break;
+            const { data, error } = await remindersApi.create({
+              ...item.payload,
+              patient_id: pid,
+            });
+            if (!error && data?.reminder?.id) {
+              success = true;
+              const rems = loadReminders();
+              const tagged = rems.map((r) =>
+                r.id === item.localId ? { ...r, _dbId: data.reminder.id } : r
+              );
+              saveReminders(tagged);
+              console.log(
+                `[syncQueue] create_reminder: local "${item.localId}" → db ${data.reminder.id}`
+              );
+            }
+            break;
+          }
+
+          case 'update_reminder': {
+            const { dbId, ...body } = item.payload;
+            if (!dbId) { success = true; break; }
+            const { error } = await remindersApi.update(dbId, body);
+            if (!error) success = true;
+            break;
+          }
+
+          case 'delete_reminder': {
+            const { dbId } = item.payload;
+            if (!dbId) { success = true; break; }
+            const { error } = await remindersApi.remove(dbId);
+            // Treat 404 as success — record already deleted on server
+            if (!error || error.includes('404') || error.includes('not found')) success = true;
+            break;
+          }
+
+          case 'complete_reminder': {
+            const { dbId, patientId: pid, dateOn } = item.payload;
+            if (!dbId) { success = true; break; }
+            const effectivePid = pid ?? patientId;
+            if (!effectivePid) break;
+            const { error } = await remindersApi.complete(dbId, effectivePid, dateOn);
+            if (!error) success = true;
+            break;
+          }
+
+          case 'uncomplete_reminder': {
+            const { dbId, patientId: pid, dateOn } = item.payload;
+            if (!dbId) { success = true; break; }
+            const effectivePid = pid ?? patientId;
+            if (!effectivePid) break;
+            const { error } = await remindersApi.uncomplete(dbId, effectivePid, dateOn);
+            if (!error) success = true;
+            break;
+          }
+
+          /* ── Game results ─────────────────────────────────── */
+
+          case 'save_game_result': {
+            const pid = item.payload.patient_id ?? patientId;
+            if (!pid) break;
+            const { error } = await gameResultsApi.save({ ...item.payload, patient_id: pid });
+            if (!error) success = true;
+            break;
+          }
+
+          default:
+            console.warn('[syncQueue] Unknown operation — dropping:', item.operation);
+            success = true; // unknown ops are not retried
+        }
+      } catch (err) {
+        console.warn(
+          `[syncQueue] Unexpected error for "${item.operation}":`,
+          err.message ?? err
+        );
+      }
+
+      if (!success) {
+        failed.push({ ...item, retries: item.retries + 1 });
+      }
+    }
+
+    saveQueue(failed);
+
+    if (failed.length === 0) {
+      console.log('[syncQueue] All queued operations synced successfully.');
+    } else {
+      console.log(
+        `[syncQueue] ${failed.length} operation(s) remain — will retry on next reconnect.`
       );
     }
 
-    if (!success) {
-      failed.push({ ...item, retries: item.retries + 1 });
-    }
+    return failed.length;
+  } finally {
+    // Always release the lock — even if something unexpected throws above.
+    isProcessing = false;
   }
-
-  saveQueue(failed);
-
-  if (failed.length === 0) {
-    console.log('[syncQueue] All queued operations synced successfully.');
-  } else {
-    console.log(
-      `[syncQueue] ${failed.length} operation(s) remain — will retry on next reconnect.`
-    );
-  }
-
-  return failed.length;
 }

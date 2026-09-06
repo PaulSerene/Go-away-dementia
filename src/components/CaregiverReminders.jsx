@@ -563,11 +563,11 @@ function CaregiverReminders({ navigate }) {
             if (error) enqueue('uncomplete_reminder', { dbId: reminder._dbId, patientId, dateOn: today });
           });
         }
-      } else if (!reminder._dbId) {
-        // No server record yet — queue the completion for when it syncs
-        const op = !wasDone ? 'complete_reminder' : 'uncomplete_reminder';
-        enqueue(op, { dbId: null, patientId, dateOn: today });
       }
+      // If no _dbId: reminder not yet synced to server. The completion is
+      // stored locally in smriti_daily_completions. When the reminder
+      // eventually syncs (create_reminder), the patient's local state
+      // is the source of truth for daily completion — no server action needed.
     } else {
       persistReminders(reminders.map((r) =>
         r.id === reminder.id ? { ...r, completed: !r.completed } : r
