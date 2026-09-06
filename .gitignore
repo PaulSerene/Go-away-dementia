@@ -28,3 +28,7 @@ Ai-responses.txt
 PROJECT_CONTEXT.md
 
 PROJECT_SNAPSHOT.md
+
+# Backend secrets and dependencies — never commit
+server/.env
+server/node_modules/
