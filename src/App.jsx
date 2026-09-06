@@ -21,7 +21,7 @@
  *   'caregiver-reminders' → Caregiver Reminder Management
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModeCard from './components/ModeCard';
 import PatientHome from './components/PatientHome';
 import PatientPlaceholder from './components/PatientPlaceholder';
@@ -32,6 +32,7 @@ import CaregiverDashboard from './components/CaregiverDashboard';
 import CaregiverMemories from './components/CaregiverMemories';
 import CaregiverReminders from './components/CaregiverReminders';
 import PatientReminders from './components/PatientReminders';
+import { getOrCreatePatientId, getOrCreateCaregiverId } from './utils/identity.js';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -74,6 +75,17 @@ function App() {
    * This is called "client-side navigation without a router".
    */
   const [currentScreen, setCurrentScreen] = useState('landing');
+
+  /*
+   * Seed demo user IDs in the DB on app first load.
+   * Runs once ([] dependency). If the backend is down, it fails
+   * silently — all components fall back to localStorage.
+   */
+  useEffect(() => {
+    getOrCreatePatientId();
+    getOrCreateCaregiverId();
+  }, []);
+
 
   /*
    * navigate is a helper function we pass down as a prop.

@@ -20,7 +20,9 @@
  *   navigate — function from App to switch screens
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { reminders as remindersApi } from '../utils/api.js';
+import { getCachedPatientId, getOrCreatePatientId } from '../utils/identity.js';
 import {
   loadReminders,
   saveReminders,
@@ -123,20 +125,73 @@ function PatientReminders({ navigate }) {
 
   const today = todayStr();
 
+  /* ---- BACKEND SYNC ON MOUNT ---- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncFromBackend() {
+      const patientId = await getOrCreatePatientId();
+      if (!patientId || cancelled) return;
+
+      const { data, error } = await remindersApi.list(patientId);
+      if (error || !data?.reminders || cancelled) return;
+
+      const localRems = loadReminders();
+      const localById = Object.fromEntries(localRems.map((r) => [r._dbId, r]));
+
+      const merged = data.reminders.map((dbRem) => ({
+        ...(localById[dbRem.id] ?? {}),
+        _dbId:       dbRem.id,
+        id:          localById[dbRem.id]?.id ?? String(dbRem.id),
+        title:       dbRem.title,
+        description: dbRem.description ?? '',
+        type:        dbRem.type,
+        date:        dbRem.date_on ?? null,
+        time:        dbRem.time_at ?? '',
+        category:    dbRem.category ?? 'Daily',
+        completed:   dbRem.completed,
+        createdAt:   dbRem.created_at,
+      }));
+
+      if (!cancelled) {
+        setReminders(merged);
+        saveReminders(merged);
+      }
+    }
+
+    syncFromBackend();
+    return () => { cancelled = true; };
+  }, []);
+
   /* ---- Toggle completion ---- */
   function handleToggleComplete(reminder) {
+    const patientId = getCachedPatientId();
+
     if (reminder.type === 'daily') {
-      /* Daily: toggle in the per-day completions map — reminder object unchanged */
+      const wasDone = dailyCompletions[reminder.id]?.includes(today);
       const updated = toggleDailyCompletion(dailyCompletions, reminder.id, today);
       setDailyCompletions(updated);
       saveDailyCompletions(updated);
+
+      // Backend sync
+      if (patientId && reminder._dbId) {
+        if (!wasDone) {
+          remindersApi.complete(reminder._dbId, patientId, today).catch(() => {});
+        } else {
+          remindersApi.uncomplete(reminder._dbId, patientId, today).catch(() => {});
+        }
+      }
     } else {
-      /* Specific: flip reminder.completed permanently */
       const updated = reminders.map((r) =>
         r.id === reminder.id ? { ...r, completed: !r.completed } : r
       );
       setReminders(updated);
       saveReminders(updated);
+
+      // Backend sync
+      if (patientId && reminder._dbId) {
+        remindersApi.update(reminder._dbId, { completed: !reminder.completed }).catch(() => {});
+      }
     }
   }
 

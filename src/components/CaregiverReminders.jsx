@@ -16,7 +16,9 @@
  *   navigate — function from App to switch screens
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { reminders as remindersApi } from '../utils/api.js';
+import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
 import {
   loadReminders,
   saveReminders,
@@ -349,6 +351,44 @@ function CaregiverReminders({ navigate }) {
 
   const today = todayStr();
 
+  /* ---- BACKEND SYNC ON MOUNT ---- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncFromBackend() {
+      const patientId = await getOrCreatePatientId();
+      if (!patientId || cancelled) return;
+
+      const { data, error } = await remindersApi.list(patientId);
+      if (error || !data?.reminders || cancelled) return;
+
+      const localRems = loadReminders();
+      const localById = Object.fromEntries(localRems.map((r) => [r._dbId, r]));
+
+      const merged = data.reminders.map((dbRem) => ({
+        ...(localById[dbRem.id] ?? {}),
+        _dbId:       dbRem.id,
+        id:          localById[dbRem.id]?.id ?? generateReminderId(),
+        title:       dbRem.title,
+        description: dbRem.description ?? '',
+        type:        dbRem.type,
+        date:        dbRem.date_on ?? null,
+        time:        dbRem.time_at ?? '',
+        category:    dbRem.category ?? 'Daily',
+        completed:   dbRem.completed,
+        createdAt:   dbRem.created_at,
+      }));
+
+      if (!cancelled) {
+        setReminders(merged);
+        saveReminders(merged);
+      }
+    }
+
+    syncFromBackend();
+    return () => { cancelled = true; };
+  }, []);
+
   /* ---- Sort: daily first, then specific by date, then by time ---- */
   const sorted = [...reminders].sort((a, b) => {
     // daily always floats to the top
@@ -375,7 +415,9 @@ function CaregiverReminders({ navigate }) {
   }
 
   /* ---- SAVE (add or edit) ---- */
-  function handleSave(formData) {
+  async function handleSave(formData) {
+    const patientId = getCachedPatientId();
+
     if (editingReminder) {
       const updated = reminders.map((r) =>
         r.id === editingReminder.id
@@ -391,6 +433,18 @@ function CaregiverReminders({ navigate }) {
           : r
       );
       persistReminders(updated);
+
+      // Backend sync
+      if (patientId && editingReminder._dbId) {
+        remindersApi.update(editingReminder._dbId, {
+          title:       formData.title.trim(),
+          description: formData.description.trim(),
+          type:        formData.type,
+          date_on:     formData.type === 'daily' ? null : formData.date,
+          time_at:     formData.time || null,
+          category:    formData.category,
+        }).catch(() => {});
+      }
     } else {
       const newRem = {
         id:          generateReminderId(),
@@ -400,10 +454,32 @@ function CaregiverReminders({ navigate }) {
         date:        formData.type === 'daily' ? null : formData.date,
         time:        formData.time,
         category:    formData.category,
-        completed:   false,   // for specific reminders
+        completed:   false,
         createdAt:   new Date().toISOString(),
       };
       persistReminders([...reminders, newRem]);
+
+      // Backend sync
+      if (patientId) {
+        const { data } = await remindersApi.create({
+          patient_id:  patientId,
+          title:       newRem.title,
+          description: newRem.description,
+          type:        newRem.type,
+          date_on:     newRem.date || null,
+          time_at:     newRem.time || null,
+          category:    newRem.category,
+        });
+        if (data?.reminder?.id) {
+          setReminders((prev) => {
+            const tagged = prev.map((r) =>
+              r.id === newRem.id ? { ...r, _dbId: data.reminder.id } : r
+            );
+            saveReminders(tagged);
+            return tagged;
+          });
+        }
+      }
     }
     setShowForm(false);
     setEditingReminder(null);
@@ -426,7 +502,14 @@ function CaregiverReminders({ navigate }) {
   }
 
   function handleDeleteConfirm() {
-    persistReminders(reminders.filter((r) => r.id !== deletingReminder.id));
+    const target = deletingReminder;
+    persistReminders(reminders.filter((r) => r.id !== target.id));
+
+    // Backend delete
+    if (target._dbId) {
+      remindersApi.remove(target._dbId).catch(() => {});
+    }
+
     setDeletingReminder(null);
   }
 
@@ -436,14 +519,31 @@ function CaregiverReminders({ navigate }) {
 
   /* ---- TOGGLE COMPLETE ---- */
   function handleToggleComplete(reminder) {
+    const patientId = getCachedPatientId();
+
     if (reminder.type === 'daily') {
+      const wasDone = dailyCompletions[reminder.id]?.includes(today);
       const updated = toggleDailyCompletion(dailyCompletions, reminder.id, today);
       setDailyCompletions(updated);
       saveDailyCompletions(updated);
+
+      // Backend sync
+      if (patientId && reminder._dbId) {
+        if (!wasDone) {
+          remindersApi.complete(reminder._dbId, patientId, today).catch(() => {});
+        } else {
+          remindersApi.uncomplete(reminder._dbId, patientId, today).catch(() => {});
+        }
+      }
     } else {
       persistReminders(reminders.map((r) =>
         r.id === reminder.id ? { ...r, completed: !r.completed } : r
       ));
+
+      // Backend sync
+      if (patientId && reminder._dbId) {
+        remindersApi.update(reminder._dbId, { completed: !reminder.completed }).catch(() => {});
+      }
     }
   }
 

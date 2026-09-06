@@ -1,4 +1,4 @@
-﻿/**
+/**
  * CaregiverMemories.jsx - Caregiver Memory Management screen.
  *
  * Allows the caregiver to view, add, edit, favourite/unfavourite,
@@ -14,7 +14,9 @@
  *   navigate - function from App to switch screens
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { memories as memoriesApi } from '../utils/api.js';
+import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
 import "./CaregiverMemories.css";
 
 /* ----------------------------------------------------------------
@@ -373,9 +375,54 @@ function CaregiverMemories({ navigate }) {
   const [memories, setMemories] = useState(() => loadMemories());
 
   /* UI state */
-  const [showForm, setShowForm]       = useState(false);     // show add/edit form?
-  const [editingMemory, setEditingMemory] = useState(null);  // memory being edited (null = add mode)
-  const [deletingMemory, setDeletingMemory] = useState(null); // memory pending deletion
+  const [showForm, setShowForm]       = useState(false);
+  const [editingMemory, setEditingMemory] = useState(null);
+  const [deletingMemory, setDeletingMemory] = useState(null);
+
+  /* ---- BACKEND SYNC ON MOUNT ---- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncFromBackend() {
+      // Ensure demo patient exists in the DB
+      const patientId = await getOrCreatePatientId();
+      if (!patientId || cancelled) return;
+
+      const { data, error } = await memoriesApi.list(patientId);
+      if (error || !data?.memories || cancelled) return;
+
+      // Backend returned memories — merge with localStorage.
+      // Backend is authoritative; map DB rows back to our local shape,
+      // preserving the 'date' field from any existing local record.
+      const localMems = loadMemories();
+      const localById = Object.fromEntries(localMems.map((m) => [m._dbId, m]));
+
+      const merged = data.memories.map((dbMem) => ({
+        // Preserve local fields that the DB doesn't store (date, image/emoji)
+        ...(localById[dbMem.id] ?? {}),
+        // Always use fresh DB fields for authoritative data
+        _dbId:       dbMem.id,
+        title:       dbMem.title,
+        category:    dbMem.category,
+        description: dbMem.description,
+        favorite:    dbMem.is_favorite,
+        media_url:   dbMem.media_url,
+        createdAt:   dbMem.created_at,
+        // Keep image from local record (emoji visual not stored in DB)
+        image: localById[dbMem.id]?.image ?? dbMem.media_url ?? null,
+        // Keep date from local record (free-text date not stored in DB)
+        date:  localById[dbMem.id]?.date ?? '',
+      }));
+
+      if (!cancelled) {
+        setMemories(merged);
+        saveMemories(merged);
+      }
+    }
+
+    syncFromBackend();
+    return () => { cancelled = true; };
+  }, []);
 
   /* ---- HELPERS ---- */
   function persist(updated) {
@@ -390,7 +437,9 @@ function CaregiverMemories({ navigate }) {
   }
 
   /* ---- SAVE (Add or Edit) ---- */
-  function handleSave(formData) {
+  async function handleSave(formData) {
+    const patientId = getCachedPatientId();
+
     if (editingMemory) {
       // EDIT — preserve id, createdAt, favorite
       const updated = memories.map((m) =>
@@ -406,6 +455,33 @@ function CaregiverMemories({ navigate }) {
           : m
       );
       persist(updated);
+
+      // Backend sync — fire-and-forget
+      if (patientId && editingMemory._dbId) {
+        memoriesApi.update(editingMemory._dbId, {
+          title:       formData.title.trim(),
+          category:    formData.category,
+          description: formData.description.trim(),
+          is_favorite: editingMemory.favorite,
+          media_url:   formData.image ?? null,
+        }).catch(() => {});
+      } else if (patientId && !editingMemory._dbId) {
+        // Was a local-only memory — create in DB now
+        const { data } = await memoriesApi.create({
+          patient_id:  patientId,
+          title:       formData.title.trim(),
+          category:    formData.category,
+          description: formData.description.trim(),
+          is_favorite: editingMemory.favorite,
+          media_url:   formData.image ?? null,
+        });
+        if (data?.memory?.id) {
+          const tagged = memories.map((m) =>
+            m.id === editingMemory.id ? { ...m, _dbId: data.memory.id } : m
+          );
+          persist(tagged);
+        }
+      }
     } else {
       // ADD — brand new memory
       const newMemory = {
@@ -419,6 +495,28 @@ function CaregiverMemories({ navigate }) {
         createdAt:   new Date().toISOString(),
       };
       persist([...memories, newMemory]);
+
+      // Backend sync
+      if (patientId) {
+        const { data } = await memoriesApi.create({
+          patient_id:  patientId,
+          title:       newMemory.title,
+          category:    newMemory.category,
+          description: newMemory.description,
+          is_favorite: false,
+          media_url:   newMemory.image ?? null,
+        });
+        if (data?.memory?.id) {
+          // Tag the just-saved memory with its DB id
+          setMemories((prev) => {
+            const tagged = prev.map((m) =>
+              m.id === newMemory.id ? { ...m, _dbId: data.memory.id } : m
+            );
+            saveMemories(tagged);
+            return tagged;
+          });
+        }
+      }
     }
     setShowForm(false);
     setEditingMemory(null);
@@ -444,6 +542,12 @@ function CaregiverMemories({ navigate }) {
   function handleDeleteConfirm() {
     const updated = memories.filter((m) => m.id !== deletingMemory.id);
     persist(updated);
+
+    // Backend delete — fire-and-forget
+    if (deletingMemory._dbId) {
+      memoriesApi.remove(deletingMemory._dbId).catch(() => {});
+    }
+
     setDeletingMemory(null);
   }
 
@@ -453,10 +557,16 @@ function CaregiverMemories({ navigate }) {
 
   /* ---- TOGGLE FAVOURITE ---- */
   function handleToggleFavorite(id) {
+    const target = memories.find((m) => m.id === id);
     const updated = memories.map((m) =>
       m.id === id ? { ...m, favorite: !m.favorite } : m
     );
     persist(updated);
+
+    // Backend sync — fire-and-forget
+    if (target?._dbId) {
+      memoriesApi.update(target._dbId, { is_favorite: !target.favorite }).catch(() => {});
+    }
   }
 
   /* ---- RENDER ---- */

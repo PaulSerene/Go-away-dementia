@@ -19,7 +19,9 @@
  *   navigate — function from App to switch screens
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { memories as memoriesApi } from '../utils/api.js';
+import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
 import './PatientMemories.css';
 
 /* ── CONSTANTS ───────────────────────────────────────────────── */
@@ -276,9 +278,48 @@ function PatientMemories({ navigate }) {
 
   /*
    * activeCategory — which filter pill is currently selected.
-   * 'All' means show every memory regardless of category.
    */
   const [activeCategory, setActiveCategory] = useState('All');
+
+  /* ── BACKEND SYNC ON MOUNT ─────────────────────────────────
+   * Loads memories from the backend after the initial render.
+   * If the API is unavailable, localStorage data is used unchanged.
+   * ───────────────────────────────────────────────── */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncFromBackend() {
+      const patientId = await getOrCreatePatientId();
+      if (!patientId || cancelled) return;
+
+      const { data, error } = await memoriesApi.list(patientId);
+      if (error || !data?.memories || cancelled) return;
+
+      const localMems = loadMemories();
+      const localById = Object.fromEntries(localMems.map((m) => [m._dbId, m]));
+
+      const merged = data.memories.map((dbMem) => ({
+        ...(localById[dbMem.id] ?? {}),
+        _dbId:       dbMem.id,
+        id:          localById[dbMem.id]?.id ?? String(dbMem.id),
+        title:       dbMem.title,
+        category:    dbMem.category,
+        description: dbMem.description,
+        favorite:    dbMem.is_favorite,
+        image:       localById[dbMem.id]?.image ?? dbMem.media_url ?? null,
+        date:        localById[dbMem.id]?.date ?? '',
+        createdAt:   dbMem.created_at,
+      }));
+
+      if (!cancelled) {
+        setMemories(merged);
+        saveMemories(merged);
+      }
+    }
+
+    syncFromBackend();
+    return () => { cancelled = true; };
+  }, []);
 
   /* ── FILTERED MEMORIES ──────────────────────────────────────
    *
@@ -304,11 +345,18 @@ function PatientMemories({ navigate }) {
    * a brand-new array, which is the React immutability pattern.
    * ─────────────────────────────────────────────────────────── */
   function handleToggleFavorite(id) {
+    const target = memories.find((m) => m.id === id);
     const updated = memories.map((m) =>
       m.id === id ? { ...m, favorite: !m.favorite } : m
     );
-    setMemories(updated);    // update UI
-    saveMemories(updated);   // persist to localStorage
+    setMemories(updated);
+    saveMemories(updated);
+
+    // Backend sync — fire-and-forget
+    const patientId = getCachedPatientId();
+    if (patientId && target?._dbId) {
+      memoriesApi.update(target._dbId, { is_favorite: !target.favorite }).catch(() => {});
+    }
   }
 
   /* ── RENDER ─────────────────────────────────────────────────*/
