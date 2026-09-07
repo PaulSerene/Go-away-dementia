@@ -1,0 +1,66 @@
+/* MovementGame.css */
+
+.mv-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-top: 16px;
+  width: 100%;
+}
+
+.mv-card {
+  background: #fff;
+  border: 2px solid var(--clr-border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.mv-card--active {
+  border-color: var(--clr-secondary);
+  background: rgba(74,124,89,0.04);
+  animation: mvPulse 2s infinite;
+}
+
+@keyframes mvPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(74,124,89,0.1); }
+  50%       { box-shadow: 0 4px 32px rgba(74,124,89,0.25); }
+}
+
+.mv-card__emoji { font-size: 5rem; }
+.mv-card__label { font-size: 1.4rem; font-weight: 700; color: var(--clr-text); }
+.mv-card__instruction { font-size: 1rem; color: var(--clr-text-muted); line-height: 1.5; max-width: 280px; }
+
+.mv-step-info { font-size: 0.9rem; color: var(--clr-text-muted); font-weight: 600; }
+
+.mv-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; }
+
+.mv-sequence-review {
+  background: #fff;
+  border-radius: 14px;
+  border: 2px solid var(--clr-border);
+  padding: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mv-review-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--clr-border);
+}
+.mv-review-item:last-child { border-bottom: none; }
+.mv-review-item .mv-check { margin-left: auto; font-size: 1.2rem; }

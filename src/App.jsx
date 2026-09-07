@@ -33,6 +33,14 @@ import CaregiverMemories from './components/CaregiverMemories';
 import CaregiverReminders from './components/CaregiverReminders';
 import PatientReminders from './components/PatientReminders';
 import CulturalBackground from './components/CulturalBackground';
+import GamesHub from './components/games/GamesHub';
+import WordChain from './components/games/WordChain';
+import MovementGame from './components/games/MovementGame';
+import StoryRecall from './components/games/StoryRecall';
+import RearrangeGame from './components/games/RearrangeGame';
+import MusicMemory from './components/games/MusicMemory';
+import RememberMe from './components/games/RememberMe';
+import PathTracer from './components/games/PathTracer';
 import { getOrCreatePatientId, getOrCreateCaregiverId, getCachedPatientId } from './utils/identity.js';
 import { useConnectivity } from './utils/connectivity.js';
 import { processQueue } from './utils/syncQueue.js';
@@ -181,6 +189,40 @@ function App() {
   /* Caregiver Reminder Management */
   if (currentScreen === 'caregiver-reminders') {
     return <>{banner}<CaregiverReminders navigate={navigate} /></>;
+  }
+
+  /* ── COGNITIVE GAMES HUB ──────────────────────────────── */
+  if (currentScreen === 'games-hub') {
+    return <>{banner}<GamesHub navigate={navigate} /></>;
+  }
+
+  /* ── INDIVIDUAL GAMES ────────────────────────────────── */
+  if (currentScreen === 'game-word-chain') {
+    return <>{banner}<WordChain navigate={navigate} /></>;
+  }
+
+  if (currentScreen === 'game-movement') {
+    return <>{banner}<MovementGame navigate={navigate} /></>;
+  }
+
+  if (currentScreen === 'game-story-recall') {
+    return <>{banner}<StoryRecall navigate={navigate} /></>;
+  }
+
+  if (currentScreen === 'game-rearrange') {
+    return <>{banner}<RearrangeGame navigate={navigate} /></>;
+  }
+
+  if (currentScreen === 'game-music-memory') {
+    return <>{banner}<MusicMemory navigate={navigate} /></>;
+  }
+
+  if (currentScreen === 'game-remember-me') {
+    return <>{banner}<RememberMe navigate={navigate} /></>;
+  }
+
+  if (currentScreen === 'game-path-tracer') {
+    return <>{banner}<PathTracer navigate={navigate} /></>;
   }
 
   /* ── LANDING PAGE (default) ───────────────────────────── */

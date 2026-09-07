@@ -1,0 +1,52 @@
+/* StoryRecall.css */
+
+.sr-story {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding-top: 8px;
+}
+
+.sr-story__title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--clr-text);
+}
+
+.sr-story__text {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid var(--clr-border);
+  padding: 20px;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--clr-text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  white-space: pre-line;
+}
+
+.sr-story__tip {
+  font-size: 0.88rem;
+  color: var(--clr-text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+.sr-question {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.sr-question__text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--clr-text);
+  line-height: 1.4;
+  background: rgba(74,124,89,0.05);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1.5px solid rgba(74,124,89,0.15);
+}

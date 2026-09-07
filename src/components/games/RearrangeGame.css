@@ -1,0 +1,146 @@
+/* RearrangeGame.css */
+
+.rg-memorise, .rg-recall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding-top: 12px;
+  width: 100%;
+}
+
+.rg-instruction {
+  font-size: 1rem;
+  color: var(--clr-text-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── OBJECT GRID ────────────────────────────────────── */
+.rg-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.rg-object {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 2px solid var(--clr-border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  min-width: 80px;
+  flex: 1;
+  max-width: 110px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.rg-object--btn {
+  cursor: pointer;
+  transition: all 0.18s;
+  border: none;
+  font-family: inherit;
+}
+.rg-object--btn:hover:not(:disabled) {
+  border-color: var(--clr-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(192,98,47,0.18);
+}
+
+.rg-object--memorise {
+  border-color: rgba(74,124,89,0.3);
+  background: rgba(74,124,89,0.04);
+}
+
+.rg-object--selected {
+  border-color: var(--clr-secondary) !important;
+  background: rgba(74,124,89,0.1) !important;
+}
+
+.rg-object--correct {
+  border-color: rgba(74,124,89,0.4);
+  background: rgba(74,124,89,0.06);
+}
+
+.rg-object__num {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--clr-primary);
+  background: rgba(192,98,47,0.1);
+  border-radius: 6px;
+  padding: 1px 5px;
+  line-height: 1;
+}
+
+.rg-object__num--sel {
+  color: var(--clr-secondary);
+  background: rgba(74,124,89,0.15);
+}
+
+.rg-object__emoji { font-size: 2.4rem; }
+.rg-object__name  { font-size: 0.8rem; font-weight: 600; color: var(--clr-text-muted); text-align: center; }
+
+/* ── SEQUENCE SLOTS ─────────────────────────────────── */
+.rg-sequence {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 12px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 14px;
+  border: 2px dashed var(--clr-border);
+}
+
+.rg-slot {
+  width: 56px;
+  height: 64px;
+  border-radius: 10px;
+  border: 2px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: #fff;
+}
+
+.rg-slot--filled {
+  border-color: var(--clr-secondary);
+  background: rgba(74,124,89,0.08);
+}
+
+.rg-slot__placeholder {
+  font-size: 1.1rem;
+  color: #ccc;
+  font-weight: 700;
+}
+
+.rg-slot__num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--clr-secondary);
+}
+
+.rg-correct-order {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .rg-object { min-width: 70px; padding: 10px 8px; }
+  .rg-object__emoji { font-size: 2rem; }
+}

@@ -1,0 +1,78 @@
+/* WordChain.css */
+
+.wc-memorise, .wc-recall, .wc-feedback-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-top: 16px;
+  width: 100%;
+}
+
+.wc-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid var(--clr-border);
+  width: 100%;
+  min-height: 80px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.wc-chain--hidden {
+  border-style: dashed;
+}
+
+.wc-chain__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wc-word {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192,98,47,0.08);
+  border: 2px solid rgba(192,98,47,0.2);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--clr-text);
+  min-width: 80px;
+  text-align: center;
+}
+
+.wc-word--hidden {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.15);
+  color: #999;
+  font-size: 1.4rem;
+  min-width: 60px;
+}
+
+.wc-word--highlight {
+  background: rgba(74,124,89,0.12);
+  border-color: rgba(74,124,89,0.4);
+  color: #2d6e44;
+}
+
+.wc-arrow {
+  font-size: 1.2rem;
+  color: var(--clr-text-muted);
+  font-weight: 700;
+}
+
+.wc-answer-reveal {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}

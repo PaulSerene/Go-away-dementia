@@ -64,14 +64,33 @@ function PatientHome({ navigate }) {
               <span className="ph-card__emoji" aria-hidden="true">🧠</span>
               <span className="ph-card__tag">TODAY'S ACTIVITY</span>
             </div>
-            <h2 className="ph-card__title">Remember the Objects</h2>
-            <p className="ph-card__desc">A short memory activity for today.</p>
+            <h2 className="ph-card__title">Memory Match</h2>
+            <p className="ph-card__desc">A short cultural image memory activity for today.</p>
             <button
               id="btn-start-activity"
               className="ph-btn ph-btn--warm"
               onClick={() => navigate('patient-activity')}
             >
               ▶&nbsp; Start Activity
+            </button>
+          </article>
+
+          {/* CARD 1b — ALL ACTIVITIES (Games Hub) */}
+          <article className="ph-card ph-card--games">
+            <div className="ph-card__header">
+              <span className="ph-card__emoji" aria-hidden="true">🎮</span>
+              <span className="ph-card__tag">ALL ACTIVITIES</span>
+            </div>
+            <h2 className="ph-card__title">All Games</h2>
+            <p className="ph-card__desc">
+              Word Chain, Story Time, Movement, PathTracer and more!
+            </p>
+            <button
+              id="btn-all-activities"
+              className="ph-btn ph-btn--games"
+              onClick={() => navigate('games-hub')}
+            >
+              🎮&nbsp; Browse All Activities
             </button>
           </article>
 

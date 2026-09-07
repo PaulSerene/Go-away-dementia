@@ -1,0 +1,354 @@
+/* =====================================================
+   GameShared.css — Shared styles for all Memora games
+   ===================================================== */
+
+/* ── GAME SCREEN WRAPPER ──────────────────────────── */
+.gs-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--clr-bg, #fdf8f3);
+  font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+/* ── GAME HEADER ──────────────────────────────────── */
+.gs-header {
+  background: rgba(253, 248, 243, 0.97);
+  backdrop-filter: blur(8px);
+  border-bottom: 2px solid var(--clr-border, #e8d9c8);
+  padding: 16px 20px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.gs-back-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--clr-primary, #c0622f);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+.gs-back-btn:hover { background: rgba(192,98,47,0.1); }
+
+.gs-header__info { flex: 1; }
+.gs-header__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--clr-text, #2c2417);
+  line-height: 1.2;
+}
+.gs-header__sub {
+  font-size: 0.82rem;
+  color: var(--clr-text-muted, #6b5d4f);
+  margin-top: 2px;
+}
+
+.gs-difficulty-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--clr-accent, #e8a838);
+  color: #2c2417;
+  white-space: nowrap;
+}
+
+/* ── GAME CONTENT AREA ────────────────────────────── */
+.gs-content {
+  flex: 1;
+  padding: 20px 16px 100px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── INTRO SCREEN ─────────────────────────────────── */
+.gs-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  padding-top: 20px;
+}
+.gs-intro__emoji { font-size: 4rem; }
+.gs-intro__title { font-size: 1.6rem; font-weight: 700; color: var(--clr-text); }
+.gs-intro__desc { font-size: 1.05rem; color: var(--clr-text-muted); line-height: 1.6; max-width: 400px; }
+.gs-intro__levels { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.gs-intro__level-pill {
+  background: rgba(74,124,89,0.1);
+  color: var(--clr-secondary, #4a7c59);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ── PRIMARY GAME BUTTON ──────────────────────────── */
+.gs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-height: 60px;
+  min-width: 160px;
+  justify-content: center;
+}
+.gs-btn:active { transform: scale(0.97); }
+
+.gs-btn--primary {
+  background: linear-gradient(135deg, #c0622f, #e8834a);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(192,98,47,0.35);
+}
+.gs-btn--primary:hover { box-shadow: 0 6px 20px rgba(192,98,47,0.45); transform: translateY(-1px); }
+
+.gs-btn--secondary {
+  background: linear-gradient(135deg, #4a7c59, #5a9a6e);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(74,124,89,0.35);
+}
+.gs-btn--secondary:hover { box-shadow: 0 6px 20px rgba(74,124,89,0.45); transform: translateY(-1px); }
+
+.gs-btn--outline {
+  background: rgba(255,255,255,0.8);
+  border: 2px solid var(--clr-border);
+  color: var(--clr-text);
+}
+.gs-btn--outline:hover { background: rgba(255,255,255,1); }
+
+.gs-btn--sm {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  min-height: 48px;
+  min-width: 100px;
+}
+
+.gs-btn--full { width: 100%; }
+
+.gs-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ── PROGRESS BAR ─────────────────────────────────── */
+.gs-progress-wrap {
+  background: rgba(0,0,0,0.08);
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.gs-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--clr-secondary), #8bc48d);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+
+/* ── TIMER ────────────────────────────────────────── */
+.gs-timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+}
+.gs-timer--warning { color: #dc2626; }
+
+/* ── FEEDBACK MESSAGE ─────────────────────────────── */
+.gs-feedback {
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  animation: gsFeedbackIn 0.3s ease-out;
+}
+@keyframes gsFeedbackIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.gs-feedback--correct { background: rgba(74,124,89,0.12); color: #2d6e44; border: 1.5px solid rgba(74,124,89,0.3); }
+.gs-feedback--incorrect { background: rgba(192,98,47,0.10); color: #9e4e24; border: 1.5px solid rgba(192,98,47,0.25); }
+.gs-feedback--neutral { background: rgba(232,168,56,0.12); color: #7a5820; border: 1.5px solid rgba(232,168,56,0.3); }
+
+/* ── GAME COMPLETE SCREEN ─────────────────────────── */
+.gs-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  padding-top: 20px;
+}
+.gs-complete__emoji { font-size: 4rem; }
+.gs-complete__title { font-size: 1.6rem; font-weight: 700; color: var(--clr-text); }
+.gs-complete__sub   { font-size: 1rem; color: var(--clr-text-muted); }
+
+.gs-score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+.gs-score-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.gs-score-card__value { font-size: 1.6rem; font-weight: 800; color: var(--clr-primary); }
+.gs-score-card__label { font-size: 0.82rem; color: var(--clr-text-muted); font-weight: 600; }
+
+.gs-level-msg {
+  background: rgba(74,124,89,0.08);
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: #2d6e44;
+  font-size: 1rem;
+  font-weight: 600;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.gs-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+}
+
+/* ── HINT BUTTON ──────────────────────────────────── */
+.gs-hint-btn {
+  background: rgba(232,168,56,0.12);
+  border: 1.5px solid rgba(232,168,56,0.4);
+  color: #7a5820;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  min-height: 44px;
+}
+.gs-hint-btn:hover { background: rgba(232,168,56,0.2); }
+
+/* ── INSTRUCTION CARD ─────────────────────────────── */
+.gs-instruction {
+  background: rgba(74,124,89,0.06);
+  border: 1.5px solid rgba(74,124,89,0.2);
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 1rem;
+  color: var(--clr-text);
+  line-height: 1.6;
+}
+
+/* ── CHOICE BUTTONS GRID ──────────────────────────── */
+.gs-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.gs-choice-btn {
+  background: #fff;
+  border: 2px solid var(--clr-border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--clr-text);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  min-height: 60px;
+}
+.gs-choice-btn:hover:not(:disabled) {
+  border-color: var(--clr-primary);
+  background: rgba(192,98,47,0.05);
+}
+.gs-choice-btn--selected {
+  border-color: var(--clr-primary);
+  background: rgba(192,98,47,0.08);
+  font-weight: 700;
+}
+.gs-choice-btn--correct {
+  border-color: var(--clr-secondary);
+  background: rgba(74,124,89,0.12);
+  font-weight: 700;
+  color: #2d6e44;
+}
+.gs-choice-btn--wrong {
+  border-color: #dc2626;
+  background: rgba(220,38,38,0.08);
+  color: #991b1b;
+}
+
+/* ── PHASE LABEL ──────────────────────────────────── */
+.gs-phase-label {
+  display: inline-block;
+  background: rgba(192,98,47,0.1);
+  color: var(--clr-primary);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── SECTION HEADING ──────────────────────────────── */
+.gs-section-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin-bottom: 12px;
+}
+
+/* ── WELLNESS NOTICE ──────────────────────────────── */
+.gs-wellness-notice {
+  background: rgba(232,168,56,0.1);
+  border: 1px solid rgba(232,168,56,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: #7a5820;
+  text-align: center;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .gs-content { padding: 16px 12px 90px; }
+  .gs-header { padding: 12px 14px; }
+  .gs-btn { font-size: 1rem; padding: 14px 24px; }
+  .gs-intro__title { font-size: 1.4rem; }
+  .gs-complete__title { font-size: 1.4rem; }
+  .gs-score-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+}

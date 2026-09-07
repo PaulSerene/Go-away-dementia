@@ -218,6 +218,16 @@
 }
 .ph-btn--teal:hover { filter: brightness(1.08); }
 
+.ph-btn--games {
+  background: linear-gradient(135deg, #5c3d8f, #7e57c2);
+  color: #ffffff;
+}
+.ph-btn--games:hover { filter: brightness(1.08); }
+
+.ph-card--games {
+  border-top: 4px solid #7e57c2;
+}
+
 /* ── REMINDER LIST ──────────────────────────────────────────
    Three rows showing today's reminders inside the third card.
    Each row is large and clearly spaced.
