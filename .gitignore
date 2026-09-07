@@ -32,3 +32,9 @@ PROJECT_SNAPSHOT.md
 # Backend secrets and dependencies — never commit
 server/.env
 server/node_modules/
+cultural-assets.zip
+culture.zip
+
+# Extracted asset temp directories and helper scripts — not for Git
+extracted_temp/
+copy-culture-assets.ps1

@@ -431,3 +431,48 @@
   margin-top: 4px;
 }
 
+/* ── CULTURAL IMAGE TILES (memorise phase) ─────────────────────
+   When an object tile contains a photo instead of an emoji,
+   we shrink the padding and show the image filling the card top.
+   ────────────────────────────────────────────────────────────── */
+.mg-object-tile--image {
+  padding: 0 0 12px;          /* image flush to top; name has padding below */
+  overflow: hidden;
+}
+
+.mg-object-tile__img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 13px 13px 0 0;
+  display: block;
+}
+
+/* ── CULTURAL IMAGE TILES (question phase) ─────────────────────
+   Smaller image area inside option buttons. The checkmark badge
+   still appears in the top-right corner (absolute positioning
+   from the parent button is unchanged).
+   ────────────────────────────────────────────────────────────── */
+.mg-option-tile--image {
+  padding: 0 0 10px;
+  overflow: hidden;
+}
+
+.mg-option-tile__img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 11px 11px 0 0;
+  display: block;
+}
+
+/* Ensure the name label still has sensible padding below the image */
+.mg-option-tile--image .mg-option-tile__name {
+  padding: 0 6px;
+}
+
+@media (min-width: 420px) {
+  .mg-object-tile__img { height: 140px; }
+  .mg-option-tile__img  { height: 96px;  }
+}
+

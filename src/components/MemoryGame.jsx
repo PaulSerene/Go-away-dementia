@@ -15,14 +15,15 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { gameResults as gameResultsApi } from '../utils/api.js';
 import { getCachedPatientId } from '../utils/identity.js';
 import { enqueue } from '../utils/syncQueue.js';
+import { getGameReadyItems } from '../utils/culturalContent.js';
 import './MemoryGame.css';
 
-/* ── OBJECT POOL ─────────────────────────────────────────────────
+/* ── EMOJI OBJECT POOL ───────────────────────────────────────────
  *
- * All possible objects the game can use across any level.
- * Objects are randomly sampled each session so the game stays fresh.
+ * Core emoji-based objects. Always available regardless of locale.
+ * These are mixed with cultural image objects at runtime.
  * ─────────────────────────────────────────────────────────────── */
-const OBJECT_POOL = [
+const EMOJI_POOL = [
   { id: 'apple',    emoji: '🍎', name: 'Apple'    },
   { id: 'drum',     emoji: '🥁', name: 'Drum'     },
   { id: 'elephant', emoji: '🐘', name: 'Elephant' },
@@ -32,6 +33,42 @@ const OBJECT_POOL = [
   { id: 'umbrella', emoji: '☂️', name: 'Umbrella' },
   { id: 'star',     emoji: '⭐', name: 'Star'     },
 ];
+
+/* ── CULTURAL CONTENT RATIO ──────────────────────────────────────
+ *
+ * Controls what fraction of game objects come from the cultural
+ * image pool vs the emoji pool. Range: 0.0 (no cultural) → 1.0
+ * (all cultural). Change this one constant to adjust the mix.
+ *
+ * At 0.4 a 5-object game uses ≈2 cultural + 3 emoji items.
+ * ─────────────────────────────────────────────────────────────── */
+const CULTURAL_RATIO = 0.4;
+
+/**
+ * Build the combined OBJECT_POOL for the current session.
+ * Cultural items are mapped to the same shape as emoji items so
+ * the rest of the game code needs no special-casing by type.
+ *
+ * Each item shape:
+ *   { id, name, emoji?, image? }
+ *
+ * Presence of `image` means the item renders as a photo card.
+ * Presence of `emoji` means it renders as an emoji tile.
+ * (An item will never have both.)
+ */
+function buildObjectPool() {
+  const culturalItems = getGameReadyItems().map((item) => ({
+    id:    item.id,
+    name:  item.name.en,   // i18n: replace 'en' with locale when ready
+    image: item.image,
+    alt:   item.description.en,
+  }));
+
+  return [...EMOJI_POOL, ...culturalItems];
+}
+
+// Computed once at module load — stable for the lifetime of the session
+const OBJECT_POOL = buildObjectPool();
 
 /* ── LEVEL CONFIGURATION ─────────────────────────────────────────
  *
@@ -193,13 +230,27 @@ function MemoryGame({ navigate }) {
    * is used consistently throughout the game session.
    * ─────────────────────────────────────────────────────────── */
   const { correctObjects, allOptions } = useMemo(() => {
-    // Pick target objects from the full pool
-    const targets = pickRandom(OBJECT_POOL, levelConfig.objectCount);
-    const targetIds = new Set(targets.map((o) => o.id));
+    // Determine how many items should come from each pool
+    const totalNeeded  = levelConfig.objectCount + levelConfig.distractors;
+    const culturalPool = OBJECT_POOL.filter((o) => o.image);
+    const emojiPool    = OBJECT_POOL.filter((o) => o.emoji);
 
-    // Pick distractor objects from what's left (never overlap targets)
-    const remaining = OBJECT_POOL.filter((o) => !targetIds.has(o.id));
-    const distractors = pickRandom(remaining, levelConfig.distractors);
+    // Pick cultural items proportionally, then fill the rest with emoji
+    const numCultural = Math.min(
+      Math.round(totalNeeded * CULTURAL_RATIO),
+      culturalPool.length,
+    );
+    const numEmoji = totalNeeded - numCultural;
+
+    const culturalSample = pickRandom(culturalPool, numCultural);
+    const emojiSample    = pickRandom(emojiPool, numEmoji);
+    const combined       = [...culturalSample, ...emojiSample].sort(
+      () => Math.random() - 0.5,
+    );
+
+    // Slice the combined pool into targets and distractors
+    const targets    = combined.slice(0, levelConfig.objectCount);
+    const distractors = combined.slice(levelConfig.objectCount);
 
     // Combine and shuffle so targets and distractors are mixed
     const options = [...targets, ...distractors].sort(() => Math.random() - 0.5);
@@ -408,8 +459,17 @@ function MemoryGame({ navigate }) {
           {/* Show this session's randomly chosen correct objects */}
           <div className="mg-object-grid" role="list" aria-label="Objects to remember">
             {correctObjects.map((obj) => (
-              <div key={obj.id} className="mg-object-tile" role="listitem">
-                <span className="mg-object-tile__emoji" aria-hidden="true">{obj.emoji}</span>
+              <div key={obj.id} className={`mg-object-tile${obj.image ? ' mg-object-tile--image' : ''}`} role="listitem">
+                {obj.image ? (
+                  <img
+                    className="mg-object-tile__img"
+                    src={obj.image}
+                    alt={obj.alt || obj.name}
+                    loading="eager"
+                  />
+                ) : (
+                  <span className="mg-object-tile__emoji" aria-hidden="true">{obj.emoji}</span>
+                )}
                 <span className="mg-object-tile__name">{obj.name}</span>
               </div>
             ))}
@@ -437,12 +497,21 @@ function MemoryGame({ navigate }) {
                 <button
                   key={obj.id}
                   id={`option-${obj.id}`}
-                  className={`mg-option-tile ${selected ? 'mg-option-tile--selected' : ''}`}
+                  className={`mg-option-tile${obj.image ? ' mg-option-tile--image' : ''} ${selected ? 'mg-option-tile--selected' : ''}`}
                   onClick={() => handleToggle(obj.id)}
                   aria-pressed={selected}
                   aria-label={`${obj.name}${selected ? ', selected' : ''}`}
                 >
-                  <span className="mg-option-tile__emoji" aria-hidden="true">{obj.emoji}</span>
+                  {obj.image ? (
+                    <img
+                      className="mg-option-tile__img"
+                      src={obj.image}
+                      alt={obj.alt || obj.name}
+                      loading="eager"
+                    />
+                  ) : (
+                    <span className="mg-option-tile__emoji" aria-hidden="true">{obj.emoji}</span>
+                  )}
                   <span className="mg-option-tile__name">{obj.name}</span>
                   {selected && (
                     <span className="mg-option-tile__check" aria-hidden="true">✓</span>
