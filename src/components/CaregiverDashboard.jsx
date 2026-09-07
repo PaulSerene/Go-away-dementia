@@ -21,6 +21,7 @@ import {
   isReminderToday,
   isReminderDoneToday,
 } from "../utils/reminderStorage";
+import CulturalBackground from "./CulturalBackground";
 import "./CaregiverDashboard.css";
 
 /* ----------------------------------------------------------------
@@ -382,41 +383,43 @@ function CaregiverDashboard({ navigate }) {
   const dailyCompletions = loadDailyCompletions();
 
   return (
-    <div className="cgd-screen">
-      <DashboardHeader navigate={navigate} />
+    <CulturalBackground variant="home">
+      <div className="cgd-screen cgd-screen--transparent">
+        <DashboardHeader navigate={navigate} />
 
-      <main className="cgd-content">
+        <main className="cgd-content">
 
-        <div className="cgd-demo-banner" role="note">
-          <span aria-hidden="true">🔬</span>
-          <span>
-            <strong>Prototype Demo</strong> — Mrs. Das is a fictional patient.
-            Data shown reflects actual game sessions played on this device.
-          </span>
-        </div>
+          <div className="cgd-demo-banner" role="note">
+            <span aria-hidden="true">🔬</span>
+            <span>
+              <strong>Prototype Demo</strong> — Mrs. Das is a fictional patient.
+              Data shown reflects actual game sessions played on this device.
+            </span>
+          </div>
 
-        <div className="cgd-refresh-row">
-          <button
-            id="cgd-btn-refresh"
-            className="cgd-btn-refresh"
-            onClick={() => setRefreshKey((k) => k + 1)}
-            aria-label="Refresh dashboard data"
-          >
-            🔄 Refresh Data
-          </button>
-        </div>
+          <div className="cgd-refresh-row">
+            <button
+              id="cgd-btn-refresh"
+              className="cgd-btn-refresh"
+              onClick={() => setRefreshKey((k) => k + 1)}
+              aria-label="Refresh dashboard data"
+            >
+              🔄 Refresh Data
+            </button>
+          </div>
 
-        <OverviewSection results={results} currentLevel={currentLevel} />
-        <RecentActivitiesSection results={results} />
-        <ActivityTrendSection results={results} />
-        <MemorySection memories={memories} navigate={navigate} />
-        <RemindersSection reminders={reminders} dailyCompletions={dailyCompletions} navigate={navigate} />
-        <ActivityNotesSection results={results} />
+          <OverviewSection results={results} currentLevel={currentLevel} />
+          <RecentActivitiesSection results={results} />
+          <ActivityTrendSection results={results} />
+          <MemorySection memories={memories} navigate={navigate} />
+          <RemindersSection reminders={reminders} dailyCompletions={dailyCompletions} navigate={navigate} />
+          <ActivityNotesSection results={results} />
 
-      </main>
+        </main>
 
-      <CaregiverNav navigate={navigate} />
-    </div>
+        <CaregiverNav navigate={navigate} />
+      </div>
+    </CulturalBackground>
   );
 }
 

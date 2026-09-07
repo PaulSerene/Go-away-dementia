@@ -15,6 +15,7 @@
  */
 
 import './PatientProgress.css';
+import CulturalBackground from './CulturalBackground';
 
 /* ── LOCALSTORAGE READERS ────────────────────────────────────────
  *
@@ -186,132 +187,134 @@ function PatientProgress({ navigate }) {
 
   /* ── RENDER ─────────────────────────────────────────────── */
   return (
-    <div className="ph-screen">
+    <CulturalBackground variant="progress">
+      <div className="ph-screen ph-screen--transparent">
 
-      {/* ── PAGE HEADER ──────────────────────────────────── */}
-      <header className="prog-header" aria-label="My Progress">
-        <p className="prog-header__title">My Progress 🌱</p>
-        <p className="prog-header__sub">
-          Here is how you've been doing with your activities.
-        </p>
-      </header>
+        {/* ── PAGE HEADER ──────────────────────────────────── */}
+        <header className="prog-header" aria-label="My Progress">
+          <p className="prog-header__title">My Progress 🌱</p>
+          <p className="prog-header__sub">
+            Here is how you've been doing with your activities.
+          </p>
+        </header>
 
-      {/* ── SCROLLABLE CONTENT ───────────────────────────── */}
-      <main className="prog-content">
+        {/* ── SCROLLABLE CONTENT ───────────────────────────── */}
+        <main className="prog-content">
 
-        {/* ── 4 SUMMARY CARDS ────────────────────────────── */}
-        <section className="prog-summary-grid" aria-label="Summary statistics">
+          {/* ── 4 SUMMARY CARDS ────────────────────────────── */}
+          <section className="prog-summary-grid" aria-label="Summary statistics">
 
-          {/* Card 1 — Games Played */}
-          <div className="prog-stat-card prog-stat-card--warm">
-            <span className="prog-stat-card__icon" aria-hidden="true">🎮</span>
-            <span className="prog-stat-card__value">{gamesPlayed}</span>
-            <span className="prog-stat-card__label">Games Played</span>
-          </div>
-
-          {/* Card 2 — Average Accuracy */}
-          <div className="prog-stat-card prog-stat-card--teal">
-            <span className="prog-stat-card__icon" aria-hidden="true">🎯</span>
-            <span className="prog-stat-card__value">{avgAccuracy}%</span>
-            <span className="prog-stat-card__label">Average Accuracy</span>
-          </div>
-
-          {/* Card 3 — Current Level */}
-          <div className="prog-stat-card prog-stat-card--rose">
-            <span className="prog-stat-card__icon" aria-hidden="true">📊</span>
-            <span className="prog-stat-card__value">{diffLabel(currentLevel)}</span>
-            <span className="prog-stat-card__label">Current Level</span>
-          </div>
-
-          {/* Card 4 — Best Accuracy */}
-          <div className="prog-stat-card prog-stat-card--gold">
-            <span className="prog-stat-card__icon" aria-hidden="true">🌟</span>
-            <span className="prog-stat-card__value">{bestAccuracy}%</span>
-            <span className="prog-stat-card__label">Best Accuracy</span>
-          </div>
-
-        </section>
-
-        {/* ── RECENT ACTIVITY ─────────────────────────────── */}
-        <section className="prog-recent" aria-label="Recent activities">
-          <h2 className="prog-section-heading">Recent Activities</h2>
-
-          {/* EMPTY STATE — no games played yet */}
-          {!hasGames && (
-            <div className="prog-empty">
-              <span className="prog-empty__emoji" aria-hidden="true">🌱</span>
-              <p className="prog-empty__msg">No activities completed yet 🌱</p>
-              <p className="prog-empty__hint">
-                Start your first memory activity to see your progress here.
-              </p>
-              <button
-                id="btn-progress-start-activity"
-                className="ph-btn ph-btn--warm prog-empty__btn"
-                onClick={() => navigate('patient-activity')}
-              >
-                ▶&nbsp; Start Activity
-              </button>
+            {/* Card 1 — Games Played */}
+            <div className="prog-stat-card prog-stat-card--warm">
+              <span className="prog-stat-card__icon" aria-hidden="true">🎮</span>
+              <span className="prog-stat-card__value">{gamesPlayed}</span>
+              <span className="prog-stat-card__label">Games Played</span>
             </div>
-          )}
 
-          {/* ACTIVITY LIST — most recent 10, newest first */}
-          {hasGames && (
-            <ul className="prog-list" role="list">
-              {recentGames.map((game, index) => (
-                /*
-                 * We use the index as a fallback key because older
-                 * result objects may not have a unique id field.
-                 * The timestamp is a better key when available.
-                 */
-                <li
-                  key={game.timestamp ?? index}
-                  className="prog-list-item"
+            {/* Card 2 — Average Accuracy */}
+            <div className="prog-stat-card prog-stat-card--teal">
+              <span className="prog-stat-card__icon" aria-hidden="true">🎯</span>
+              <span className="prog-stat-card__value">{avgAccuracy}%</span>
+              <span className="prog-stat-card__label">Average Accuracy</span>
+            </div>
+
+            {/* Card 3 — Current Level */}
+            <div className="prog-stat-card prog-stat-card--rose">
+              <span className="prog-stat-card__icon" aria-hidden="true">📊</span>
+              <span className="prog-stat-card__value">{diffLabel(currentLevel)}</span>
+              <span className="prog-stat-card__label">Current Level</span>
+            </div>
+
+            {/* Card 4 — Best Accuracy */}
+            <div className="prog-stat-card prog-stat-card--gold">
+              <span className="prog-stat-card__icon" aria-hidden="true">🌟</span>
+              <span className="prog-stat-card__value">{bestAccuracy}%</span>
+              <span className="prog-stat-card__label">Best Accuracy</span>
+            </div>
+
+          </section>
+
+          {/* ── RECENT ACTIVITY ─────────────────────────────── */}
+          <section className="prog-recent" aria-label="Recent activities">
+            <h2 className="prog-section-heading">Recent Activities</h2>
+
+            {/* EMPTY STATE — no games played yet */}
+            {!hasGames && (
+              <div className="prog-empty">
+                <span className="prog-empty__emoji" aria-hidden="true">🌱</span>
+                <p className="prog-empty__msg">No activities completed yet 🌱</p>
+                <p className="prog-empty__hint">
+                  Start your first memory activity to see your progress here.
+                </p>
+                <button
+                  id="btn-progress-start-activity"
+                  className="ph-btn ph-btn--warm prog-empty__btn"
+                  onClick={() => navigate('patient-activity')}
                 >
-                  {/* Game title row */}
-                  <div className="prog-item__title-row">
-                    <span className="prog-item__icon" aria-hidden="true">🧠</span>
-                    <span className="prog-item__title">Remember the Objects</span>
-                    <span className="prog-item__level">
-                      {diffLabel(game.difficulty ?? 1)}
-                    </span>
-                  </div>
+                  ▶&nbsp; Start Activity
+                </button>
+              </div>
+            )}
 
-                  {/* Stats row */}
-                  <div className="prog-item__stats">
-                    <span className="prog-item__stat">
-                      <span className="prog-item__stat-icon" aria-hidden="true">🎯</span>
-                      <span><strong>{game.accuracy ?? 0}%</strong> accuracy</span>
-                    </span>
-                    <span className="prog-item__stat">
-                      <span className="prog-item__stat-icon" aria-hidden="true">✅</span>
-                      <span>
-                        <strong>{game.correct ?? 0} / {game.total ?? 0}</strong> objects
+            {/* ACTIVITY LIST — most recent 10, newest first */}
+            {hasGames && (
+              <ul className="prog-list" role="list">
+                {recentGames.map((game, index) => (
+                  /*
+                   * We use the index as a fallback key because older
+                   * result objects may not have a unique id field.
+                   * The timestamp is a better key when available.
+                   */
+                  <li
+                    key={game.timestamp ?? index}
+                    className="prog-list-item"
+                  >
+                    {/* Game title row */}
+                    <div className="prog-item__title-row">
+                      <span className="prog-item__icon" aria-hidden="true">🧠</span>
+                      <span className="prog-item__title">Remember the Objects</span>
+                      <span className="prog-item__level">
+                        {diffLabel(game.difficulty ?? 1)}
                       </span>
-                    </span>
-                    <span className="prog-item__stat">
-                      <span className="prog-item__stat-icon" aria-hidden="true">⏱️</span>
-                      <span>
-                        Response time: <strong>{game.responseTime ?? '—'}s</strong>
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="prog-item__stats">
+                      <span className="prog-item__stat">
+                        <span className="prog-item__stat-icon" aria-hidden="true">🎯</span>
+                        <span><strong>{game.accuracy ?? 0}%</strong> accuracy</span>
                       </span>
-                    </span>
-                  </div>
+                      <span className="prog-item__stat">
+                        <span className="prog-item__stat-icon" aria-hidden="true">✅</span>
+                        <span>
+                          <strong>{game.correct ?? 0} / {game.total ?? 0}</strong> objects
+                        </span>
+                      </span>
+                      <span className="prog-item__stat">
+                        <span className="prog-item__stat-icon" aria-hidden="true">⏱️</span>
+                        <span>
+                          Response time: <strong>{game.responseTime ?? '—'}s</strong>
+                        </span>
+                      </span>
+                    </div>
 
-                  {/* Date */}
-                  <p className="prog-item__date">
-                    {game.timestamp ? formatDate(game.timestamp) : '—'}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
+                    {/* Date */}
+                    <p className="prog-item__date">
+                      {game.timestamp ? formatDate(game.timestamp) : '—'}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
 
-        </section>
-      </main>
+          </section>
+        </main>
 
-      {/* ── BOTTOM NAVIGATION ────────────────────────────── */}
-      <ProgressNav navigate={navigate} />
+        {/* ── BOTTOM NAVIGATION ────────────────────────────── */}
+        <ProgressNav navigate={navigate} />
 
-    </div>
+      </div>
+    </CulturalBackground>
   );
 }
 

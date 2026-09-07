@@ -61,14 +61,47 @@ export function todayStr() {
 
 /**
  * Load reminders from localStorage.
- * - Key absent  → []   (no seeding — zero means zero)
+ * - Key absent  → seeds with DEMO reminders so the screen is demonstrable
  * - Corrupt     → []   (fail silently, never crash)
  * - Valid       → parsed array with missing `type` field normalised to "specific"
  */
 export function loadReminders() {
   try {
     const raw = localStorage.getItem(REMINDERS_KEY);
-    if (!raw) return [];
+    if (!raw) {
+      // Seed with DEMO reminders if completely empty
+      const DEMO_REMINDERS = [
+        {
+          id: generateReminderId(),
+          title: 'Morning Walk',
+          description: 'A gentle 15-minute walk in the fresh air.',
+          type: 'daily',
+          time: '08:00',
+          category: 'Health',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: generateReminderId(),
+          title: 'Take a break',
+          description: 'Rest and have a cup of tea.',
+          type: 'daily',
+          time: '15:30',
+          category: 'Daily',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: generateReminderId(),
+          title: 'Evening Activity',
+          description: 'Read a book or listen to some calming music.',
+          type: 'daily',
+          time: '18:00',
+          category: 'Other',
+          createdAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem(REMINDERS_KEY, JSON.stringify(DEMO_REMINDERS));
+      return DEMO_REMINDERS;
+    }
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     // Normalize old records: missing `type` → treat as "specific"

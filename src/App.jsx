@@ -32,6 +32,7 @@ import CaregiverDashboard from './components/CaregiverDashboard';
 import CaregiverMemories from './components/CaregiverMemories';
 import CaregiverReminders from './components/CaregiverReminders';
 import PatientReminders from './components/PatientReminders';
+import CulturalBackground from './components/CulturalBackground';
 import { getOrCreatePatientId, getOrCreateCaregiverId, getCachedPatientId } from './utils/identity.js';
 import { useConnectivity } from './utils/connectivity.js';
 import { processQueue } from './utils/syncQueue.js';
@@ -184,77 +185,79 @@ function App() {
 
   /* ── LANDING PAGE (default) ───────────────────────────── */
   return (
-    <div className="app">
-      {/* Sticky header at the top */}
-      <Header />
+    <CulturalBackground variant="landing">
+      <div className="app app--transparent">
+        {/* Sticky header at the top */}
+        <Header />
 
-      {/* Main content area */}
-      <main className="hero">
+        {/* Main content area */}
+        <main className="hero">
 
-        {/* Small decorative tag */}
-        <span className="hero__tag">🇮🇳 North Eastern India</span>
+          {/* Small decorative tag */}
+          <span className="hero__tag">🇮🇳 North Eastern India</span>
 
-        {/* Main title */}
-        <h1 className="hero__title">Memora</h1>
+          {/* Main title */}
+          <h1 className="hero__title">Memora</h1>
 
-        {/* Subtitle */}
-        <p className="hero__subtitle">AI Cognitive &amp; Memory Companion</p>
+          {/* Subtitle */}
+          <p className="hero__subtitle">AI Cognitive &amp; Memory Companion</p>
 
-        {/* Description */}
-        <p className="hero__desc">
-          Memora supports elderly dementia patients with guided cognitive
-          activities, personalised memory assistance, and real-time caregiver
-          tools — all in one accessible, compassionate platform.
-        </p>
+          {/* Description */}
+          <p className="hero__desc">
+            Memora supports elderly dementia patients with guided cognitive
+            activities, personalised memory assistance, and real-time caregiver
+            tools — all in one accessible, compassionate platform.
+          </p>
 
-        {/* Feature pills — quick visual summary of what Smriti offers */}
-        <div className="feature-pills" aria-label="Key features">
-          <span className="pill">🧩 Cognitive Activities</span>
-          <span className="pill">🧠 Memory Assistance</span>
-          <span className="pill">❤️ Caregiver Support</span>
-          <span className="pill">🌿 NE Languages</span>
-        </div>
+          {/* Feature pills — quick visual summary of what Smriti offers */}
+          <div className="feature-pills" aria-label="Key features">
+            <span className="pill">🧩 Cognitive Activities</span>
+            <span className="pill">🧠 Memory Assistance</span>
+            <span className="pill">❤️ Caregiver Support</span>
+            <span className="pill">🌿 NE Languages</span>
+          </div>
 
-        {/* Mode selection heading */}
-        <h2 className="mode-heading">Choose Your Mode</h2>
-        <p className="mode-subheading">
-          Select the experience that matches your role
-        </p>
+          {/* Mode selection heading */}
+          <h2 className="mode-heading">Choose Your Mode</h2>
+          <p className="mode-subheading">
+            Select the experience that matches your role
+          </p>
 
-        {/*
-         * Mode cards grid.
-         * We use .map() to loop over the modes array and render
-         * one <ModeCard /> per mode — cleaner than writing two
-         * separate card blocks by hand.
-         */}
-        <div className="mode-cards">
-          {modes.map((mode) => (
-            <ModeCard
-              key={mode.id}
-              icon={mode.icon}
-              title={mode.title}
-              desc={mode.desc}
-              theme={mode.theme}
-              /*
-               * When Patient Mode is clicked → go to patient-home.
-               * Caregiver Mode is not built yet so we fall back to a
-               * simple alert (will be replaced in a future session).
-               */
-              onClick={() => {
-                if (mode.id === 'patient') {
-                  navigate('patient-home');
-                } else {
-                  navigate('caregiver-dashboard');
-                }
-              }}
-            />
-          ))}
-        </div>
+          {/*
+           * Mode cards grid.
+           * We use .map() to loop over the modes array and render
+           * one <ModeCard /> per mode — cleaner than writing two
+           * separate card blocks by hand.
+           */}
+          <div className="mode-cards">
+            {modes.map((mode) => (
+              <ModeCard
+                key={mode.id}
+                icon={mode.icon}
+                title={mode.title}
+                desc={mode.desc}
+                theme={mode.theme}
+                /*
+                 * When Patient Mode is clicked → go to patient-home.
+                 * Caregiver Mode is not built yet so we fall back to a
+                 * simple alert (will be replaced in a future session).
+                 */
+                onClick={() => {
+                  if (mode.id === 'patient') {
+                    navigate('patient-home');
+                  } else {
+                    navigate('caregiver-dashboard');
+                  }
+                }}
+              />
+            ))}
+          </div>
 
-      </main>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </CulturalBackground>
   );
 }
 

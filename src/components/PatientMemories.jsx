@@ -23,7 +23,14 @@ import { useState, useEffect } from 'react';
 import { memories as memoriesApi } from '../utils/api.js';
 import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
 import { enqueue } from '../utils/syncQueue.js';
+import CulturalBackground from './CulturalBackground';
 import './PatientMemories.css';
+
+// Import bundled cultural images for the demo memories
+import familyImg from '../assets/culture/people/children-bihu-celebration.jpg';
+import placesImg from '../assets/culture/crafts/bamboo-stilt-house.jpg';
+import eventsImg from '../assets/culture/people/couple-traditional-attire.jpg';
+import momentsImg from '../assets/culture/nature/misty-forest.jpg';
 
 /* ── CONSTANTS ───────────────────────────────────────────────── */
 
@@ -56,7 +63,7 @@ const SAMPLE_MEMORIES = [
     category:    'Family',
     description: 'A happy afternoon together in the park. Everyone was laughing and enjoying the sunshine.',
     date:        'June 2024',
-    image:       null,
+    image:       familyImg,
     favorite:    true,
     createdAt:   '2024-06-15T10:00:00.000Z',
   },
@@ -66,7 +73,7 @@ const SAMPLE_MEMORIES = [
     category:    'Places',
     description: 'A place filled with many wonderful memories — the garden, the kitchen, and long evenings on the porch.',
     date:        '2019',
-    image:       null,
+    image:       placesImg,
     favorite:    false,
     createdAt:   '2019-01-01T10:00:00.000Z',
   },
@@ -76,7 +83,7 @@ const SAMPLE_MEMORIES = [
     category:    'Events',
     description: 'A special birthday surrounded by family. There was cake, music, and plenty of laughter.',
     date:        'March 2023',
-    image:       null,
+    image:       eventsImg,
     favorite:    false,
     createdAt:   '2023-03-10T10:00:00.000Z',
   },
@@ -86,7 +93,7 @@ const SAMPLE_MEMORIES = [
     category:    'Special Moments',
     description: 'A peaceful evening spent with loved ones, watching the sunset and sharing stories.',
     date:        'December 2022',
-    image:       null,
+    image:       momentsImg,
     favorite:    true,
     createdAt:   '2022-12-20T10:00:00.000Z',
   },
@@ -380,98 +387,100 @@ function PatientMemories({ navigate }) {
   const hasMemories = memories.length > 0;
 
   return (
-    <div className="ph-screen">
+    <CulturalBackground variant="home">
+      <div className="ph-screen ph-screen--transparent">
 
-      {/* ── PAGE HEADER ─────────────────────────────────── */}
-      <header className="mem-header" aria-label="My Memories">
-        <p className="mem-header__title">My Memories ❤️</p>
-        <p className="mem-header__sub">
-          Take a moment to revisit the memories that matter to you.
-        </p>
-      </header>
+        {/* ── PAGE HEADER ─────────────────────────────────── */}
+        <header className="mem-header" aria-label="My Memories">
+          <p className="mem-header__title">My Memories ❤️</p>
+          <p className="mem-header__sub">
+            Take a moment to revisit the memories that matter to you.
+          </p>
+        </header>
 
-      <main className="mem-content">
+        <main className="mem-content">
 
-        {/* ── EMPTY STATE ─────────────────────────────────── */}
-        {!hasMemories && (
-          <div className="mem-empty">
-            <span className="mem-empty__emoji" aria-hidden="true">❤️</span>
-            <h2 className="mem-empty__heading">My Memories ❤️</h2>
-            <p className="mem-empty__msg">No memories have been added yet.</p>
-            <p className="mem-empty__hint">
-              Your special moments will appear here.
-            </p>
-          </div>
-        )}
-
-        {/* ── CATEGORY FILTERS ────────────────────────────── */}
-        {hasMemories && (
-          <>
-            {/*
-             * A horizontal scrollable row of filter pills.
-             * role="group" with aria-label groups them semantically.
-             * The active pill gets aria-pressed="true".
-             */}
-            <div
-              className="mem-filters"
-              role="group"
-              aria-label="Filter memories by category"
-            >
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  id={`filter-${cat.replace(/\s+/g, '-').toLowerCase()}`}
-                  className={`mem-filter-btn ${activeCategory === cat ? 'mem-filter-btn--active' : ''}`}
-                  onClick={() => setActiveCategory(cat)}
-                  aria-pressed={activeCategory === cat}
-                >
-                  {cat !== 'All' && (
-                    <span aria-hidden="true">{CATEGORY_EMOJI[cat]}</span>
-                  )}
-                  {cat}
-                </button>
-              ))}
+          {/* ── EMPTY STATE ─────────────────────────────────── */}
+          {!hasMemories && (
+            <div className="mem-empty">
+              <span className="mem-empty__emoji" aria-hidden="true">❤️</span>
+              <h2 className="mem-empty__heading">My Memories ❤️</h2>
+              <p className="mem-empty__msg">No memories have been added yet.</p>
+              <p className="mem-empty__hint">
+                Your special moments will appear here.
+              </p>
             </div>
+          )}
 
-            {/* Count of visible memories */}
-            <p className="mem-count" aria-live="polite">
-              {visibleMemories.length === 0
-                ? 'No memories in this category.'
-                : `${visibleMemories.length} memor${visibleMemories.length === 1 ? 'y' : 'ies'}`}
-            </p>
-
-            {/* ── MEMORY CARDS ──────────────────────────────── */}
-            {visibleMemories.length > 0 && (
-              <ul className="mem-list" role="list">
-                {visibleMemories.map((memory) => (
-                  <li key={memory.id} className="mem-list-item">
-                    <MemoryCard
-                      memory={memory}
-                      onToggleFavorite={handleToggleFavorite}
-                    />
-                  </li>
+          {/* ── CATEGORY FILTERS ────────────────────────────── */}
+          {hasMemories && (
+            <>
+              {/*
+               * A horizontal scrollable row of filter pills.
+               * role="group" with aria-label groups them semantically.
+               * The active pill gets aria-pressed="true".
+               */}
+              <div
+                className="mem-filters"
+                role="group"
+                aria-label="Filter memories by category"
+              >
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    id={`filter-${cat.replace(/\s+/g, '-').toLowerCase()}`}
+                    className={`mem-filter-btn ${activeCategory === cat ? 'mem-filter-btn--active' : ''}`}
+                    onClick={() => setActiveCategory(cat)}
+                    aria-pressed={activeCategory === cat}
+                  >
+                    {cat !== 'All' && (
+                      <span aria-hidden="true">{CATEGORY_EMOJI[cat]}</span>
+                    )}
+                    {cat}
+                  </button>
                 ))}
-              </ul>
-            )}
-
-            {/* Empty filter state (category has no memories) */}
-            {visibleMemories.length === 0 && (
-              <div className="mem-empty-filter">
-                <span aria-hidden="true">
-                  {CATEGORY_EMOJI[activeCategory] ?? '📖'}
-                </span>
-                <p>No {activeCategory} memories yet.</p>
               </div>
-            )}
-          </>
-        )}
 
-      </main>
+              {/* Count of visible memories */}
+              <p className="mem-count" aria-live="polite">
+                {visibleMemories.length === 0
+                  ? 'No memories in this category.'
+                  : `${visibleMemories.length} memor${visibleMemories.length === 1 ? 'y' : 'ies'}`}
+              </p>
 
-      {/* ── BOTTOM NAVIGATION ────────────────────────────── */}
-      <MemoriesNav navigate={navigate} />
+              {/* ── MEMORY CARDS ──────────────────────────────── */}
+              {visibleMemories.length > 0 && (
+                <ul className="mem-list" role="list">
+                  {visibleMemories.map((memory) => (
+                    <li key={memory.id} className="mem-list-item">
+                      <MemoryCard
+                        memory={memory}
+                        onToggleFavorite={handleToggleFavorite}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-    </div>
+              {/* Empty filter state (category has no memories) */}
+              {visibleMemories.length === 0 && (
+                <div className="mem-empty-filter">
+                  <span aria-hidden="true">
+                    {CATEGORY_EMOJI[activeCategory] ?? '📖'}
+                  </span>
+                  <p>No {activeCategory} memories yet.</p>
+                </div>
+              )}
+            </>
+          )}
+
+        </main>
+
+        {/* ── BOTTOM NAVIGATION ────────────────────────────── */}
+        <MemoriesNav navigate={navigate} />
+
+      </div>
+    </CulturalBackground>
   );
 }
 
