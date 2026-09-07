@@ -185,8 +185,7 @@ function GamesHub({ navigate }) {
 
           <div className="ghub-welcome">
             <p className="ghub-welcome__text">
-              All activities are designed to be gentle, fun, and encouraging.
-              Take your time — there is no rush. 🌱
+              {t('hub.sub')}
             </p>
           </div>
 
@@ -212,13 +211,13 @@ function GamesHub({ navigate }) {
               <button
                 className="ghub-game-card"
                 onClick={() => navigate('patient-activity')}
-                aria-label="Play Remember the Objects"
+                aria-label={`${t('hub.start')} ${t('game.memoryMatch.name')}`}
                 id="game-card-memory-match"
               >
                 <span className="ghub-game-card__icon" aria-hidden="true">🎴</span>
                 <div className="ghub-game-card__info">
-                  <p className="ghub-game-card__name">Remember the Objects</p>
-                  <p className="ghub-game-card__tagline">Memorise cultural images then identify them. The original Memora memory game.</p>
+                  <p className="ghub-game-card__name">{t('game.memoryMatch.name')}</p>
+                  <p className="ghub-game-card__tagline">{t('game.memoryMatch.tagline')}</p>
                   <div className="ghub-game-card__meta">
                     <span className="ghub-meta-pill">⏱ 3–5 min</span>
                     <span className="ghub-meta-pill">📊 Adaptive</span>
@@ -233,21 +232,21 @@ function GamesHub({ navigate }) {
 
         {/* ── BOTTOM NAV ────────────────────────────────────── */}
         <nav className="ph-nav" aria-label="Main navigation">
-          <button className="ph-nav__btn" onClick={() => navigate('patient-home')} aria-label="Home">
+          <button className="ph-nav__btn" onClick={() => navigate('patient-home')} aria-label={t('nav.patientHome')}>
             <span className="ph-nav__icon" aria-hidden="true">🏠</span>
-            <span className="ph-nav__label">Home</span>
+            <span className="ph-nav__label">{t('nav.home').replace('← Memora ', '')}</span>
           </button>
-          <button className="ph-nav__btn ph-nav__btn--active" aria-current="page" aria-label="Activities">
+          <button className="ph-nav__btn ph-nav__btn--active" aria-current="page" aria-label={t('hub.heading')}>
             <span className="ph-nav__icon" aria-hidden="true">🧠</span>
-            <span className="ph-nav__label">Activities</span>
+            <span className="ph-nav__label">{t('hub.heading')}</span>
           </button>
-          <button className="ph-nav__btn" onClick={() => navigate('patient-memories')} aria-label="Memories">
+          <button className="ph-nav__btn" onClick={() => navigate('patient-memories')} aria-label={t('memories.title')}>
             <span className="ph-nav__icon" aria-hidden="true">❤️</span>
-            <span className="ph-nav__label">Memories</span>
+            <span className="ph-nav__label">{t('memories.title')}</span>
           </button>
-          <button className="ph-nav__btn" onClick={() => navigate('patient-reminders')} aria-label="Reminders">
+          <button className="ph-nav__btn" onClick={() => navigate('patient-reminders')} aria-label={t('reminders.title')}>
             <span className="ph-nav__icon" aria-hidden="true">⏰</span>
-            <span className="ph-nav__label">Reminders</span>
+            <span className="ph-nav__label">{t('reminders.title')}</span>
           </button>
         </nav>
 

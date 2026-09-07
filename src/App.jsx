@@ -267,20 +267,18 @@ function App() {
 
           {/* Description */}
           <p className="hero__desc">
-            Memora supports elderly dementia patients with guided cognitive
-            activities, personalised memory assistance, and real-time caregiver
-            tools — all in one accessible, compassionate platform.
+            {t('landing.subheading')}
           </p>
 
           {/* Safety / Wellness disclaimer */}
           <p className="hero__disclaimer">{t('landing.disclaimer')}</p>
 
-          {/* Feature pills — quick visual summary of what Smriti offers */}
+          {/* Feature pills */}
           <div className="feature-pills" aria-label="Key features">
-            <span className="pill">🧩 Cognitive Activities</span>
-            <span className="pill">🧠 Memory Assistance</span>
-            <span className="pill">❤️ Caregiver Support</span>
-            <span className="pill">🌿 NE Languages</span>
+            <span className="pill">🧩 {t('hub.cat.memory')}</span>
+            <span className="pill">🧠 {t('hub.title')}</span>
+            <span className="pill">❤️ {t('landing.caregiver.title')}</span>
+            <span className="pill">🌿 {t('lang.picker.heading')}</span>
           </div>
 
           {/* Mode selection heading */}

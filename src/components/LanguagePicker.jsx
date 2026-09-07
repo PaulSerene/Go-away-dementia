@@ -69,7 +69,7 @@ export default function LanguagePicker({ onClose }) {
         </ul>
 
         <p className="lp-note">
-          More languages coming soon.
+          {t('lang.picker.note')}
         </p>
       </div>
     </div>

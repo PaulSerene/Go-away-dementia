@@ -24,17 +24,17 @@ import React from 'react';
  * Do NOT scatter this across components.
  * ─────────────────────────────────────────────────────────────── */
 export const LOCALE_META = [
-  { code: 'en',  englishName: 'English',           nativeName: 'English',      script: 'Latin'       },
-  { code: 'as',  englishName: 'Assamese',          nativeName: 'অসমীয়া',     script: 'Bengali'     },
-  { code: 'bn',  englishName: 'Bengali',           nativeName: 'বাংলা',        script: 'Bengali'     },
-  { code: 'mni', englishName: 'Manipuri / Meitei', nativeName: 'মৈতৈলোন্',   script: 'MeeteiMayek' },
-  { code: 'lus', englishName: 'Mizo',              nativeName: 'Mizo tawng',   script: 'Latin'       },
-  { code: 'kha', englishName: 'Khasi',             nativeName: 'Khasi',        script: 'Latin'       },
-  { code: 'grt', englishName: 'Garo',              nativeName: 'Garo',         script: 'Latin'       },
-  { code: 'brx', englishName: 'Bodo',              nativeName: 'बर\'',         script: 'Devanagari'  },
-  { code: 'ne',  englishName: 'Nepali',            nativeName: 'नेपाली',       script: 'Devanagari'  },
-  { code: 'hi',  englishName: 'Hindi',             nativeName: 'हिंदी',        script: 'Devanagari'  },
-  { code: 'te',  englishName: 'Telugu',            nativeName: 'తెలుగు',       script: 'Telugu'      },
+  { code: 'en',  englishName: 'English',           nativeName: 'English',      script: 'Latin',       dir: 'ltr' },
+  { code: 'as',  englishName: 'Assamese',          nativeName: 'অসমীয়া',     script: 'Bengali',     dir: 'ltr' },
+  { code: 'bn',  englishName: 'Bengali',           nativeName: 'বাংলা',        script: 'Bengali',     dir: 'ltr' },
+  { code: 'mni', englishName: 'Manipuri / Meitei', nativeName: 'মৈতৈলোন্',   script: 'MeeteiMayek', dir: 'ltr' },
+  { code: 'lus', englishName: 'Mizo',              nativeName: 'Mizo tawng',   script: 'Latin',       dir: 'ltr' },
+  { code: 'kha', englishName: 'Khasi',             nativeName: 'Khasi',        script: 'Latin',       dir: 'ltr' },
+  { code: 'grt', englishName: 'Garo',              nativeName: 'Garo',         script: 'Latin',       dir: 'ltr' },
+  { code: 'brx', englishName: 'Bodo',              nativeName: "बर'",          script: 'Devanagari',  dir: 'ltr' },
+  { code: 'ne',  englishName: 'Nepali',            nativeName: 'नेपाली',       script: 'Devanagari',  dir: 'ltr' },
+  { code: 'hi',  englishName: 'Hindi',             nativeName: 'हिंदी',        script: 'Devanagari',  dir: 'ltr' },
+  { code: 'te',  englishName: 'Telugu',            nativeName: 'తెలుగు',       script: 'Telugu',      dir: 'ltr' },
 ];
 
 export const LOCALE_CODES = LOCALE_META.map((l) => l.code);
@@ -151,7 +151,9 @@ export function LanguageProvider({ children }) {
     _activeLang = code;
     try { localStorage.setItem(LS_KEY, code); } catch { /* ignore */ }
     if (typeof document !== 'undefined') {
+      const meta = LOCALE_META.find(m => m.code === code);
       document.documentElement.lang = LOCALE_BCP47[code] || code;
+      document.documentElement.dir  = meta?.dir || 'ltr';
     }
     setLangState(code);
   }, []);

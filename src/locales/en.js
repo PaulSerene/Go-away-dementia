@@ -379,6 +379,7 @@ const en = {
   'lang.picker.close':         'Close',
   'lang.picker.selected':      '✓ Selected',
   'lang.picker.select':        'Select',
+  'lang.picker.note':          'All 11 languages are available. More improvements coming soon.',
 
   /* ── ACCESSIBILITY ────────────────────────────────────────────── */
   'a11y.settings.heading':     'Display Settings',

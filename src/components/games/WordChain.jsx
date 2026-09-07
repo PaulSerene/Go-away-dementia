@@ -13,44 +13,24 @@
  *   4 — chains of 5–6 words
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, shuffle, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { getWordPool, getAllWords } from '../../utils/wordPools.js';
 import { useLanguage } from '../../locales/index.js';
 import './WordChain.css';
 import '../games/GameShared.css';
 
 
-/* ── WORD DATASET ─────────────────────────────────────────────── */
-const WORD_CHAINS = [
-  ['river', 'water', 'fish', 'net', 'market', 'home'],
-  ['tea', 'garden', 'leaf', 'rain', 'cloud', 'sky'],
-  ['mother', 'kitchen', 'rice', 'fire', 'smoke', 'village'],
-  ['school', 'book', 'learn', 'grow', 'tree', 'forest'],
-  ['festival', 'music', 'dance', 'drum', 'bamboo', 'craft'],
-  ['flower', 'honey', 'bee', 'hive', 'sweet', 'fruit'],
-  ['mountain', 'mist', 'morning', 'dew', 'grass', 'path'],
-  ['grandmother', 'story', 'lamp', 'night', 'stars', 'moon'],
-];
-
-const ALL_WORDS = [...new Set(WORD_CHAINS.flat())];
-
+/* ── LEVEL CONFIG ─────────────────────────────────────────────── */
 const LEVEL_CONFIG = {
   1: { chainLength: 2, rounds: 3, memoriseMs: 4000 },
   2: { chainLength: 3, rounds: 3, memoriseMs: 4000 },
   3: { chainLength: 4, rounds: 4, memoriseMs: 3500 },
   4: { chainLength: 5, rounds: 4, memoriseMs: 3000 },
 };
-
-function buildGame(level) {
-  const config = LEVEL_CONFIG[level];
-  // Pick a random base chain and truncate to chainLength
-  const base = pickRandom(WORD_CHAINS, 1)[0];
-  const chain = base.slice(0, config.chainLength);
-  return { chain, config };
-}
 
 function buildOptions(correctWord, allWords, count = 4) {
   const wrong = shuffle(allWords.filter(w => w !== correctWord)).slice(0, count - 1);
@@ -62,16 +42,14 @@ function buildOptions(correctWord, allWords, count = 4) {
 const PHASE = { INTRO: 'intro', MEMORISE: 'memorise', RECALL: 'recall', FEEDBACK: 'feedback', COMPLETE: 'complete' };
 
 export default function WordChain({ navigate }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const level = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
   const [phase, setPhase] = useState(PHASE.INTRO);
-  const [chain, setChain]   = useState([]);
   const [round, setRound]   = useState(0);           // 0-indexed round number
   const [options, setOptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [correct, setCorrect]   = useState(0);
-  const [incorrect, setIncorrect] = useState(0);
   const [feedback, setFeedback]   = useState(null);  // { correct: bool, message: string }
   const [hintUsed, setHintUsed]   = useState(false);
   const [totalHints, setTotalHints] = useState(0);
@@ -81,13 +59,19 @@ export default function WordChain({ navigate }) {
 
   const totalRounds = config.rounds;
 
+  // Load language-specific word pool, falling back to English
+  const WORD_CHAINS = getWordPool(lang);
+  const ALL_WORDS = getAllWords(WORD_CHAINS);
+
   // Build a full chain for the whole session, extending each round
   const [fullChain] = useState(() => {
-    const base = pickRandom(WORD_CHAINS, 1)[0];
+    const pool = getWordPool(lang);
+    const base = pickRandom(pool, 1)[0];
+    const allW = getAllWords(pool);
     // Ensure we have enough words
     let combined = [...base];
     while (combined.length < config.chainLength + config.rounds - 1) {
-      const extra = pickRandom(ALL_WORDS, 1)[0];
+      const extra = pickRandom(allW, 1)[0];
       if (!combined.includes(extra)) combined.push(extra);
     }
     return combined;
@@ -131,10 +115,9 @@ export default function WordChain({ navigate }) {
     const isCorrect = word === correctWord;
     if (isCorrect) {
       setCorrect(c => c + 1);
-      setFeedback({ correct: true, message: '✅ Excellent! You remembered it!' });
+      setFeedback({ correct: true, message: t('game.feedback.correct') });
     } else {
-      setIncorrect(i => i + 1);
-      setFeedback({ correct: false, message: `💪 The answer was "${correctWord}". Keep going!` });
+      setFeedback({ correct: false, message: t('game.feedback.tryAgain') });
     }
     setPhase(PHASE.FEEDBACK);
   }
@@ -172,7 +155,7 @@ export default function WordChain({ navigate }) {
     setTotalHints(h => h + 1);
     // Show the second-to-last word as a hint
     const penultimate = currentChain[currentChain.length - 2] || currentChain[0];
-    setFeedback({ correct: null, message: `💡 Hint: the word before it is "${penultimate}"` });
+    setFeedback({ correct: null, message: `💡 "${penultimate}"` });
   }
 
   useEffect(() => {
@@ -187,31 +170,22 @@ export default function WordChain({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">🔤 Word Chain</p>
-            <p className="gs-header__sub">Memory · Language</p>
+            <p className="gs-header__title">🔤 {t('wordChain.title')}</p>
+            <p className="gs-header__sub">{t('wordChain.sub')}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">🔤</span>
-            <h1 className="gs-intro__title">Word Chain</h1>
-            <p className="gs-intro__desc">
-              A chain of connected words will appear on screen. 
-              Remember the last word — then choose it from options!
-            </p>
-            <p className="gs-intro__desc">
-              You will play <strong>{totalRounds} rounds</strong>. Each round, the chain grows by one word.
-            </p>
-            <div className="gs-intro__levels">
-              {['Easy', 'Moderate', 'Challenging', 'Advanced'].map(l => (
-                <span key={l} className="gs-intro__level-pill">{l}</span>
-              ))}
-            </div>
+            <h1 className="gs-intro__title">{t('wordChain.intro.title')}</h1>
+            <p className="gs-intro__desc">{t('wordChain.intro.desc1')}</p>
+            <p className="gs-intro__desc">{t('wordChain.intro.desc2')}</p>
+            <p className="gs-intro__meta">{t('wordChain.intro.rounds', { rounds: totalRounds })}</p>
             <button className="gs-btn gs-btn--primary" onClick={startMemorisePhase}>
-              ▶ Start Game
+              ▶ {t('game.btn.begin')}
             </button>
           </div>
         </div>
@@ -224,39 +198,39 @@ export default function WordChain({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">🔤 Word Chain</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">🔤 {t('wordChain.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">{finalAccuracy >= 80 ? '🌟' : finalAccuracy >= 50 ? '🌸' : '💪'}</span>
-            <h1 className="gs-complete__title">Activity Complete!</h1>
-            <p className="gs-complete__sub">Great effort, Mrs. Das.</p>
+            <h1 className="gs-complete__title">{t('game.complete.title')}</h1>
+            <p className="gs-complete__sub">{t('wordChain.complete.sub', { name: 'Mrs. Das' })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Accuracy</span>
+                <span className="gs-score-card__label">{t('game.score.accuracy')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{correct}/{totalRounds}</span>
-                <span className="gs-score-card__label">Correct</span>
+                <span className="gs-score-card__label">{t('game.score.correct')}</span>
               </div>
               <div className="gs-score-card">
-                <span className="gs-score-card__value">{levelLabel(level)}</span>
-                <span className="gs-score-card__label">Level</span>
+                <span className="gs-score-card__value">{levelLabel(level, t)}</span>
+                <span className="gs-score-card__label">{t('game.score.level')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{totalHints}</span>
-                <span className="gs-score-card__label">Hints Used</span>
+                <span className="gs-score-card__label">{t('game.score.hints')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
-              <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setRound(0); setCorrect(0); setIncorrect(0); setTotalHints(0); setPhase(PHASE.INTRO); }}>
-                🔄 Play Again
+              <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setRound(0); setCorrect(0); setTotalHints(0); setPhase(PHASE.INTRO); }}>
+                {t('game.btn.playAgain')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -268,12 +242,12 @@ export default function WordChain({ navigate }) {
   return (
     <div className="gs-screen">
       <header className="gs-header">
-        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">🔤 Word Chain</p>
-          <p className="gs-header__sub">Round {round + 1} of {totalRounds}</p>
+          <p className="gs-header__title">🔤 {t('wordChain.title')}</p>
+          <p className="gs-header__sub">{t('game.round', { n: round + 1, total: totalRounds })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -285,10 +259,10 @@ export default function WordChain({ navigate }) {
         {/* MEMORISE phase */}
         {phase === PHASE.MEMORISE && (
           <div className="wc-memorise">
-            <p className="gs-phase-label">📖 Memorise the Chain</p>
+            <p className="gs-phase-label">{t('wordChain.phase.memorise')}</p>
             {countdown !== null && (
               <div className={`gs-timer ${countdown <= 2 ? 'gs-timer--warning' : ''}`}>
-                ⏱ {countdown}s
+                {t('game.timer', { n: countdown })}
               </div>
             )}
             <div className="wc-chain">
@@ -299,16 +273,13 @@ export default function WordChain({ navigate }) {
                 </div>
               ))}
             </div>
-            <p className="gs-instruction">
-              Remember the <strong>last word</strong> in the chain. It will be hidden in the next step!
-            </p>
           </div>
         )}
 
         {/* RECALL phase */}
         {phase === PHASE.RECALL && (
           <div className="wc-recall">
-            <p className="gs-phase-label">🤔 What was the last word?</p>
+            <p className="gs-phase-label">{t('wordChain.phase.recall')}</p>
             <div className="wc-chain wc-chain--hidden">
               {currentChain.slice(0, -1).map((word, i) => (
                 <div key={i} className="wc-chain__item">
@@ -322,7 +293,7 @@ export default function WordChain({ navigate }) {
             </div>
 
             {!hintUsed && (
-              <button className="gs-hint-btn" onClick={handleHint}>💡 Show a Hint</button>
+              <button className="gs-hint-btn" onClick={handleHint}>{t('game.hint.btn')}</button>
             )}
             {feedback && feedback.correct === null && (
               <div className="gs-feedback gs-feedback--neutral">{feedback.message}</div>
@@ -349,7 +320,6 @@ export default function WordChain({ navigate }) {
               {feedback?.message}
             </div>
             <div className="wc-answer-reveal">
-              <p className="gs-section-heading">The full chain was:</p>
               <div className="wc-chain">
                 {currentChain.map((word, i) => (
                   <div key={i} className="wc-chain__item">
@@ -362,7 +332,7 @@ export default function WordChain({ navigate }) {
               </div>
             </div>
             <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-              {round + 1 >= totalRounds ? 'See Results' : 'Next Round →'}
+              {round + 1 >= totalRounds ? t('game.btn.seeResults') : t('game.btn.next')}
             </button>
           </div>
         )}
