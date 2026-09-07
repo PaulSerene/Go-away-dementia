@@ -24,6 +24,7 @@ import { memories as memoriesApi } from '../utils/api.js';
 import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
 import { enqueue } from '../utils/syncQueue.js';
 import CulturalBackground from './CulturalBackground';
+import { useLanguage } from '../locales/index.js';
 import './PatientMemories.css';
 
 // Import bundled cultural images for the demo memories
@@ -271,6 +272,7 @@ function MemoryCard({ memory, onToggleFavorite }) {
 
 /* ── MAIN COMPONENT ──────────────────────────────────────────────*/
 function PatientMemories({ navigate }) {
+  const { t } = useLanguage();
 
   /*
    * memories — the full list loaded from localStorage on mount.

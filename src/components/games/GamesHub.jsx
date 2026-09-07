@@ -10,6 +10,8 @@
 
 import './GamesHub.css';
 import CulturalBackground from '../CulturalBackground';
+import { useLanguage } from '../../locales/index.js';
+
 
 const GAME_CATEGORIES = [
   {
@@ -102,12 +104,12 @@ const GAME_CATEGORIES = [
   },
 ];
 
-function GameCard({ game, navigate }) {
+function GameCard({ game, navigate, t }) {
   return (
     <button
       className="ghub-game-card"
       onClick={() => navigate(game.id)}
-      aria-label={`Play ${game.name}`}
+      aria-label={`${t('hub.start')} ${game.name}`}
       id={`game-card-${game.id}`}
     >
       <span className="ghub-game-card__icon" aria-hidden="true">{game.icon}</span>
@@ -124,7 +126,41 @@ function GameCard({ game, navigate }) {
   );
 }
 
+
 function GamesHub({ navigate }) {
+  const { t } = useLanguage();
+
+  /* Build category/game data using t() for labels */
+  const GAME_CATEGORIES_L = [
+    {
+      id: 'memory', emoji: '🧠', label: t('hub.cat.memory'), color: 'warm',
+      games: [
+        { id: 'game-word-chain',   icon: '🔤', name: t('game.wordChain.name'),   tagline: t('game.wordChain.tagline'),   duration: '5–8 min', level: 'All Levels' },
+        { id: 'game-story-recall', icon: '📖', name: t('game.storyRecall.name'), tagline: t('game.storyRecall.tagline'), duration: '5–10 min', level: 'All Levels' },
+        { id: 'game-remember-me',  icon: '❤️', name: t('game.rememberMe.name'),  tagline: t('game.rememberMe.tagline'),  duration: '4–7 min', level: 'All Levels' },
+      ],
+    },
+    {
+      id: 'attention', emoji: '👀', label: t('hub.cat.attention'), color: 'teal',
+      games: [
+        { id: 'game-rearrange',    icon: '🪑', name: t('game.rearrange.name'),   tagline: t('game.rearrange.tagline'),   duration: '5–8 min', level: 'All Levels' },
+        { id: 'game-path-tracer',  icon: '🗺️', name: t('game.pathTracer.name'),  tagline: t('game.pathTracer.tagline'),  duration: '5–8 min', level: 'All Levels' },
+      ],
+    },
+    {
+      id: 'movement', emoji: '🤸', label: t('hub.cat.movement'), color: 'rose',
+      games: [
+        { id: 'game-movement',     icon: '🙌', name: t('game.movement.name'),    tagline: t('game.movement.tagline'),    duration: '3–6 min', level: 'All Levels' },
+      ],
+    },
+    {
+      id: 'music', emoji: '🎵', label: t('hub.cat.music'), color: 'gold',
+      games: [
+        { id: 'game-music-memory', icon: '🎶', name: t('game.musicMemory.name'), tagline: t('game.musicMemory.tagline'), duration: '5–8 min', level: 'All Levels' },
+      ],
+    },
+  ];
+
   return (
     <CulturalBackground variant="home">
       <div className="ghub-screen ph-screen--transparent">
@@ -134,13 +170,13 @@ function GamesHub({ navigate }) {
           <button
             className="gs-back-btn"
             onClick={() => navigate('patient-home')}
-            aria-label="Back to Home"
+            aria-label={t('nav.patientHome')}
           >
-            ← Home
+            {t('nav.patientHome')}
           </button>
           <div className="ghub-header__info">
-            <p className="ghub-header__title">🎮 Activities</p>
-            <p className="ghub-header__sub">Choose a game to start</p>
+            <p className="ghub-header__title">🎮 {t('hub.heading')}</p>
+            <p className="ghub-header__sub">{t('hub.sub')}</p>
           </div>
         </header>
 
@@ -154,14 +190,14 @@ function GamesHub({ navigate }) {
             </p>
           </div>
 
-          {GAME_CATEGORIES.map((cat) => (
+          {GAME_CATEGORIES_L.map((cat) => (
             <section key={cat.id} className={`ghub-category ghub-category--${cat.color}`}>
               <h2 className="ghub-category__heading">
                 <span aria-hidden="true">{cat.emoji}</span> {cat.label}
               </h2>
               <div className="ghub-game-list">
                 {cat.games.map((game) => (
-                  <GameCard key={game.id} game={game} navigate={navigate} />
+                  <GameCard key={game.id} game={game} navigate={navigate} t={t} />
                 ))}
               </div>
             </section>
@@ -170,7 +206,7 @@ function GamesHub({ navigate }) {
           {/* Also show existing Memory Game */}
           <section className="ghub-category ghub-category--warm">
             <h2 className="ghub-category__heading">
-              <span aria-hidden="true">🖼️</span> Cultural Memory Match
+              <span aria-hidden="true">🖼️</span> {t('game.memoryMatch.name')}
             </h2>
             <div className="ghub-game-list">
               <button

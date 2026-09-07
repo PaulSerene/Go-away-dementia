@@ -19,8 +19,10 @@ import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, shuffle, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { useLanguage } from '../../locales/index.js';
 import './PathTracer.css';
 import '../games/GameShared.css';
+
 
 /* ── ROUTE LANDMARK POOL ─────────────────────────────────────── */
 const LANDMARK_POOL = [
@@ -59,6 +61,7 @@ function buildRoute(stopCount) {
 const PHASE = { INTRO: 'intro', MEMORISE: 'memorise', RECALL: 'recall', COMPLETE: 'complete' };
 
 export default function PathTracer({ navigate }) {
+  const { t } = useLanguage();
   const level  = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
 

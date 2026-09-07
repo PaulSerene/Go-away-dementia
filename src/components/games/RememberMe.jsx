@@ -17,8 +17,10 @@ import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, shuffle, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { useLanguage } from '../../locales/index.js';
 import './RememberMe.css';
 import '../games/GameShared.css';
+
 
 // Import existing cultural assets as demo memory images
 import imgChildren   from '../../assets/culture/people/children-bihu-celebration.jpg';
@@ -131,6 +133,7 @@ const LEVEL_CONFIG = {
 const PHASE = { INTRO: 'intro', VIEW: 'view', QUESTION: 'question', FEEDBACK: 'feedback', COMPLETE: 'complete' };
 
 export default function RememberMe({ navigate }) {
+  const { t } = useLanguage();
   const level  = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
 

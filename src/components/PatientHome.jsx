@@ -23,8 +23,11 @@ import {
   CATEGORY_EMOJI,
 } from '../utils/reminderStorage';
 import CulturalBackground from './CulturalBackground';
+import { useLanguage } from '../locales/index.js';
+
 
 function PatientHome({ navigate }) {
+  const { t } = useLanguage();
   /* Load real reminders from shared storage */
   const allReminders    = loadReminders();
   const dailyCompletions = loadDailyCompletions();
@@ -36,23 +39,28 @@ function PatientHome({ navigate }) {
 
   const todayTotalCount = allReminders.filter((r) => isReminderToday(r)).length;
 
+  /* Time-of-day greeting */
+  const hour = new Date().getHours();
+  const timeKey = hour < 12 ? 'home.greeting.morning' : hour < 17 ? 'home.greeting.afternoon' : 'home.greeting.evening';
+  const greeting = t('home.greeting', { timeOfDay: t(timeKey), name: 'Mrs. Das' });
+
   return (
     <CulturalBackground variant="home">
       <div className="ph-screen ph-screen--transparent">
 
-        {/* ── GREETING HEADER ──────────────────────────────── */}
+        {/* ── GREETING HEADER ──────────────────────── */}
         <header className="ph-greeting" aria-label="Greeting">
           {/* Back to Memora Home button */}
           <button
             className="ph-header-back-btn"
             onClick={() => navigate('landing')}
-            aria-label="Return to Memora Home"
+            aria-label={t('nav.home')}
           >
-            ← Memora Home
+            {t('nav.home')}
           </button>
 
-          <p className="ph-greeting__name">Good Morning, Mrs. Das ❤️</p>
-          <p className="ph-greeting__sub">Let's make today a good day.</p>
+          <p className="ph-greeting__name">{greeting}</p>
+          <p className="ph-greeting__sub">{t('home.sub')}</p>
         </header>
 
         {/* ── MAIN CARD AREA ───────────────────────────────── */}
@@ -62,16 +70,16 @@ function PatientHome({ navigate }) {
           <article className="ph-card ph-card--activity">
             <div className="ph-card__header">
               <span className="ph-card__emoji" aria-hidden="true">🧠</span>
-              <span className="ph-card__tag">TODAY'S ACTIVITY</span>
+              <span className="ph-card__tag">{t('home.todayActivity.tag')}</span>
             </div>
-            <h2 className="ph-card__title">Memory Match</h2>
-            <p className="ph-card__desc">A short cultural image memory activity for today.</p>
+            <h2 className="ph-card__title">{t('home.todayActivity.title')}</h2>
+            <p className="ph-card__desc">{t('home.todayActivity.desc')}</p>
             <button
               id="btn-start-activity"
               className="ph-btn ph-btn--warm"
               onClick={() => navigate('patient-activity')}
             >
-              ▶&nbsp; Start Activity
+              {t('home.todayActivity.btn')}
             </button>
           </article>
 
@@ -79,18 +87,16 @@ function PatientHome({ navigate }) {
           <article className="ph-card ph-card--games">
             <div className="ph-card__header">
               <span className="ph-card__emoji" aria-hidden="true">🎮</span>
-              <span className="ph-card__tag">ALL ACTIVITIES</span>
+              <span className="ph-card__tag">{t('home.allActivities.tag')}</span>
             </div>
-            <h2 className="ph-card__title">All Games</h2>
-            <p className="ph-card__desc">
-              Word Chain, Story Time, Movement, PathTracer and more!
-            </p>
+            <h2 className="ph-card__title">{t('home.allActivities.title')}</h2>
+            <p className="ph-card__desc">{t('home.allActivities.desc')}</p>
             <button
               id="btn-all-activities"
               className="ph-btn ph-btn--games"
               onClick={() => navigate('games-hub')}
             >
-              🎮&nbsp; Browse All Activities
+              {t('home.allActivities.btn')}
             </button>
           </article>
 
@@ -98,18 +104,16 @@ function PatientHome({ navigate }) {
           <article className="ph-card ph-card--memories">
             <div className="ph-card__header">
               <span className="ph-card__emoji" aria-hidden="true">❤️</span>
-              <span className="ph-card__tag">MY MEMORIES</span>
+              <span className="ph-card__tag">{t('home.memories.tag')}</span>
             </div>
-            <h2 className="ph-card__title">My Memories</h2>
-            <p className="ph-card__desc">
-              People, places and moments that matter.
-            </p>
+            <h2 className="ph-card__title">{t('home.memories.title')}</h2>
+            <p className="ph-card__desc">{t('home.memories.desc')}</p>
             <button
               id="btn-open-memories"
               className="ph-btn ph-btn--rose"
               onClick={() => navigate('patient-memories')}
             >
-              📖&nbsp; Open Memories
+              {t('home.memories.btn')}
             </button>
           </article>
 
@@ -117,16 +121,16 @@ function PatientHome({ navigate }) {
           <article className="ph-card ph-card--reminders">
             <div className="ph-card__header">
               <span className="ph-card__emoji" aria-hidden="true">⏰</span>
-              <span className="ph-card__tag">TODAY'S REMINDERS</span>
+              <span className="ph-card__tag">{t('home.reminders.tag')}</span>
             </div>
-            <h2 className="ph-card__title">Today's Reminders</h2>
+            <h2 className="ph-card__title">{t('home.reminders.title')}</h2>
 
             {todayTotalCount === 0 ? (
               /* No reminders at all today */
-              <p className="ph-reminder-empty">No reminders for today.</p>
+              <p className="ph-reminder-empty">{t('home.reminders.none')}</p>
             ) : todayPendingReminders.length === 0 ? (
               /* All done! */
-              <p className="ph-reminder-empty">✅ All done for today!</p>
+              <p className="ph-reminder-empty">✅ {t('home.reminders.done')}</p>
             ) : (
               /* Show up to 3 pending reminders as a preview */
               <ul className="ph-reminder-list" role="list">
@@ -154,7 +158,7 @@ function PatientHome({ navigate }) {
               className="ph-btn ph-btn--teal"
               onClick={() => navigate('patient-reminders')}
             >
-              ⏰&nbsp; See All Reminders
+              {t('home.reminders.btn')}
             </button>
           </article>
 

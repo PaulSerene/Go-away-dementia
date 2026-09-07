@@ -16,7 +16,9 @@ import { gameResults as gameResultsApi } from '../utils/api.js';
 import { getCachedPatientId } from '../utils/identity.js';
 import { enqueue } from '../utils/syncQueue.js';
 import { getGameReadyItems } from '../utils/culturalContent.js';
+import { useLanguage } from '../locales/index.js';
 import './MemoryGame.css';
+
 
 /* ── OBJECT POOL ─────────────────────────────────────────────────
  *
@@ -180,6 +182,7 @@ function calcScore(selectedIds, correctObjects) {
    MAIN COMPONENT
    ════════════════════════════════════════════════════════════════ */
 function MemoryGame({ navigate }) {
+  const { t } = useLanguage();
 
   /* ── READ DIFFICULTY FROM LOCALSTORAGE ON MOUNT ─────────────
    *

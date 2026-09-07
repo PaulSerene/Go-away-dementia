@@ -44,6 +44,9 @@ import PathTracer from './components/games/PathTracer';
 import { getOrCreatePatientId, getOrCreateCaregiverId, getCachedPatientId } from './utils/identity.js';
 import { useConnectivity } from './utils/connectivity.js';
 import { processQueue } from './utils/syncQueue.js';
+import { LanguageProvider, useLanguage } from './locales/index.js';
+import { AccessibilityProvider } from './contexts/AccessibilityContext.jsx';
+import AccessibilityPanel from './components/AccessibilityPanel.jsx';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -52,37 +55,53 @@ import './components/PatientHome.css';
  * Uses position:fixed so it floats above all existing layouts.
  * ─────────────────────────────────────────────────────── */
 function OfflineBanner() {
+  const { t } = useLanguage();
   return (
     <div className="offline-banner" role="status" aria-live="polite">
-      📵 Offline — changes are saved locally and will sync when you reconnect.
+      {t('offline.banner')}
     </div>
   );
 }
 
 /* ---- Small reusable Header component ---- */
 function Header() {
+  const { t } = useLanguage();
+  const [showA11y, setShowA11y] = useState(false);
   return (
-    <header className="header">
-      {/* Brand / logo area */}
-      <span className="header__brand">
-        <span className="header__brand-icon">🧠</span>
-        Memora
-      </span>
+    <>
+      <header className="header">
+        {/* Brand / logo area */}
+        <span className="header__brand">
+          <span className="header__brand-icon">🧠</span>
+          {t('app.name')}
+        </span>
 
-      {/* Small badge on the right */}
-      <span className="header__badge">SIH 2026 · NE India</span>
-    </header>
+        <div className="header__right">
+          {/* Accessibility / Language button */}
+          <button
+            className="header__a11y-btn"
+            onClick={() => setShowA11y(true)}
+            aria-label={t('a11y.settings.btn')}
+            title={t('a11y.settings.btn')}
+          >
+            ⚙
+          </button>
+          {/* Small badge */}
+          <span className="header__badge">{t('app.badge')}</span>
+        </div>
+      </header>
+
+      {showA11y && <AccessibilityPanel onClose={() => setShowA11y(false)} />}
+    </>
   );
 }
 
 /* ---- Small reusable Footer component ---- */
 function Footer() {
+  const { t } = useLanguage();
   return (
     <footer className="footer">
-      <p>
-        <strong>Memora</strong> · AI Cognitive &amp; Memory Companion ·
-        Built for SIH 2026 Problem Statement SIH26003
-      </p>
+      <p>{t('footer.text')}</p>
     </footer>
   );
 }
@@ -130,20 +149,22 @@ function App() {
    */
   const navigate = (screen) => setCurrentScreen(screen);
 
+  const { t } = useLanguage();
+
   /* Data for the two mode cards — stored as an array of objects */
   const modes = [
     {
       id: 'patient',
       icon: '👴',
-      title: 'Patient Mode',
-      desc: 'Cognitive activities, memory games, and daily reminders designed for elderly users.',
+      title: t('landing.patient.title'),
+      desc: t('landing.patient.desc'),
       theme: 'patient',
     },
     {
       id: 'caregiver',
       icon: '👨‍👩‍👧',
-      title: 'Caregiver Mode',
-      desc: 'Monitor progress, manage care plans, and stay connected with your loved one.',
+      title: t('landing.caregiver.title'),
+      desc: t('landing.caregiver.desc'),
       theme: 'caregiver',
     },
   ];
@@ -239,10 +260,10 @@ function App() {
           <span className="hero__tag">🇮🇳 North Eastern India</span>
 
           {/* Main title */}
-          <h1 className="hero__title">Memora</h1>
+          <h1 className="hero__title">{t('app.name')}</h1>
 
           {/* Subtitle */}
-          <p className="hero__subtitle">AI Cognitive &amp; Memory Companion</p>
+          <p className="hero__subtitle">{t('app.tagline')}</p>
 
           {/* Description */}
           <p className="hero__desc">
@@ -250,6 +271,9 @@ function App() {
             activities, personalised memory assistance, and real-time caregiver
             tools — all in one accessible, compassionate platform.
           </p>
+
+          {/* Safety / Wellness disclaimer */}
+          <p className="hero__disclaimer">{t('landing.disclaimer')}</p>
 
           {/* Feature pills — quick visual summary of what Smriti offers */}
           <div className="feature-pills" aria-label="Key features">
@@ -260,10 +284,7 @@ function App() {
           </div>
 
           {/* Mode selection heading */}
-          <h2 className="mode-heading">Choose Your Mode</h2>
-          <p className="mode-subheading">
-            Select the experience that matches your role
-          </p>
+          <h2 className="mode-heading">{t('landing.select')}</h2>
 
           {/*
            * Mode cards grid.
@@ -303,4 +324,15 @@ function App() {
   );
 }
 
-export default App;
+/* ── ROOT EXPORT: wrapped in both providers ─────────────────────── */
+function Root() {
+  return (
+    <LanguageProvider>
+      <AccessibilityProvider>
+        <App />
+      </AccessibilityProvider>
+    </LanguageProvider>
+  );
+}
+
+export default Root;

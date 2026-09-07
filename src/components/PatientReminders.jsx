@@ -37,7 +37,9 @@ import {
   todayStr,
 } from '../utils/reminderStorage';
 import CulturalBackground from './CulturalBackground';
+import { useLanguage } from '../locales/index.js';
 import './PatientReminders.css';
+
 
 /* ----------------------------------------------------------------
    HELPERS
@@ -122,6 +124,7 @@ function PatientReminderCard({ reminder, isDone, onToggleComplete }) {
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function PatientReminders({ navigate }) {
+  const { t } = useLanguage();
   const [reminders, setReminders]             = useState(() => loadReminders());
   const [dailyCompletions, setDailyCompletions] = useState(() => loadDailyCompletions());
 

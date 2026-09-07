@@ -20,8 +20,10 @@ import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, shuffle, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { useLanguage } from '../../locales/index.js';
 import './MusicMemory.css';
 import '../games/GameShared.css';
+
 
 /* ── MUSIC DATABASE ───────────────────────────────────────────── */
 const MUSIC_ITEMS = [
@@ -103,6 +105,7 @@ const LEVEL_CONFIG = {
 const PHASE = { INTRO: 'intro', QUESTION: 'question', FEEDBACK: 'feedback', COMPLETE: 'complete' };
 
 export default function MusicMemory({ navigate }) {
+  const { t } = useLanguage();
   const level  = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
 

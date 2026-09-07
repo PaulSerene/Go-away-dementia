@@ -22,6 +22,7 @@ import {
   isReminderDoneToday,
 } from "../utils/reminderStorage";
 import CulturalBackground from "./CulturalBackground";
+import { useLanguage } from '../locales/index.js';
 import "./CaregiverDashboard.css";
 
 /* ----------------------------------------------------------------
@@ -373,6 +374,7 @@ function CaregiverNav({ navigate }) {
    the caregiver clicks "Refresh Data" mid-session.
 ---------------------------------------------------------------- */
 function CaregiverDashboard({ navigate }) {
+  const { t } = useLanguage();
   const [refreshKey, setRefreshKey] = useState(0);
   void refreshKey; // referenced so lint knows it is used
 

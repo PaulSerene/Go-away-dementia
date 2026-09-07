@@ -18,8 +18,10 @@ import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { useLanguage } from '../../locales/index.js';
 import './MovementGame.css';
 import '../games/GameShared.css';
+
 
 /* ── MOVEMENT DATABASE ────────────────────────────────────────── */
 const MOVEMENTS = [
@@ -43,6 +45,7 @@ const LEVEL_CONFIG = {
 const PHASE = { INTRO: 'intro', WATCH: 'watch', DO: 'do', FEEDBACK: 'feedback', COMPLETE: 'complete' };
 
 export default function MovementGame({ navigate }) {
+  const { t } = useLanguage();
   const level  = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
 

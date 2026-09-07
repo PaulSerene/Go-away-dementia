@@ -16,6 +16,8 @@
 
 import './PatientProgress.css';
 import CulturalBackground from './CulturalBackground';
+import { useLanguage } from '../locales/index.js';
+
 
 /* ── LOCALSTORAGE READERS ────────────────────────────────────────
  *
@@ -167,6 +169,7 @@ function ProgressNav({ navigate }) {
  * up-to-date without any polling or refresh.
  * ─────────────────────────────────────────────────────────────── */
 function PatientProgress({ navigate }) {
+  const { t } = useLanguage();
   /*
    * Read data at render time — no useState/useEffect needed here
    * because the values don't change while the screen is open.

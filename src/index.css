@@ -78,3 +78,93 @@ button {
   background: none;
 }
 
+/* ── SCRIPT-SPECIFIC FONT FAMILIES ───────────────────────────────
+   Applied via :lang() selector when document.documentElement.lang changes.
+   System fonts are listed as fallbacks for offline use.
+   ─────────────────────────────────────────────────────────────── */
+:lang(as),
+:lang(bn)  { font-family: 'Noto Sans Bengali',      'Noto Sans', system-ui, sans-serif; }
+:lang(mni) { font-family: 'Noto Sans Meetei Mayek', 'Noto Sans', system-ui, sans-serif; }
+:lang(hi),
+:lang(ne),
+:lang(brx) { font-family: 'Noto Sans Devanagari',   'Noto Sans', system-ui, sans-serif; }
+:lang(te)  { font-family: 'Noto Sans Telugu',        'Noto Sans', system-ui, sans-serif; }
+:lang(lus),
+:lang(kha),
+:lang(grt) { font-family: 'Noto Sans', 'Inter',      system-ui, sans-serif; }
+
+/* ── ACCESSIBILITY: LARGE TEXT ───────────────────────────────────
+   One step larger than default. Preserves layout — does not cause
+   overflow. Game-specific text is handled via .gs- classes.
+   ─────────────────────────────────────────────────────────────── */
+.memora-large-text {
+  font-size: 20px;    /* was 18px */
+}
+
+.memora-large-text h1 { font-size: 1.9rem; }
+.memora-large-text h2 { font-size: 1.5rem; }
+.memora-large-text h3 { font-size: 1.2rem; }
+
+/* Ensure buttons don't overflow on large-text */
+.memora-large-text button {
+  word-break: keep-all;
+}
+
+/* ── ACCESSIBILITY: HIGH CONTRAST ────────────────────────────────
+   Stronger contrast. Does NOT rely solely on color.
+   ─────────────────────────────────────────────────────────────── */
+.memora-high-contrast {
+  --clr-text:       #000000;
+  --clr-text-muted: #1a1a1a;
+  --clr-bg:         #ffffff;
+  --clr-surface:    #ffffff;
+  --clr-border:     #444444;
+  --clr-primary:    #8b3a18;
+  --clr-secondary:  #2a5e3e;
+}
+
+.memora-high-contrast button:focus-visible,
+.memora-high-contrast a:focus-visible {
+  outline: 3px solid #000;
+  outline-offset: 3px;
+}
+
+/* ── ACCESSIBILITY: REDUCED MOTION ───────────────────────────────
+   Respects both the user preference and the OS-level setting.
+   ─────────────────────────────────────────────────────────────── */
+.memora-reduced-motion *,
+.memora-reduced-motion *::before,
+.memora-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── MOBILE BASE ─────────────────────────────────────────────────
+   Prevent horizontal overflow everywhere.
+   ─────────────────────────────────────────────────────────────── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+*  { box-sizing: border-box; min-width: 0; }
+
+/* Touch targets: all interactive elements ≥ 44px tall on mobile */
+@media (max-width: 768px) {
+  button, [role="button"] {
+    min-height: 44px;
+  }
+}

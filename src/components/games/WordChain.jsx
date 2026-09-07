@@ -18,8 +18,10 @@ import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, shuffle, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { useLanguage } from '../../locales/index.js';
 import './WordChain.css';
 import '../games/GameShared.css';
+
 
 /* ── WORD DATASET ─────────────────────────────────────────────── */
 const WORD_CHAINS = [
@@ -60,6 +62,7 @@ function buildOptions(correctWord, allWords, count = 4) {
 const PHASE = { INTRO: 'intro', MEMORISE: 'memorise', RECALL: 'recall', FEEDBACK: 'feedback', COMPLETE: 'complete' };
 
 export default function WordChain({ navigate }) {
+  const { t } = useLanguage();
   const level = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
   const [phase, setPhase] = useState(PHASE.INTRO);

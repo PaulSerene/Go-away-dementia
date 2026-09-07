@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { memories as memoriesApi } from '../utils/api.js';
 import { getOrCreatePatientId, getCachedPatientId } from '../utils/identity.js';
 import { enqueue } from '../utils/syncQueue.js';
+import { useLanguage } from '../locales/index.js';
 import "./CaregiverMemories.css";
 
 /* ----------------------------------------------------------------
@@ -371,6 +372,7 @@ function MemoryCard({ memory, onEdit, onDelete, onToggleFavorite }) {
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function CaregiverMemories({ navigate }) {
+  const { t } = useLanguage();
 
   /* Load fresh from localStorage on every mount */
   const [memories, setMemories] = useState(() => loadMemories());

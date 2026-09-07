@@ -37,10 +37,16 @@ export function calcNextDifficulty(currentLevel, accuracy) {
   return Math.max(currentLevel - 1, MIN_LEVEL);
 }
 
-export function nextLevelMessage(currentLevel, nextLevel) {
-  if (nextLevel > currentLevel) return 'Wonderful! 🌟 Your next activity will be a little more challenging.';
-  if (nextLevel < currentLevel) return "Great effort! 💪 We'll make the next activity a little gentler.";
-  return "Well done! 🌸 We'll practise at this level again.";
+export function nextLevelMessage(currentLevel, nextLevel, t) {
+  if (t) {
+    if (nextLevel > currentLevel) return t('game.nextLevel.up');
+    if (nextLevel < currentLevel) return t('game.nextLevel.down');
+    return t('game.nextLevel.same');
+  }
+  // Fallback: English strings (backward-compatible for components not yet using t())
+  if (nextLevel > currentLevel) return 'Wonderful! \uD83C\uDF1F Your next activity will be a little more challenging.';
+  if (nextLevel < currentLevel) return "Great effort! \uD83D\uDCAA We'll make the next activity a little gentler.";
+  return "Well done! \uD83C\uDF38 We'll practise at this level again.";
 }
 
 /* ── RESULT SAVING ───────────────────────────────────────────────
@@ -75,7 +81,12 @@ export function calcAccuracy(correct, total) {
 }
 
 /* ── LEVEL LABEL ─────────────────────────────────────────────────*/
-export function levelLabel(level) {
+export function levelLabel(level, t) {
+  if (t) {
+    const keys = { 1: 'game.level.easy', 2: 'game.level.moderate', 3: 'game.level.challenging', 4: 'game.level.advanced' };
+    return keys[level] ? t(keys[level]) : t('game.level.label', { n: level });
+  }
+  // Fallback: English
   const labels = { 1: 'Easy', 2: 'Moderate', 3: 'Challenging', 4: 'Advanced' };
   return labels[level] || 'Level ' + level;
 }

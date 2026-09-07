@@ -33,6 +33,7 @@ import {
   isReminderToday,
   isReminderDoneToday,
 } from '../utils/reminderStorage';
+import { useLanguage } from '../locales/index.js';
 import './CaregiverReminders.css';
 
 /* ----------------------------------------------------------------
@@ -344,6 +345,7 @@ function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplet
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function CaregiverReminders({ navigate }) {
+  const { t } = useLanguage();
   const [reminders, setReminders]               = useState(() => loadReminders());
   const [dailyCompletions, setDailyCompletions] = useState(() => loadDailyCompletions());
   const [showForm, setShowForm]                 = useState(false);

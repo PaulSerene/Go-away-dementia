@@ -20,8 +20,10 @@ import {
   loadDifficulty, saveDifficulty, calcNextDifficulty,
   nextLevelMessage, saveResult, pickRandom, shuffle, calcAccuracy, levelLabel, nowIso
 } from '../../utils/gameUtils';
+import { useLanguage } from '../../locales/index.js';
 import './StoryRecall.css';
 import '../games/GameShared.css';
+
 
 /* ── STORY DATABASE ───────────────────────────────────────────── */
 const STORIES = [
@@ -114,6 +116,7 @@ const LEVEL_CONFIG = {
 const PHASE = { INTRO: 'intro', READ: 'read', QUESTION: 'question', FEEDBACK: 'feedback', COMPLETE: 'complete' };
 
 export default function StoryRecall({ navigate }) {
+  const { t } = useLanguage();
   const level  = loadDifficulty();
   const config = LEVEL_CONFIG[level] || LEVEL_CONFIG[1];
 
