@@ -1,326 +1,340 @@
-# Go-away-dementia
-<div align="center">
+# MEMORA — AI Cognitive & Memory Companion
 
-# 🌸 Memora
+> **Smart India Hackathon 2026 · Problem Statement SIH26003 · Northeast India**
 
-### *AI-Powered Cognitive Gaming & Memory Assistance Platform for Elderly Users*
+MEMORA is a culturally sensitive **cognitive-wellness and memory-support application** designed for elderly users and people experiencing memory difficulties, with a particular focus on the communities, languages, and cultural context of Northeast India.
 
-[![Status](https://img.shields.io/badge/Status-Prototype-orange.svg)]()
-[![Platform](https://img.shields.io/badge/Platform-Mobile-blue.svg)]()
-[![React Native](https://img.shields.io/badge/React%20Native-Development-61DAFB.svg)](https://reactnative.dev/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Git](https://img.shields.io/badge/Git-Version%20Control-F05032.svg)](https://git-scm.com/)
-[![GitHub](https://img.shields.io/badge/GitHub-Open%20Source-181717.svg)](https://github.com/)
-
-<br>
-
-<p align="center">
-  <b>Memora</b> is a cognitive care and memory assistance platform designed to make
-  cognitive activities more accessible, engaging, and meaningful for elderly users.
-  It combines elderly-friendly patient experiences, cognitive games, performance
-  tracking, adaptive difficulty, memory features, and caregiver monitoring into
-  one unified platform.
-</p>
-
-<br>
-
-### 🧠 Play. Remember. Progress.
-
-**Built by Team InnoMinds for Smart India Hackathon**
-
-</div>
+It combines cognitive games, memory assistance, reminders, caregiver tools, accessibility features, cultural content, and an offline-first architecture into one simple experience.
 
 ---
 
-## 📑 Table of Contents
+## ⚠️ Disclaimer
 
-* [🌟 About Memora](#-about-memora)
-* [🎯 Problem Statement](#-problem-statement)
-* [💡 Our Solution](#-our-solution)
-* [✨ Core Features](#-core-features)
-
-  * [👴 Patient Mode](#1--patient-mode)
-  * [🧠 Cognitive Games](#2--cognitive-games)
-  * [📊 Scoring & Progress](#3--scoring--progress)
-  * [🖼️ Patient Memories](#4--patient-memories)
-  * [🎚️ Adaptive Difficulty](#5--adaptive-difficulty)
-  * [👨‍👩‍👧 Caregiver Dashboard](#6--caregiver-dashboard)
-* [🏗️ System Architecture](#️-system-architecture)
-* [💻 Tech Stack](#-tech-stack)
-* [🚀 Getting Started](#-getting-started)
-* [📂 Project Structure](#-project-structure)
-* [🌿 Development Workflow](#-development-workflow)
-* [🗺️ Roadmap](#️-roadmap)
-* [🔐 Privacy & Security](#-privacy--security)
-* [🤝 Contributing](#-contributing)
-* [👥 Team InnoMinds](#-team-innominds)
-* [📄 License](#-license)
+MEMORA is a **cognitive-wellness and memory-practice tool**. It is **not** a medical diagnostic, treatment, or cure system and does not replace professional medical advice or care.
 
 ---
 
-# 🌟 About Memora
+## 🌟 Overview
 
-**Memora** is being developed as a solution for the Smart India Hackathon problem statement:
+MEMORA is a full-stack web application with Capacitor-based Android packaging.
 
-> **AI-Based Cognitive Gaming and Memory Assistance Platform for Elderly Dementia Patients in North Eastern Region (NER)**
+The application is designed around a few core principles:
 
-Memora is designed around a simple idea:
-
-> **Cognitive care should feel less like a clinical task and more like an engaging everyday experience.**
-
-The platform combines cognitive activities with progress tracking and caregiver visibility, creating a foundation for personalized cognitive engagement.
-
----
-
-# 🎯 Problem Statement
-
-Elderly individuals experiencing dementia and age-related cognitive decline can face difficulties with:
-
-* 🧠 Memory and recall
-* 👀 Recognition
-* 🎯 Attention and concentration
-* 📅 Maintaining everyday routines
-* 📈 Tracking cognitive progress
-
-At the same time, caregivers may have limited visibility into how consistently and effectively an individual is engaging with cognitive activities.
-
-Many digital experiences are also not designed specifically around the needs of elderly users.
-
-### The challenge
-
-How can technology make cognitive engagement:
-
-**Simple → Accessible → Engaging → Personalized → Trackable**
-
-?
+- 🧠 Cognitive wellness through engaging memory activities
+- ❤️ Simple, respectful UX for elderly users
+- 👨‍👩‍👧 Caregiver-assisted memory and reminder management
+- 🌏 Cultural relevance, especially for Northeast India
+- 🌐 Multilingual and accessibility-aware interaction
+- 📴 Offline-first use with synchronization when connectivity returns
 
 ---
 
-# 💡 Our Solution
+## 🎯 Problem
 
-Memora connects the **patient experience** with the **caregiver experience**.
+Many existing cognitive and memory-support applications can be difficult to use in the context MEMORA targets.
+
+The project focuses on challenges such as:
+
+- Language and accessibility barriers
+- Limited digital familiarity among some elderly users
+- The need for caregivers to help manage memories and reminders
+- Lack of culturally relevant content
+- Unreliable internet connectivity in some environments
+- Separating cognitive-wellness activities from medical diagnosis or treatment
+
+---
+
+## 💡 Solution
+
+MEMORA brings several support functions together in one application:
+
+- Interactive cognitive-wellness games
+- A personal memory album
+- Daily and date-specific reminders
+- Caregiver dashboard and management tools
+- Multilingual localization infrastructure
+- Accessibility controls and read-aloud support
+- Northeast India-inspired cultural content
+- Offline-first local data handling with queued synchronization
+
+---
+
+# ✨ Key Features
+
+## 👴 Patient Experience
+
+- Personalized home screen with time-based greetings
+- Cognitive games with adaptive difficulty
+- Progress tracking
+- Memory Album with caregiver-curated memories
+- Daily and date-specific reminders
+- Language selection
+- Accessibility settings
+- Read-aloud support where available
+- Offline status indication
+
+## 👨‍👩‍👧 Caregiver Experience
+
+- Caregiver dashboard
+- Activity and accuracy summaries
+- Memory management
+  - Add
+  - Edit
+  - Delete
+  - Favourite
+- Reminder management
+  - Daily reminders
+  - Date-specific reminders
+  - Categories and times
+- Patient View shortcut
+
+---
+
+# 🎮 Cognitive Games
+
+MEMORA currently includes **8 cognitive-wellness games**:
+
+| Game | Activity |
+|---|---|
+| **Memory Match** | Visual memory using cultural images |
+| **Word Chain** | Sequential/verbal memory activity |
+| **Story Time** | Story comprehension and recall |
+| **RememberMe** | Recognition and recall using cultural imagery |
+| **Remember the Room** | Spatial and sequential memory |
+| **PathTracer** | Route and sequential spatial memory |
+| **Music Memory** | Music-related recognition and categorization |
+| **Movement with Aroha** | Guided movement/wellness activity |
+
+The games use difficulty levels where supported by the current implementation. Adaptive behavior is based on gameplay performance rather than presenting the system as a medical assessment.
+
+---
+
+# ♿ Accessibility
+
+MEMORA includes an accessibility layer designed to make the interface easier to use:
+
+- **Large Text**
+- **High Contrast**
+- **Reduced Motion**
+- **Read Aloud / TTS**
+- Accessibility preferences persisted locally
+- Touch-friendly interface
+- Language-aware speech settings where browser support is available
+
+### Speech-to-Text
+
+A speech-recognition service abstraction is present, but STT is **not currently connected to the application's main UI flow**.
+
+### Browser Compatibility
+
+Voice capabilities depend on the browser/device's Web Speech API support. MEMORA therefore treats voice functionality as a progressive enhancement rather than a requirement for using the application.
+
+---
+
+# 🌏 Cultural Adaptation
+
+Cultural relevance is an important part of MEMORA's design.
+
+The application includes bundled Northeast India-inspired visual content across categories such as:
+
+- Nature
+- Wildlife
+- Food
+- Crafts
+- Textiles
+- People
+- Places
+
+Cultural imagery is used within games and selected interface backgrounds.
+
+The project intentionally avoids assigning unsupported tribal, ethnic, or regional identities to individual assets.
+
+Some game content also uses Northeast India-inspired contexts such as tea gardens, festivals, village environments, and familiar natural settings.
+
+---
+
+# 🌐 Language Support
+
+MEMORA has a localization architecture covering **11 target languages**:
+
+| Code | Language | Script |
+|---|---|---|
+| `en` | English | Latin |
+| `as` | Assamese | Bengali |
+| `bn` | Bengali | Bengali |
+| `mni` | Manipuri / Meitei | Meetei Mayek |
+| `lus` | Mizo | Latin |
+| `kha` | Khasi | Latin |
+| `grt` | Garo | Latin |
+| `brx` | Bodo | Devanagari |
+| `ne` | Nepali | Devanagari |
+| `hi` | Hindi | Devanagari |
+| `te` | Telugu | Telugu |
+
+### Important
+
+The project has localization infrastructure and locale files for all 11 languages, but **translation completeness and quality vary by language**.
+
+English is the authoritative source language. Non-English translations should be considered best-effort until reviewed by native speakers.
+
+When a translation is unavailable, MEMORA falls back safely rather than displaying an undefined value.
+
+Translations are statically bundled so the localization system can operate without requiring a translation API at runtime.
+
+---
+
+# 🔊 Voice Features
+
+## Text-to-Speech
+
+MEMORA uses the browser's Web Speech API for text-to-speech.
+
+The `ReadAloudButton`:
+
+- Provides read-aloud functionality where TTS is available
+- Uses a slower speech rate appropriate for the target audience
+- Passes the selected language's BCP-47 language tag to the speech engine
+- Hides itself when speech synthesis is unavailable
+
+## Speech-to-Text
+
+A reusable STT service abstraction exists but is not yet connected to the main application UI.
+
+## BHASHINI
+
+**BHASHINI is not currently integrated.**
+
+It is considered a future enhancement for stronger regional-language speech and translation capabilities.
+
+---
+
+# 📴 Offline-First Architecture
+
+MEMORA follows an **offline-first** approach.
+
+Core application functionality does not require a continuous internet connection.
+
+### How it works
+
+1. User actions are stored locally first.
+2. If the backend cannot be reached, failed mutations are placed in a synchronization queue.
+3. The queue retains pending operations locally.
+4. When connectivity returns, queued operations are replayed against the backend.
+5. Server-generated IDs are reconciled with local records after successful creation.
+6. Queue processing includes retry handling and concurrency protection.
+
+This allows the core experience to remain usable offline while still supporting backend synchronization when connectivity is available.
+
+### Important limitation
+
+Cloud/backend synchronization itself requires network connectivity. Offline mode should therefore be understood as **offline-first**, not as permanent cloud access without an internet connection.
+
+---
+
+# 🏗️ Architecture
 
 ```text
-                         🌸 MEMORA
-                            │
-             ┌──────────────┴──────────────┐
-             │                             │
-             ▼                             ▼
-        👴 PATIENT                   👨‍👩‍👧 CAREGIVER
-             │                             │
-             │                             │
-      Cognitive Games                Dashboard
-             │                             │
-             ▼                             ▼
-          Scoring                    Progress View
-             │                             │
-             ▼                             │
-        Performance ───────────────────────┘
-             │
-             ▼
-      🎚️ Adaptive Difficulty
-             │
-             ▼
-      Personalized Experience
+                    MEMORA
+                       │
+                       ▼
+              React + Vite Frontend
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+   Localization   Accessibility   Offline Layer
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+                  API Client
+                       │
+                  /api/*
+                       ▼
+             Express.js Backend
+                  (Node.js)
+                       │
+                  node-postgres
+                       │
+                       ▼
+                  PostgreSQL
 ```
 
-The current prototype establishes this core loop and provides the foundation for expanding Memora into a more intelligent cognitive-care ecosystem.
+The project also contains a **Capacitor Android wrapper** for packaging the web application as an Android application.
 
 ---
 
-# ✨ Core Features
+# 🛠️ Tech Stack
 
-## 1. 👴 Patient Mode
-
-The patient experience is designed around **simplicity and accessibility**.
-
-Rather than presenting elderly users with complicated interfaces, Memora focuses on clear, focused interactions.
-
-### Current capabilities
-
-* Simple patient navigation
-* Dedicated activity experience
-* Cognitive-game interaction
-* Immediate game feedback
-* Score-based performance evaluation
-* Memory-oriented experiences
-
-The goal is to make the application understandable even for users with limited familiarity with smartphones and digital applications.
+| Layer | Technology |
+|---|---|
+| Frontend | React |
+| Build Tool | Vite |
+| Styling | Vanilla CSS |
+| Backend | Node.js + Express.js |
+| Database | PostgreSQL |
+| Database Client | node-postgres (`pg`) |
+| Mobile Packaging | Capacitor |
+| Speech | Browser Web Speech API |
+| Localization | Custom lightweight localization system |
 
 ---
 
-## 2. 🧠 Cognitive Games
-
-Memora's cognitive-game system is one of the core components of the platform.
-
-### 🧩 Remember the Objects
-
-The first major memory activity challenges the patient to carefully observe a set of objects and later recall them.
+# 📁 Project Structure
 
 ```text
-        Introduction
-             ↓
-     👀 Observe Objects
-             ↓
-        🧠 Remember
-             ↓
-      Memory Challenge
-             ↓
-       User Response
-             ↓
-           Score
-             ↓
-     Performance Analysis
+Memora/
+├── src/
+│   ├── App.jsx
+│   ├── main.jsx
+│   ├── components/
+│   │   ├── PatientHome.jsx
+│   │   ├── PatientProgress.jsx
+│   │   ├── PatientMemories.jsx
+│   │   ├── PatientReminders.jsx
+│   │   ├── CaregiverDashboard.jsx
+│   │   ├── CaregiverMemories.jsx
+│   │   ├── CaregiverReminders.jsx
+│   │   ├── AccessibilityPanel.jsx
+│   │   ├── LanguagePicker.jsx
+│   │   ├── ReadAloudButton.jsx
+│   │   ├── CulturalBackground.jsx
+│   │   ├── MemoryGame.jsx
+│   │   └── games/
+│   │       ├── GamesHub.jsx
+│   │       ├── WordChain.jsx
+│   │       ├── StoryRecall.jsx
+│   │       ├── RememberMe.jsx
+│   │       ├── RearrangeGame.jsx
+│   │       ├── MusicMemory.jsx
+│   │       ├── MovementGame.jsx
+│   │       └── PathTracer.jsx
+│   ├── contexts/
+│   ├── hooks/
+│   ├── locales/
+│   ├── utils/
+│   └── assets/
+│       └── culture/
+│
+├── server/
+│   └── src/
+│       ├── index.js
+│       ├── db/
+│       │   ├── pool.js
+│       │   ├── migrate.js
+│       │   └── schema.sql
+│       └── routes/
+│           ├── health.js
+│           ├── users.js
+│           ├── memories.js
+│           ├── reminders.js
+│           └── gameResults.js
+│
+├── scripts/
+├── android/
+├── capacitor.config.json
+├── vite.config.js
+├── package.json
+└── README.md
 ```
-
-The game provides the foundation for:
-
-* Memory exercises
-* Scoring
-* Difficulty progression
-* Performance tracking
-* Future personalization
-
-The cognitive-game framework is designed to allow additional activities to be added over time.
-
----
-
-## 3. 📊 Scoring & Progress
-
-Memora tracks performance during cognitive activities to provide a measurable representation of the patient's interaction with the games.
-
-Performance information forms the basis for:
-
-* 📈 Progress tracking
-* 🎯 Accuracy evaluation
-* 🧠 Activity performance
-* 🎚️ Difficulty adjustment
-* 🔮 Future personalization
-
-The current implementation establishes the scoring and progress foundation that can later be expanded into richer cognitive analytics.
-
----
-
-## 4. 🖼️ Patient Memories
-
-Memora includes a **Patient Memories** experience designed around the idea that familiar and meaningful information can play an important role in memory-oriented interaction.
-
-This feature establishes the foundation for future experiences involving:
-
-* Personal memories
-* Familiar people
-* Important life events
-* Reminiscence-based activities
-* Personalized cognitive experiences
-
-As the platform develops, this area can become an important bridge between cognitive games and the patient's personal world.
-
----
-
-## 5. 🎚️ Adaptive Difficulty
-
-A fixed difficulty level is not ideal for every user.
-
-Memora therefore includes adaptive difficulty for its memory-game experience.
-
-```text
-       Patient Performance
-                ↓
-          Score / Accuracy
-                ↓
-       Difficulty Evaluation
-                ↓
-       ┌────────┴────────┐
-       ↓                 ↓
-   Performing        Struggling
-       ↓                 ↓
-  Increase /          Reduce /
-  maintain            adjust
-  challenge           challenge
-       └────────┬────────┘
-                ↓
-         Next Activity
-```
-
-The objective is to keep activities **challenging enough to remain engaging without making them unnecessarily difficult**.
-
-This adaptive system also provides an important foundation for future AI-driven personalization.
-
----
-
-## 6. 👨‍👩‍👧 Caregiver Dashboard
-
-The caregiver experience provides a separate interface for monitoring and understanding the patient's interaction with Memora.
-
-The current caregiver-dashboard development includes:
-
-* Caregiver dashboard
-* Dedicated caregiver navigation
-* Patient-oriented information
-* Progress-oriented views
-* Foundation for future caregiver analytics
-
-As more cognitive data becomes available, the dashboard can evolve into a more comprehensive view of patient performance and activity.
-
----
-
-# 🏗️ System Architecture
-
-The current prototype is primarily focused on the application experience and its core cognitive functionality.
-
-```text
-┌─────────────────────────────────────────────────────┐
-│                     🌸 MEMORA                       │
-└──────────────────────────┬──────────────────────────┘
-                           │
-             ┌─────────────┴─────────────┐
-             │                           │
-             ▼                           ▼
-       👴 PATIENT                  👨‍👩‍👧 CAREGIVER
-             │                           │
-             ▼                           ▼
-     Cognitive Activities          Dashboard
-             │                           │
-             ▼                           │
-          Scoring                       │
-             │                           │
-             ▼                           │
-       Progress Data ────────────────────┘
-             │
-             ▼
-      Adaptive Difficulty
-             │
-             ▼
-     Future Personalization
-```
-
-The architecture will expand as backend services, persistent data, AI capabilities, and additional accessibility features are introduced.
-
----
-
-# 💻 Tech Stack
-
-| Layer               | Technology              |
-| ------------------- | ----------------------- |
-| **Application**     | React Native            |
-| **Language**        | JavaScript              |
-| **UI**              | React Native Components |
-| **Development**     | VS Code / Antigravity   |
-| **Version Control** | Git                     |
-| **Repository**      | GitHub                  |
-
-### Planned / Future
-
-The architecture is intended to eventually support additional technologies for:
-
-* 🤖 AI-assisted personalization
-* 🗄️ Persistent data storage
-* 📊 Advanced analytics
-* 🔐 Secure authentication
-* 🌐 Multilingual interaction
-* ☁️ Backend services
-
-These components will be introduced as the project progresses.
 
 ---
 
@@ -328,242 +342,218 @@ These components will be introduced as the project progresses.
 
 ## Prerequisites
 
-Make sure you have the following installed:
+Recommended requirements:
 
-* **Node.js**
-* **npm**
-* **Git**
-* **VS Code** or another code editor
-* **React Native development environment**
+- Node.js
+- npm
+- PostgreSQL for backend/database functionality
 
----
+The frontend can still run without the backend for offline/local functionality.
 
-## 1. Clone the Repository
+## 1. Install frontend dependencies
 
-```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd <PROJECT_DIRECTORY>
-```
-
----
-
-## 2. Install Dependencies
+From the project root:
 
 ```bash
 npm install
 ```
 
----
-
-## 3. Start the Application
-
-Use the appropriate React Native development command for your configured environment.
-
-For example:
+## 2. Install backend dependencies
 
 ```bash
-npm start
+cd server
+npm install
 ```
 
-Then run the application on your configured Android/iOS environment.
+## 3. Configure the backend
 
-> Setup instructions may evolve as the project architecture develops.
-
----
-
-# 📂 Project Structure
-
-The project follows a feature-oriented structure separating patient and caregiver experiences.
+Create:
 
 ```text
-Memora/
-│
-├── src/
-│   ├── components/
-│   │
-│   ├── screens/
-│   │   ├── patient/
-│   │   │   ├── games/
-│   │   │   ├── progress/
-│   │   │   └── memories/
-│   │   │
-│   │   └── caregiver/
-│   │
-│   ├── assets/
-│   │
-│   └── ...
-│
-├── public/
-│
-├── package.json
-├── .gitignore
-└── README.md
+server/.env
 ```
 
-> The exact structure will continue to evolve alongside the application.
+Configure the PostgreSQL connection and backend settings according to your local environment.
+
+Example:
+
+```env
+DATABASE_URL=postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/memora
+PORT=3001
+NODE_ENV=development
+```
+
+**Never commit real credentials or secrets.**
+
+## 4. Run the database migration
+
+From `server/`:
+
+```bash
+npm run db:migrate
+```
+
+## 5. Start the backend
+
+```bash
+npm run dev
+```
+
+The backend runs on port `3001`.
+
+## 6. Start the frontend
+
+Open another terminal at the project root:
+
+```bash
+npm run dev
+```
+
+The Vite development server normally runs on port `5173`.
+
+The frontend proxies `/api/*` requests to the backend.
 
 ---
 
-# 🌿 Development Workflow
+# 🧪 Testing & Validation
 
-Memora is developed using feature-specific Git branches.
+The project includes backend integration and synchronization tests.
 
-```text
-                         main
-                          │
-             ┌────────────┼────────────┐
-             │            │            │
-             ▼            ▼            ▼
-      patient-mode  patient-progress  caregiver-dashboard
-             │            │            │
-             ▼            ▼            ▼
-          Features     Progress       Caregiver
-          & Games      & Memories     Experience
+Depending on the current repository scripts, useful validation commands include:
+
+```bash
+npm run build
 ```
 
-### Current branches
+Backend tests can be run using the project's existing test scripts.
 
-| Branch                | Purpose                                |
-| --------------------- | -------------------------------------- |
-| `main`                | Stable project version                 |
-| `patient-mode`        | Patient experience and cognitive games |
-| `patient-progress`    | Patient progress and memories          |
-| `caregiver-dashboard` | Caregiver dashboard and navigation     |
-
-Development follows a checkpoint-based workflow:
-
-```text
-Feature Development
-        ↓
-Implementation
-        ↓
-Testing
-        ↓
-git diff / Review
-        ↓
-Git Commit
-        ↓
-Push to GitHub
-        ↓
-Pull Request / Merge
-        ↓
-main
-```
+A production build should be run before important releases or demonstrations.
 
 ---
 
-# 🗺️ Roadmap
+# 📱 Android / Capacitor
 
-## 🟢 Completed
+MEMORA contains a Capacitor Android project.
 
-* [x] Initial application foundation
-* [x] Patient Mode
-* [x] Cognitive memory-game experience
-* [x] Remember the Objects activity
-* [x] Patient scoring
-* [x] Patient progress
-* [x] Patient memories
-* [x] Adaptive memory-game difficulty
-* [x] Caregiver dashboard foundation
-* [x] Caregiver navigation
+Capacitor provides a bridge for packaging the web application as an Android application while keeping the existing React frontend.
 
-## 🟡 In Development
+Typical commands include:
 
-* [ ] Caregiver analytics
-* [ ] More cognitive games
-* [ ] Improved adaptive difficulty
-* [ ] Enhanced progress visualization
-* [ ] Improved elderly accessibility
-* [ ] Expanded multilingual support
+```bash
+npm run android:sync
+npm run android:open
+npm run android:run
+```
 
-## 🔵 Future Vision
+Android development/testing requires an appropriate Android development environment, including Android Studio and the Android SDK.
 
-* [ ] AI-driven personalization
-* [ ] Intelligent activity recommendations
-* [ ] Backend integration
-* [ ] Persistent patient profiles
-* [ ] Long-term cognitive analytics
-* [ ] Caregiver alerts and insights
-* [ ] Additional accessibility features
-* [ ] Production deployment
+The Android wrapper should currently be considered a **development/package target rather than a published production Android application**.
 
 ---
 
-# 🔐 Privacy & Security
+# 🗄️ Database
 
-Memora is intended for a healthcare-related use case involving elderly users.
+MEMORA's backend uses PostgreSQL.
 
-The current implementation is a **prototype** and should not be used as a production medical system or with real sensitive patient data without appropriate security infrastructure.
+The main tables include:
 
-Future production development will require:
+| Table | Purpose |
+|---|---|
+| `users` | Patients and caregivers |
+| `memories` | Patient memory records |
+| `game_results` | Completed game sessions and performance data |
+| `reminders` | Daily/date-specific reminders |
+| `daily_reminder_completions` | Per-day completion records for recurring reminders |
 
-* 🔒 Secure authentication
-* 🛡️ Role-based authorization
-* 🔐 Encrypted data handling
-* 👤 Patient privacy controls
-* 📋 Consent mechanisms
-* 🧾 Data minimization
-* 🔍 Auditability
-* ♿ Accessibility
-* ⚖️ Appropriate healthcare and privacy compliance
+The database is accessed through `node-postgres`.
 
-**Never commit real patient information, credentials, API keys, or other secrets to the repository.**
+---
+
+# 🔌 API
+
+The Express backend currently exposes routes for:
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | Server health |
+| `GET` | `/api/health/db` | Database connectivity |
+| `GET` | `/api/users` | Retrieve users |
+| `POST` | `/api/users` | Create a user |
+| `GET` | `/api/memories` | Retrieve memories |
+| `POST` | `/api/memories` | Create a memory |
+| `PUT` | `/api/memories/:id` | Update a memory |
+| `DELETE` | `/api/memories/:id` | Delete a memory |
+| `GET` | `/api/reminders` | Retrieve reminders |
+| `POST` | `/api/reminders` | Create a reminder |
+| `PUT` | `/api/reminders/:id` | Update a reminder |
+| `DELETE` | `/api/reminders/:id` | Delete a reminder |
+| `GET` | `/api/game-results` | Retrieve game results |
+| `POST` | `/api/game-results` | Save a game result |
+
+---
+
+# 🗺️ Future Work
+
+The following are planned or incomplete areas rather than fully implemented production features:
+
+- 🤖 Full conversational **Aroha AI companion**
+- 🗣️ Connecting STT to application UI
+- 🇮🇳 BHASHINI integration for regional-language voice capabilities
+- 📝 Native-speaker review and validation of translations
+- 📷 Camera/image upload for memory creation
+- 📱 Further Android/mobile testing and deployment
+- 📦 Production Play Store release pipeline
+- ⚡ Further performance optimization/code splitting
+- 🧪 Expanded automated test coverage
+- 🌐 Further localization/content expansion
+
+---
+
+# 🔒 Privacy & Data
+
+MEMORA is designed with a privacy-conscious architecture.
+
+- Local data is stored on the user's device for offline operation.
+- Backend synchronization occurs through the application's API when connectivity is available.
+- Environment secrets are kept outside source control.
+- The application does not require a translation API at runtime for its bundled localization system.
+
+MEMORA should not be treated as a substitute for professional medical record or clinical-data systems.
 
 ---
 
 # 🤝 Contributing
 
-Memora is being developed as an open-source project and contributions are welcome.
+For development work:
 
-### Development guidelines
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Keep changes focused.
-4. Test your changes.
-5. Review your diff.
+1. Create a feature branch.
+2. Make focused changes.
+3. Test the application.
+4. Run a production build where appropriate.
+5. Review your changes with Git.
 6. Commit with a clear message.
-7. Push your branch.
-8. Open a Pull Request.
-
-For larger changes, please discuss the proposed approach before introducing major architectural changes.
+7. Push the branch and merge after review.
 
 ---
 
-# 👥 Team InnoMinds
+# 🏆 Smart India Hackathon
 
-### 🇮🇳 Smart India Hackathon
+MEMORA is being developed for **Smart India Hackathon 2026** under:
 
-|  # | Team Member   |
-| -: | ------------- |
-|  1 | **Jay**       |
-|  2 | **Nikshith**  |
-|  3 | **Sharth**    |
-|  4 | **Nikhilesh** |
-|  5 | **Thanvi**    |
-|  6 | **Kasturi**   |
+**Problem Statement:** SIH26003
+
+The project focuses on building a culturally sensitive, accessible cognitive-wellness and memory-support experience for elderly users and people experiencing memory difficulties, with particular attention to Northeast India.
+
+---
+
+# 👥 Team
+
+**Team InnoMinds**
+
+MEMORA is developed as a collaborative Smart India Hackathon project.
 
 ---
 
 # 📄 License
 
-This project is intended to be open source.
-
-The specific license governing the use, modification, and distribution of this project will be provided in the repository's `LICENSE` file.
-
----
-
-<div align="center">
-
-## 🌸 Memora
-
-### *Preserving memories. Encouraging cognition. Empowering caregivers.*
-
-<br>
-
-**Built with ❤️ by Team InnoMinds**
-
-**Smart India Hackathon**
-
-</div>
-
+No project license has been specified in this repository unless a `LICENSE` file is present.
