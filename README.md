@@ -546,14 +546,17 @@ The project focuses on building a culturally sensitive, accessible cognitive-wel
 
 ---
 
-# 👥 Team
+# 👥 Team InnoMinds
 
-**Team InnoMinds**
+### 🇮🇳 Smart India Hackathon
+
+|  # | Team Member   |
+| -: | ------------- |
+|  1 | **Jay**       |
+|  2 | **Nikshith**  |
+|  3 | **Sharth**    |
+|  4 | **Nikhilesh** |
+|  5 | **Thanvi**    |
+|  6 | **Kasturi**   |
 
 MEMORA is developed as a collaborative Smart India Hackathon project.
-
----
-
-# 📄 License
-
-No project license has been specified in this repository unless a `LICENSE` file is present.
