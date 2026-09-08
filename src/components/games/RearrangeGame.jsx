@@ -23,19 +23,18 @@ import { useLanguage } from '../../locales/index.js';
 import './RearrangeGame.css';
 import '../games/GameShared.css';
 
-
 /* ── OBJECT POOL ─────────────────────────────────────────────── */
 const ROOM_OBJECTS = [
-  { id: 'chair',   emoji: '🪑', name: 'Chair' },
-  { id: 'book',    emoji: '📚', name: 'Book' },
-  { id: 'cup',     emoji: '☕', name: 'Cup' },
-  { id: 'flower',  emoji: '🌸', name: 'Flower Vase' },
-  { id: 'clock',   emoji: '🕐', name: 'Clock' },
-  { id: 'bag',     emoji: '👜', name: 'Bag' },
-  { id: 'lamp',    emoji: '🪔', name: 'Lamp' },
-  { id: 'basket',  emoji: '🧺', name: 'Basket' },
-  { id: 'umbrella',emoji: '☂️', name: 'Umbrella' },
-  { id: 'pot',     emoji: '🪴', name: 'Plant Pot' },
+  { id: 'chair',   emoji: '🪑' },
+  { id: 'book',    emoji: '📚' },
+  { id: 'cup',     emoji: '☕' },
+  { id: 'flower',  emoji: '🌸' },
+  { id: 'clock',   emoji: '🕐' },
+  { id: 'bag',     emoji: '👜' },
+  { id: 'lamp',    emoji: '🪔' },
+  { id: 'basket',  emoji: '🧺' },
+  { id: 'umbrella',emoji: '☂️' },
+  { id: 'pot',     emoji: '🪴' },
 ];
 
 const LEVEL_CONFIG = {
@@ -63,6 +62,8 @@ export default function RearrangeGame({ navigate }) {
   const [feedback, setFeedback]       = useState(null);
   const [showResult, setShowResult]   = useState(false);
   const timerRef = useRef(null);
+
+  const DEMO_NAME = "Mrs. Das"; // For demo
 
   function startGame() {
     const picks = pickRandom(ROOM_OBJECTS, config.count);
@@ -122,8 +123,8 @@ export default function RearrangeGame({ navigate }) {
       hits,
       total: original.length,
       message: isCorrect
-        ? '🌟 Perfect! You remembered the correct order!'
-        : `💪 You got ${hits} out of ${original.length} positions right. Well done!`,
+        ? t('rearrange.feedback.perfect')
+        : t('rearrange.feedback.partial', { hits, total: original.length }),
     });
     setShowResult(true);
   }
@@ -165,26 +166,29 @@ export default function RearrangeGame({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">🪑 Remember the Room</p>
-            <p className="gs-header__sub">Attention · Spatial Memory</p>
+            <p className="gs-header__title">🪑 {t('rearrange.title')}</p>
+            <p className="gs-header__sub">{t('rearrange.sub')}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">🪑</span>
-            <h1 className="gs-intro__title">Remember the Room</h1>
+            <h1 className="gs-intro__title">{t('rearrange.intro.title')}</h1>
             <p className="gs-intro__desc">
-              Objects will appear in a row. Remember their <strong>order</strong> carefully!
-              Then they will be shuffled — tap them back in the original order.
+              {t('rearrange.intro.desc1')}
             </p>
             <p className="gs-intro__desc">
-              <strong>{config.count} objects</strong> to memorise · <strong>{totalRounds} rounds</strong>
+              {t('rearrange.intro.desc2', {
+                count: config.count,
+                plural: config.count > 1 ? 's' : '',
+                rounds: totalRounds
+              })}
             </p>
             <button className="gs-btn gs-btn--primary" onClick={() => { setRound(0); setCorrect(0); startGame(); }}>
-              ▶ Start Game
+              {t('game.btn.startGame')}
             </button>
           </div>
         </div>
@@ -197,39 +201,39 @@ export default function RearrangeGame({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">🪑 Remember the Room</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">🪑 {t('rearrange.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">{finalAccuracy >= 80 ? '🌟' : '💪'}</span>
-            <h1 className="gs-complete__title">Activity Complete!</h1>
-            <p className="gs-complete__sub">Wonderful effort, Mrs. Das!</p>
+            <h1 className="gs-complete__title">{t('game.complete.title')}</h1>
+            <p className="gs-complete__sub">{t('game.complete.wonderful', { name: DEMO_NAME })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Accuracy</span>
+                <span className="gs-score-card__label">{t('game.score.accuracy')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{correct}/{totalRounds}</span>
-                <span className="gs-score-card__label">Perfect Rounds</span>
+                <span className="gs-score-card__label">{t('rearrange.complete.perfectRounds')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{config.count}</span>
-                <span className="gs-score-card__label">Objects</span>
+                <span className="gs-score-card__label">{t('rearrange.complete.objects')}</span>
               </div>
               <div className="gs-score-card">
-                <span className="gs-score-card__value">{levelLabel(level)}</span>
-                <span className="gs-score-card__label">Level</span>
+                <span className="gs-score-card__value">{levelLabel(level, t)}</span>
+                <span className="gs-score-card__label">{t('game.score.level')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
               <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setRound(0); setCorrect(0); setPhase(PHASE.INTRO); }}>
-                🔄 Play Again
+                {t('game.btn.playAgain')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -241,12 +245,12 @@ export default function RearrangeGame({ navigate }) {
   return (
     <div className="gs-screen">
       <header className="gs-header">
-        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">🪑 Remember the Room</p>
-          <p className="gs-header__sub">Round {round + 1} of {totalRounds}</p>
+          <p className="gs-header__title">🪑 {t('rearrange.title')}</p>
+          <p className="gs-header__sub">{t('game.round', { n: round + 1, total: totalRounds })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -257,19 +261,19 @@ export default function RearrangeGame({ navigate }) {
         {/* MEMORISE phase */}
         {phase === PHASE.MEMORISE && (
           <div className="rg-memorise">
-            <p className="gs-phase-label">👀 Memorise the Order</p>
+            <p className="gs-phase-label">👀 {t('rearrange.phase.memorize')}</p>
             {countdown !== null && (
               <div className={`gs-timer ${countdown <= 2 ? 'gs-timer--warning' : ''}`}>
-                ⏱ {countdown}s remaining
+                ⏱ {t('rearrange.timer.remaining', { s: countdown })}
               </div>
             )}
-            <p className="rg-instruction">Remember the order from left to right: 1, 2, 3...</p>
+            <p className="rg-instruction">{t('rearrange.instruction.memorize')}</p>
             <div className="rg-grid">
               {original.map((obj, i) => (
                 <div key={obj.id} className="rg-object rg-object--memorise">
                   <span className="rg-object__num">{i + 1}</span>
                   <span className="rg-object__emoji">{obj.emoji}</span>
-                  <span className="rg-object__name">{obj.name}</span>
+                  <span className="rg-object__name">{t(`rearrange.obj.${obj.id}`)}</span>
                 </div>
               ))}
             </div>
@@ -279,10 +283,10 @@ export default function RearrangeGame({ navigate }) {
         {/* RECALL phase */}
         {phase === PHASE.RECALL && (
           <div className="rg-recall">
-            <p className="gs-phase-label">🤔 Put Them Back in Order</p>
+            <p className="gs-phase-label">🤔 {t('rearrange.phase.recall')}</p>
             <p className="rg-instruction">
-              Tap the objects in the <strong>original order</strong> (1 first, then 2, 3...).
-              {selected.length > 0 && ` You've placed ${selected.length} of ${original.length}.`}
+              {t('rearrange.instruction.recall')}
+              {selected.length > 0 && ` ${t('rearrange.recall.placed', { n: selected.length, total: original.length })}`}
             </p>
 
             {/* Show user's current sequence so far */}
@@ -315,11 +319,11 @@ export default function RearrangeGame({ navigate }) {
                     className={`rg-object rg-object--btn ${isSelected ? 'rg-object--selected' : ''}`}
                     onClick={() => handleObjectTap(i)}
                     disabled={showResult}
-                    aria-label={`${obj.name}${isSelected ? ` (placed ${selOrder + 1})` : ''}`}
+                    aria-label={`${t(`rearrange.obj.${obj.id}`)}${isSelected ? ` (placed ${selOrder + 1})` : ''}`}
                   >
                     {isSelected && <span className="rg-object__num rg-object__num--sel">{selOrder + 1}</span>}
                     <span className="rg-object__emoji">{obj.emoji}</span>
-                    <span className="rg-object__name">{obj.name}</span>
+                    <span className="rg-object__name">{t(`rearrange.obj.${obj.id}`)}</span>
                   </button>
                 );
               })}
@@ -333,27 +337,27 @@ export default function RearrangeGame({ navigate }) {
                 </div>
                 {!feedback.correct && (
                   <div className="rg-correct-order">
-                    <p className="gs-section-heading">The correct order was:</p>
+                    <p className="gs-section-heading">{t('rearrange.feedback.correctOrder')}</p>
                     <div className="rg-grid">
                       {original.map((obj, i) => (
                         <div key={obj.id} className="rg-object rg-object--correct">
                           <span className="rg-object__num">{i + 1}</span>
                           <span className="rg-object__emoji">{obj.emoji}</span>
-                          <span className="rg-object__name">{obj.name}</span>
+                          <span className="rg-object__name">{t(`rearrange.obj.${obj.id}`)}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
                 <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-                  {round + 1 >= totalRounds ? 'See Results' : 'Next Round →'}
+                  {round + 1 >= totalRounds ? t('game.btn.seeResults') : t('game.btn.next')}
                 </button>
               </>
             )}
 
             {!showResult && selected.length > 0 && (
               <button className="gs-btn gs-btn--outline gs-btn--sm" onClick={() => setSelected([])}>
-                🔄 Reset Selection
+                {t('rearrange.btn.reset')}
               </button>
             )}
           </div>

@@ -18,7 +18,20 @@
  *   else syncLocalStorageWithServer(data.memories);
  */
 
-const BASE = '/api';
+import { getApiBaseUrl } from './platform.js';
+
+/**
+ * Environment-aware API base.
+ *
+ *  Web dev:          '' (empty → Vite proxy handles /api → localhost:3001)
+ *  Android emulator: 'http://10.0.2.2:3001' (reaches host PC)
+ *  Physical device:  set VITE_API_BASE_URL=http://<LAN-IP>:3001
+ *  Production:       set VITE_API_BASE_URL=https://your-api.example.com
+ *
+ * DO NOT hardcode an IP address here. Use .env or the platform utility.
+ */
+const BASE = `${getApiBaseUrl()}/api`;
+
 
 /**
  * Core fetch wrapper.

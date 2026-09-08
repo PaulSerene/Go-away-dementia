@@ -22,17 +22,17 @@ import { useLanguage } from '../../locales/index.js';
 import './MovementGame.css';
 import '../games/GameShared.css';
 
-
 /* ── MOVEMENT DATABASE ────────────────────────────────────────── */
+// Labels and instructions are keys to be passed to t()
 const MOVEMENTS = [
-  { id: 'raise-right', emoji: '🙋‍♀️', label: 'Raise your right hand', instruction: 'Slowly raise your right hand up above your shoulder.' },
-  { id: 'clap-twice',  emoji: '👏', label: 'Clap twice',             instruction: 'Gently clap your hands together two times.' },
-  { id: 'raise-both',  emoji: '🙌', label: 'Raise both hands',       instruction: 'Slowly raise both hands above your head.' },
-  { id: 'tap-knees',   emoji: '🦵', label: 'Tap your knees',         instruction: 'Gently tap both knees with your palms.' },
-  { id: 'wave-hello',  emoji: '👋', label: 'Wave hello',             instruction: 'Give a friendly wave with your right hand.' },
-  { id: 'nod-head',    emoji: '🫡', label: 'Nod your head',          instruction: 'Gently nod your head up and down twice.' },
-  { id: 'touch-chin',  emoji: '🤔', label: 'Touch your chin',        instruction: 'Gently touch your chin with one finger.' },
-  { id: 'circle-arms', emoji: '🔄', label: 'Circle your arms',       instruction: 'Make small, slow circles with your arms.' },
+  { id: 'raise-right', emoji: '🙋‍♀️' },
+  { id: 'clap-twice',  emoji: '👏' },
+  { id: 'raise-both',  emoji: '🙌' },
+  { id: 'tap-knees',   emoji: '🦵' },
+  { id: 'wave-hello',  emoji: '👋' },
+  { id: 'nod-head',    emoji: '🫡' },
+  { id: 'touch-chin',  emoji: '🤔' },
+  { id: 'circle-arms', emoji: '🔄' },
 ];
 
 const LEVEL_CONFIG = {
@@ -54,8 +54,9 @@ export default function MovementGame({ navigate }) {
   const [currentStep, setCurrentStep] = useState(0);  // which step in the sequence we are showing
   const [round, setRound]   = useState(0);
   const [correct, setCorrect] = useState(0);
-  const [nextRoundSeq, setNextRoundSeq] = useState(null);
   const startTimeRef = useRef(null);
+
+  const DEMO_NAME = "Mrs. Das"; // Using demo name as used across the prototype
 
   function startNewRound() {
     const seq = pickRandom(MOVEMENTS, config.count);
@@ -128,30 +129,31 @@ export default function MovementGame({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">🙌 Movement with Aroha</p>
-            <p className="gs-header__sub">Gentle Activity</p>
+            <p className="gs-header__title">🙌 {t('movement.title')}</p>
+            <p className="gs-header__sub">{t('movement.sub')}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">🤸</span>
-            <h1 className="gs-intro__title">Movement with Aroha</h1>
+            <h1 className="gs-intro__title">{t('movement.intro.title')}</h1>
             <div className="gs-wellness-notice">
-              🌿 Only do movements that feel comfortable for you. 
-              You may always skip a step.
+              🌿 {t('movement.intro.notice')}
             </div>
+            <p className="gs-intro__desc">{t('movement.intro.desc1')}</p>
+            <p className="gs-intro__desc">{t('movement.intro.desc2')}</p>
             <p className="gs-intro__desc">
-              Aroha will show you a sequence of simple, gentle movements.
-              Watch carefully, then try each one at your own pace.
-            </p>
-            <p className="gs-intro__desc">
-              <strong>{config.count} movement{config.count > 1 ? 's' : ''}</strong> per round &middot; <strong>{config.rounds} rounds</strong>
+              {t('movement.intro.rounds', {
+                count: config.count,
+                plural: config.count > 1 ? 's' : '',
+                rounds: config.rounds
+              })}
             </p>
             <button className="gs-btn gs-btn--primary" onClick={startNewRound}>
-              ▶ Begin Activity
+              {t('movement.intro.begin')}
             </button>
           </div>
         </div>
@@ -164,31 +166,31 @@ export default function MovementGame({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">🙌 Movement</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">🙌 {t('movement.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">🌸</span>
-            <h1 className="gs-complete__title">Wonderful!</h1>
-            <p className="gs-complete__sub">You completed your movement activity, Mrs. Das.</p>
+            <h1 className="gs-complete__title">{t('game.complete.wonderful')}</h1>
+            <p className="gs-complete__sub">{t('movement.complete.sub', { name: DEMO_NAME })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Participation</span>
+                <span className="gs-score-card__label">{t('movement.complete.participation')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{config.rounds}</span>
-                <span className="gs-score-card__label">Rounds</span>
+                <span className="gs-score-card__label">{t('movement.complete.total')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
               <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setRound(0); setCorrect(0); setPhase(PHASE.INTRO); }}>
-                🔄 Do Again
+                {t('movement.complete.again')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -202,12 +204,12 @@ export default function MovementGame({ navigate }) {
   return (
     <div className="gs-screen">
       <header className="gs-header">
-        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">🙌 Movement with Aroha</p>
-          <p className="gs-header__sub">Round {round + 1} of {config.rounds}</p>
+          <p className="gs-header__title">🙌 {t('movement.title')}</p>
+          <p className="gs-header__sub">{t('game.round', { n: round + 1, total: config.rounds })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -216,23 +218,23 @@ export default function MovementGame({ navigate }) {
         </div>
 
         <div className="gs-wellness-notice" style={{ marginBottom: 16 }}>
-          🌿 Only move if it feels comfortable. You can always skip.
+          🌿 {t('movement.wellness.notice')}
         </div>
 
         {/* WATCH phase — show movement to learn */}
         {phase === PHASE.WATCH && currentMovement && (
           <div className="mv-phase">
-            <p className="gs-phase-label">👀 Watch the Movement</p>
+            <p className="gs-phase-label">👀 {t('movement.phase.watch')}</p>
             <div className="mv-card">
               <span className="mv-card__emoji">{currentMovement.emoji}</span>
-              <p className="mv-card__label">{currentMovement.label}</p>
-              <p className="mv-card__instruction">{currentMovement.instruction}</p>
+              <p className="mv-card__label">{t(`movement.id.${currentMovement.id}`)}</p>
+              <p className="mv-card__instruction">{t(`movement.instructions.${currentMovement.id}`)}</p>
             </div>
             <p className="mv-step-info">
-              Movement {currentStep + 1} of {sequence.length}
+              {t('movement.step.of', { n: currentStep + 1, total: sequence.length })}
             </p>
             <button className="gs-btn gs-btn--primary" onClick={handleWatchNext}>
-              {currentStep + 1 < sequence.length ? 'Next Movement →' : "I'm Ready — Let's Try!"}
+              {currentStep + 1 < sequence.length ? t('movement.btn.nextMovement') : t('movement.btn.ready')}
             </button>
           </div>
         )}
@@ -240,21 +242,21 @@ export default function MovementGame({ navigate }) {
         {/* DO phase — patient performs each movement */}
         {phase === PHASE.DO && currentMovement && (
           <div className="mv-phase">
-            <p className="gs-phase-label">🙌 Your Turn!</p>
+            <p className="gs-phase-label">🙌 {t('movement.phase.do')}</p>
             <div className="mv-card mv-card--active">
               <span className="mv-card__emoji">{currentMovement.emoji}</span>
-              <p className="mv-card__label">{currentMovement.label}</p>
-              <p className="mv-card__instruction">{currentMovement.instruction}</p>
+              <p className="mv-card__label">{t(`movement.id.${currentMovement.id}`)}</p>
+              <p className="mv-card__instruction">{t(`movement.instructions.${currentMovement.id}`)}</p>
             </div>
             <p className="mv-step-info">
-              Step {currentStep + 1} of {sequence.length}
+              {t('movement.step.of', { n: currentStep + 1, total: sequence.length }).replace('Movement', 'Step')}
             </p>
             <div className="mv-actions">
               <button className="gs-btn gs-btn--primary" onClick={handleDid}>
-                ✅ I Did It!
+                {t('movement.btn.done')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--sm" onClick={handleSkip}>
-                Skip this one
+                {t('movement.btn.skip')}
               </button>
             </div>
           </div>
@@ -264,20 +266,20 @@ export default function MovementGame({ navigate }) {
         {phase === PHASE.FEEDBACK && (
           <div className="mv-phase">
             <div className="gs-feedback gs-feedback--correct">
-              🎉 Well done! You completed the sequence!
+              🎉 {t('movement.feedback.great')}
             </div>
             <div className="mv-sequence-review">
-              <p className="gs-section-heading">Movements completed:</p>
+              <p className="gs-section-heading">{t('movement.feedback.completed')}</p>
               {sequence.map((m, i) => (
                 <div key={i} className="mv-review-item">
                   <span>{m.emoji}</span>
-                  <span>{m.label}</span>
+                  <span>{t(`movement.id.${m.id}`)}</span>
                   <span className="mv-check">✅</span>
                 </div>
               ))}
             </div>
             <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-              {round + 1 >= config.rounds ? 'See Results' : 'Next Round →'}
+              {round + 1 >= config.rounds ? t('game.btn.seeResults') : t('game.btn.next')}
             </button>
           </div>
         )}

@@ -38,7 +38,17 @@ import momentsImg from '../assets/culture/nature/misty-forest.jpg';
 const STORAGE_KEY = 'smriti_memories';
 
 /** All valid category values used throughout the feature. */
+/** Internal category keys — UI labels are looked up via t() */
 const CATEGORIES = ['All', 'Family', 'Places', 'Events', 'Special Moments'];
+
+/** Map internal category value → locale key */
+const CATEGORY_KEY = {
+  All:              'memories.categories.all',
+  Family:           'memories.categories.family',
+  Places:           'memories.categories.places',
+  Events:           'memories.categories.events',
+  'Special Moments':'memories.categories.specialMoments',
+};
 
 /**
  * Category emoji map — shown next to category labels on cards.
@@ -153,47 +163,48 @@ function saveMemories(memories) {
  * with "memories" marked as the active tab.
  * ─────────────────────────────────────────────────────────────── */
 function MemoriesNav({ navigate }) {
+  const { t } = useLanguage();
   return (
     <nav className="ph-nav" aria-label="Main navigation">
       <button
         id="mem-nav-home"
         className="ph-nav__btn"
         onClick={() => navigate('patient-home')}
-        aria-label="Home"
+        aria-label={t('memories.nav.home')}
       >
         <span className="ph-nav__icon" aria-hidden="true">🏠</span>
-        <span className="ph-nav__label">Home</span>
+        <span className="ph-nav__label">{t('memories.nav.home')}</span>
       </button>
 
       <button
         id="mem-nav-activities"
         className="ph-nav__btn"
         onClick={() => navigate('patient-activities')}
-        aria-label="Activities"
+        aria-label={t('memories.nav.games')}
       >
         <span className="ph-nav__icon" aria-hidden="true">🧠</span>
-        <span className="ph-nav__label">Activities</span>
+        <span className="ph-nav__label">{t('memories.nav.games')}</span>
       </button>
 
       <button
         id="mem-nav-memories"
         className="ph-nav__btn ph-nav__btn--active"
         aria-current="page"
-        aria-label="Memories"
+        aria-label={t('memories.nav.memories')}
         onClick={() => navigate('patient-memories')}
       >
         <span className="ph-nav__icon" aria-hidden="true">❤️</span>
-        <span className="ph-nav__label">Memories</span>
+        <span className="ph-nav__label">{t('memories.nav.memories')}</span>
       </button>
 
       <button
         id="mem-nav-reminders"
         className="ph-nav__btn"
         onClick={() => navigate('patient-reminders')}
-        aria-label="Reminders"
+        aria-label={t('memories.nav.reminders')}
       >
         <span className="ph-nav__icon" aria-hidden="true">⏰</span>
-        <span className="ph-nav__label">Reminders</span>
+        <span className="ph-nav__label">{t('memories.nav.reminders')}</span>
       </button>
     </nav>
   );
@@ -205,7 +216,9 @@ function MemoriesNav({ navigate }) {
  * The ❤️ button calls onToggleFavorite with the memory's id.
  * ─────────────────────────────────────────────────────────────── */
 function MemoryCard({ memory, onToggleFavorite }) {
+  const { t } = useLanguage();
   const categoryEmoji = CATEGORY_EMOJI[memory.category] ?? '📖';
+  const categoryLabel = t(CATEGORY_KEY[memory.category] ?? 'memories.categories.all');
 
   return (
     <article
@@ -233,7 +246,7 @@ function MemoryCard({ memory, onToggleFavorite }) {
       <div className="mem-card__body">
         {/* Category label */}
         <span className="mem-card__category">
-          <span aria-hidden="true">{categoryEmoji}</span> {memory.category}
+          <span aria-hidden="true">{categoryEmoji}</span> {categoryLabel}
         </span>
 
         {/* Memory title */}
@@ -259,7 +272,7 @@ function MemoryCard({ memory, onToggleFavorite }) {
             className={`mem-fav-btn ${memory.favorite ? 'mem-fav-btn--active' : ''}`}
             onClick={() => onToggleFavorite(memory.id)}
             aria-pressed={memory.favorite}
-            aria-label={memory.favorite ? 'Remove from favourites' : 'Add to favourites'}
+            aria-label={memory.favorite ? t('memories.unfavourite') : t('memories.favourite')}
             id={`fav-${memory.id}`}
           >
             {memory.favorite ? '❤️' : '🤍'}
@@ -393,10 +406,10 @@ function PatientMemories({ navigate }) {
       <div className="ph-screen ph-screen--transparent">
 
         {/* ── PAGE HEADER ─────────────────────────────────── */}
-        <header className="mem-header" aria-label="My Memories">
-          <p className="mem-header__title">My Memories ❤️</p>
+        <header className="mem-header" aria-label={t('memories.heading')}>
+          <p className="mem-header__title">{t('memories.heading')} ❤️</p>
           <p className="mem-header__sub">
-            Take a moment to revisit the memories that matter to you.
+            {t('memories.empty.sub')}
           </p>
         </header>
 
@@ -406,10 +419,10 @@ function PatientMemories({ navigate }) {
           {!hasMemories && (
             <div className="mem-empty">
               <span className="mem-empty__emoji" aria-hidden="true">❤️</span>
-              <h2 className="mem-empty__heading">My Memories ❤️</h2>
-              <p className="mem-empty__msg">No memories have been added yet.</p>
+              <h2 className="mem-empty__heading">{t('memories.heading')} ❤️</h2>
+              <p className="mem-empty__msg">{t('memories.empty')}</p>
               <p className="mem-empty__hint">
-                Your special moments will appear here.
+                {t('memories.empty.sub')}
               </p>
             </div>
           )}
@@ -425,7 +438,7 @@ function PatientMemories({ navigate }) {
               <div
                 className="mem-filters"
                 role="group"
-                aria-label="Filter memories by category"
+                aria-label={t('memories.heading')}
               >
                 {CATEGORIES.map((cat) => (
                   <button
@@ -438,7 +451,7 @@ function PatientMemories({ navigate }) {
                     {cat !== 'All' && (
                       <span aria-hidden="true">{CATEGORY_EMOJI[cat]}</span>
                     )}
-                    {cat}
+                    {t(CATEGORY_KEY[cat] ?? 'memories.categories.all')}
                   </button>
                 ))}
               </div>
@@ -446,8 +459,10 @@ function PatientMemories({ navigate }) {
               {/* Count of visible memories */}
               <p className="mem-count" aria-live="polite">
                 {visibleMemories.length === 0
-                  ? 'No memories in this category.'
-                  : `${visibleMemories.length} memor${visibleMemories.length === 1 ? 'y' : 'ies'}`}
+                  ? t('memories.noCategoryMems', { category: t(CATEGORY_KEY[activeCategory] ?? 'memories.categories.all') })
+                  : visibleMemories.length === 1
+                    ? t('memories.count.one')
+                    : t('memories.count.many', { count: visibleMemories.length })}
               </p>
 
               {/* ── MEMORY CARDS ──────────────────────────────── */}
@@ -470,7 +485,7 @@ function PatientMemories({ navigate }) {
                   <span aria-hidden="true">
                     {CATEGORY_EMOJI[activeCategory] ?? '📖'}
                   </span>
-                  <p>No {activeCategory} memories yet.</p>
+                  <p>{t('memories.noCategoryMems', { category: t(CATEGORY_KEY[activeCategory] ?? 'memories.categories.all') })}</p>
                 </div>
               )}
             </>

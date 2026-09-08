@@ -21,7 +21,6 @@ import { useLanguage } from '../../locales/index.js';
 import './RememberMe.css';
 import '../games/GameShared.css';
 
-
 // Import existing cultural assets as demo memory images
 import imgChildren   from '../../assets/culture/people/children-bihu-celebration.jpg';
 import imgCouple     from '../../assets/culture/people/couple-traditional-attire.jpg';
@@ -155,6 +154,8 @@ export default function RememberMe({ navigate }) {
   const mem  = memories[mIndex];
   const q    = mem?.questions.find(q => q.level === config.questionLevel) || mem?.questions[0];
 
+  const DEMO_NAME = "Mrs. Das";
+
   function handleAnswer(opt) {
     if (selected) return;
     setSelected(opt);
@@ -163,8 +164,8 @@ export default function RememberMe({ navigate }) {
     setFeedback({
       correct: isCorrect,
       message: isCorrect
-        ? '❤️ Wonderful! You remembered it beautifully!'
-        : `💪 The answer was "${q.answer}". Every memory is precious!`,
+        ? t('game.feedback.correct')
+        : t('game.feedback.tryAgain').replace('Keep going.', `The answer was "${q.answer}". Every memory is precious!`)
     });
     setPhase(PHASE.FEEDBACK);
   }
@@ -173,7 +174,7 @@ export default function RememberMe({ navigate }) {
     if (hintShown) return;
     setHintShown(true);
     setTotalHints(h => h + 1);
-    setFeedback({ correct: null, message: `💡 Hint: ${mem.feeling}` });
+    setFeedback({ correct: null, message: `💡 ${t('game.hint.btn').replace('Show a Hint', 'Hint')}: ${mem.feeling}` });
   }
 
   function handleNext() {
@@ -214,29 +215,27 @@ export default function RememberMe({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">❤️ RememberMe</p>
-            <p className="gs-header__sub">Nostalgia · Memory</p>
+            <p className="gs-header__title">❤️ {t('rememberMe.title')}</p>
+            <p className="gs-header__sub">{t('rememberMe.sub')}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">❤️</span>
-            <h1 className="gs-intro__title">RememberMe</h1>
+            <h1 className="gs-intro__title">{t('rememberMe.intro.title')}</h1>
+            <p className="gs-intro__desc">{t('rememberMe.intro.desc1')}</p>
+            <p className="gs-intro__desc">{t('rememberMe.intro.desc2')}</p>
             <p className="gs-intro__desc">
-              A memory photo will appear. Look at it carefully and answer a simple question about it.
-              Take your time — these are warm, familiar memories.
+              <strong>Note:</strong> {t('rememberMe.intro.note').replace('Note: ', '')}
             </p>
             <p className="gs-intro__desc">
-              <strong>Note:</strong> These are demo memories — not your personal photos.
-            </p>
-            <p className="gs-intro__desc">
-              <strong>{config.rounds} memories</strong> to explore.
+              <strong>{t('rememberMe.intro.memories', { count: config.rounds })}</strong>
             </p>
             <button className="gs-btn gs-btn--primary" onClick={() => setPhase(PHASE.VIEW)}>
-              ❤️ Begin
+              {t('rememberMe.intro.begin')}
             </button>
           </div>
         </div>
@@ -249,31 +248,31 @@ export default function RememberMe({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">❤️ RememberMe</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">❤️ {t('rememberMe.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">❤️</span>
-            <h1 className="gs-complete__title">Wonderful!</h1>
-            <p className="gs-complete__sub">Your memories are precious, Mrs. Das.</p>
+            <h1 className="gs-complete__title">{t('rememberMe.complete.wonderful')}</h1>
+            <p className="gs-complete__sub">{t('rememberMe.complete.sub', { name: DEMO_NAME })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Accuracy</span>
+                <span className="gs-score-card__label">{t('game.score.accuracy')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{correct}/{config.rounds}</span>
-                <span className="gs-score-card__label">Correct</span>
+                <span className="gs-score-card__label">{t('game.score.correct')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
               <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setMIndex(0); setCorrect(0); setSelected(null); setFeedback(null); setHintShown(false); setTotalHints(0); setPhase(PHASE.INTRO); }}>
-                🔄 Play Again
+                {t('game.btn.playAgain')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -287,12 +286,12 @@ export default function RememberMe({ navigate }) {
   return (
     <div className="gs-screen">
       <header className="gs-header">
-        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">❤️ RememberMe</p>
-          <p className="gs-header__sub">Memory {mIndex + 1} of {config.rounds}</p>
+          <p className="gs-header__title">❤️ {t('rememberMe.title')}</p>
+          <p className="gs-header__sub">{t('rememberMe.memory.of', { n: mIndex + 1, total: config.rounds })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -303,7 +302,7 @@ export default function RememberMe({ navigate }) {
         {/* VIEW phase */}
         {phase === PHASE.VIEW && (
           <div className="rm-view">
-            <p className="gs-phase-label">🖼️ Look at this memory</p>
+            <p className="gs-phase-label">{t('rememberMe.phase.view')}</p>
             <div className="rm-image-card">
               <img src={mem.image} alt={mem.alt} className="rm-image" />
               <div className="rm-image__caption">
@@ -311,9 +310,9 @@ export default function RememberMe({ navigate }) {
                 <span className="rm-image__cat">{mem.category}</span>
               </div>
             </div>
-            <p className="rm-view__tip">Take a moment to look carefully. When you're ready, tap the button below.</p>
+            <p className="rm-view__tip">{t('rememberMe.view.tip')}</p>
             <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => setPhase(PHASE.QUESTION)}>
-              I'm Ready → Answer the Question
+              {t('rememberMe.btn.ready')}
             </button>
           </div>
         )}
@@ -330,7 +329,7 @@ export default function RememberMe({ navigate }) {
             <h2 className="rm-question__text">{q.q}</h2>
 
             {!hintShown && phase === PHASE.QUESTION && (
-              <button className="gs-hint-btn" onClick={handleHint}>💡 Show a Hint</button>
+              <button className="gs-hint-btn" onClick={handleHint}>{t('rememberMe.hint.btn')}</button>
             )}
             {feedback && feedback.correct === null && (
               <div className="gs-feedback gs-feedback--neutral">{feedback.message}</div>
@@ -357,7 +356,7 @@ export default function RememberMe({ navigate }) {
                   {feedback.message}
                 </div>
                 <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-                  {mIndex + 1 >= config.rounds ? 'See Results' : 'Next Memory →'}
+                  {mIndex + 1 >= config.rounds ? t('game.btn.seeResults') : t('game.btn.next')}
                 </button>
               </>
             )}

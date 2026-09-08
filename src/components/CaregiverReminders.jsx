@@ -33,7 +33,7 @@ import {
   isReminderToday,
   isReminderDoneToday,
 } from '../utils/reminderStorage';
-import { useLanguage } from '../locales/index.js';
+import { useLanguage, LOCALE_BCP47 } from '../locales/index.js';
 import './CaregiverReminders.css';
 
 /* ----------------------------------------------------------------
@@ -48,24 +48,38 @@ const EMPTY_FORM = {
   category: 'Daily',
 };
 
+const DEMO_PATIENT = { name: "Mrs. Das" };
+
 /* ----------------------------------------------------------------
    HELPERS
 ---------------------------------------------------------------- */
-function formatDisplayDate(dateStr) {
+function formatDisplayDate(dateStr, bcp47) {
   if (!dateStr) return '';
   try {
     const [y, m, d] = dateStr.split('-').map(Number);
     const date = new Date(y, m - 1, d);
-    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString(bcp47 || 'en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   } catch {
     return dateStr;
+  }
+}
+
+function formatDisplayTime(timeStr, bcp47) {
+  if (!timeStr) return '';
+  try {
+    const [h, m] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(h, m, 0, 0);
+    return date.toLocaleTimeString(bcp47 || 'en-IN', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return timeStr;
   }
 }
 
 /* ----------------------------------------------------------------
    ADD/EDIT FORM COMPONENT
 ---------------------------------------------------------------- */
-function ReminderForm({ initial, onSave, onCancel }) {
+function ReminderForm({ initial, onSave, onCancel, t }) {
   const [form, setForm] = useState(initial ?? EMPTY_FORM);
   const [errors, setErrors] = useState({});
 
@@ -99,10 +113,17 @@ function ReminderForm({ initial, onSave, onCancel }) {
 
   const isDaily = form.type === 'daily';
 
+  // Helper to translate categories
+  const getCategoryLabel = (cat) => {
+    const key = `caregiver.reminders.category.${cat.toLowerCase()}`;
+    const trans = t(key);
+    return trans !== key ? trans : cat;
+  };
+
   return (
     <div className="cgrm-overlay" role="dialog" aria-modal="true" aria-label="Reminder form">
       <div className="cgrm-form-card">
-        <h2 className="cgrm-form-title">{initial ? 'Edit Reminder' : 'Add Reminder'}</h2>
+        <h2 className="cgrm-form-title">{initial ? t('caregiverRem.form.save').replace('Save', 'Edit') : t('caregiverRem.add')}</h2>
         <form onSubmit={handleSubmit} noValidate>
 
           {/* Reminder type selector */}
@@ -119,7 +140,7 @@ function ReminderForm({ initial, onSave, onCancel }) {
                   className="cgrm-radio"
                 />
                 <span className="cgrm-type-option__icon">🔁</span>
-                <span className="cgrm-type-option__text">Every day</span>
+                <span className="cgrm-type-option__text">{t('reminders.everyDay')}</span>
               </label>
               <label className={'cgrm-type-option' + (!isDaily ? ' cgrm-type-option--selected' : '')}>
                 <input
@@ -139,7 +160,7 @@ function ReminderForm({ initial, onSave, onCancel }) {
           {/* Title */}
           <div className="cgrm-field">
             <label className="cgrm-label" htmlFor="cgrm-title">
-              Title <span className="cgrm-required" aria-hidden="true">*</span>
+              {t('caregiverRem.form.text')} <span className="cgrm-required" aria-hidden="true">*</span>
             </label>
             <input
               id="cgrm-title"
@@ -164,7 +185,7 @@ function ReminderForm({ initial, onSave, onCancel }) {
               className="cgrm-input cgrm-textarea"
               value={form.description}
               onChange={(e) => handleChange('description', e.target.value)}
-              placeholder="Any extra details..."
+              placeholder="..."
               maxLength={300}
               rows={3}
             />
@@ -190,7 +211,7 @@ function ReminderForm({ initial, onSave, onCancel }) {
 
             <div className="cgrm-field">
               <label className="cgrm-label" htmlFor="cgrm-time">
-                Time <span className="cgrm-required" aria-hidden="true">*</span>
+                {t('caregiverRem.form.time')} <span className="cgrm-required" aria-hidden="true">*</span>
               </label>
               <input
                 id="cgrm-time"
@@ -206,7 +227,7 @@ function ReminderForm({ initial, onSave, onCancel }) {
           {/* Category */}
           <div className="cgrm-field">
             <label className="cgrm-label" htmlFor="cgrm-category">
-              Category <span className="cgrm-required" aria-hidden="true">*</span>
+              {t('caregiverRem.form.category')} <span className="cgrm-required" aria-hidden="true">*</span>
             </label>
             <select
               id="cgrm-category"
@@ -216,7 +237,7 @@ function ReminderForm({ initial, onSave, onCancel }) {
             >
               {REMINDER_CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
-                  {CATEGORY_EMOJI[cat]} {cat}
+                  {CATEGORY_EMOJI[cat]} {getCategoryLabel(cat)}
                 </option>
               ))}
             </select>
@@ -226,10 +247,10 @@ function ReminderForm({ initial, onSave, onCancel }) {
           {/* Actions */}
           <div className="cgrm-form-actions">
             <button type="button" className="cgrm-btn cgrm-btn--secondary" onClick={onCancel}>
-              Cancel
+              {t('caregiverRem.form.cancel')}
             </button>
             <button type="submit" className="cgrm-btn cgrm-btn--primary">
-              {initial ? 'Save Changes' : 'Save Reminder'}
+              {initial ? t('caregiverRem.form.update') : t('caregiverRem.form.save')}
             </button>
           </div>
 
@@ -242,17 +263,17 @@ function ReminderForm({ initial, onSave, onCancel }) {
 /* ----------------------------------------------------------------
    DELETE CONFIRMATION
 ---------------------------------------------------------------- */
-function DeleteConfirm({ reminder, onConfirm, onCancel }) {
+function DeleteConfirm({ reminder, onConfirm, onCancel, t }) {
   return (
-    <div className="cgrm-overlay" role="dialog" aria-modal="true" aria-label="Delete confirmation">
+    <div className="cgrm-overlay" role="dialog" aria-modal="true" aria-label={t('caregiverRem.deleteConfirm.aria')}>
       <div className="cgrm-confirm-card">
         <p className="cgrm-confirm-emoji" aria-hidden="true">🗑️</p>
-        <h2 className="cgrm-confirm-title">Delete this reminder?</h2>
+        <h2 className="cgrm-confirm-title">{t('caregiverRem.deleteConfirm.title')}</h2>
         <p className="cgrm-confirm-name">"{reminder.title}"</p>
-        <p className="cgrm-confirm-msg">This cannot be undone.</p>
+        <p className="cgrm-confirm-msg">{t('confirm.irreversible')}</p>
         <div className="cgrm-form-actions">
-          <button className="cgrm-btn cgrm-btn--secondary" onClick={onCancel}>Cancel</button>
-          <button className="cgrm-btn cgrm-btn--danger" onClick={onConfirm}>Delete</button>
+          <button className="cgrm-btn cgrm-btn--secondary" onClick={onCancel}>{t('caregiverRem.form.cancel')}</button>
+          <button className="cgrm-btn cgrm-btn--danger" onClick={onConfirm}>{t('caregiverRem.delete')}</button>
         </div>
       </div>
     </div>
@@ -262,10 +283,16 @@ function DeleteConfirm({ reminder, onConfirm, onCancel }) {
 /* ----------------------------------------------------------------
    REMINDER CARD (Caregiver view)
 ---------------------------------------------------------------- */
-function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplete }) {
+function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplete, t, bcp47 }) {
   const emoji    = CATEGORY_EMOJI[reminder.category] ?? '📝';
   const isDaily  = reminder.type === 'daily';
   const isToday  = isReminderToday(reminder);
+
+  const getCategoryLabel = (cat) => {
+    const key = `caregiver.reminders.category.${cat.toLowerCase()}`;
+    const trans = t(key);
+    return trans !== key ? trans : cat;
+  };
 
   return (
     <article
@@ -280,11 +307,11 @@ function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplet
       <div className="cgrm-card__top">
         <div className="cgrm-card__meta">
           <span className="cgrm-card__category">
-            <span aria-hidden="true">{emoji}</span> {reminder.category}
+            <span aria-hidden="true">{emoji}</span> {getCategoryLabel(reminder.category)}
           </span>
-          {isDaily   && <span className="cgrm-daily-badge">🔁 Every Day</span>}
-          {!isDaily && isToday && <span className="cgrm-today-badge">Today</span>}
-          {isDoneToday && <span className="cgrm-done-badge">✅ Done</span>}
+          {isDaily   && <span className="cgrm-daily-badge">🔁 {t('reminders.everyDay')}</span>}
+          {!isDaily && isToday && <span className="cgrm-today-badge">{t('reminders.today')}</span>}
+          {isDoneToday && <span className="cgrm-done-badge">{t('reminders.done')}</span>}
         </div>
 
         <button
@@ -307,18 +334,18 @@ function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplet
 
       <div className="cgrm-card__datetime">
         {isDaily
-          ? <span>⏰ Daily at {reminder.time}</span>
+          ? <span>⏰ {t('reminders.everyDay')} {t('caregiverRem.form.time').toLowerCase()} {formatDisplayTime(reminder.time, bcp47)}</span>
           : (
             <>
-              <span>📅 {formatDisplayDate(reminder.date)}</span>
-              {reminder.time && <span>⏰ {reminder.time}</span>}
+              <span>📅 {formatDisplayDate(reminder.date, bcp47)}</span>
+              {reminder.time && <span>⏰ {formatDisplayTime(reminder.time, bcp47)}</span>}
             </>
           )
         }
       </div>
 
       {isDaily && isDoneToday && (
-        <p className="cgrm-card__reset-note">Resets tomorrow.</p>
+        <p className="cgrm-card__reset-note">{t('reminders.resetNote')}</p>
       )}
 
       <div className="cgrm-card__actions">
@@ -334,7 +361,7 @@ function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplet
           onClick={() => onDelete(reminder)}
           aria-label={'Delete: ' + reminder.title}
         >
-          🗑️ Delete
+          🗑️ {t('caregiverRem.delete')}
         </button>
       </div>
     </article>
@@ -345,7 +372,9 @@ function ReminderCard({ reminder, isDoneToday, onEdit, onDelete, onToggleComplet
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function CaregiverReminders({ navigate }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const bcp47 = LOCALE_BCP47[lang] || 'en-IN';
+
   const [reminders, setReminders]               = useState(() => loadReminders());
   const [dailyCompletions, setDailyCompletions] = useState(() => loadDailyCompletions());
   const [showForm, setShowForm]                 = useState(false);
@@ -609,18 +638,18 @@ function CaregiverReminders({ navigate }) {
     <div className="cgrm-screen">
 
       {/* ── HEADER ──────────────────────────────────────── */}
-      <header className="cgrm-header" aria-label="Manage Reminders header">
+      <header className="cgrm-header" aria-label={t('caregiverRem.heading')}>
         <button
           className="cgrm-header-back-btn"
           onClick={() => navigate('caregiver-dashboard')}
-          aria-label="Back to Dashboard"
+          aria-label={t('nav.back')}
         >
-          ← Dashboard
+          {t('caregiver.nav.dashboard') ? `← ${t('caregiver.nav.dashboard')}` : `← Dashboard`}
         </button>
         <div className="cgrm-header__titles">
-          <p className="cgrm-header__title">Reminders ⏰</p>
+          <p className="cgrm-header__title">{t('caregiverRem.heading')} ⏰</p>
           <p className="cgrm-header__subtitle">
-            Keep track of important things for Mrs. Das.
+            {t('caregiverRem.sub', { name: DEMO_PATIENT.name })}
           </p>
         </div>
       </header>
@@ -632,15 +661,15 @@ function CaregiverReminders({ navigate }) {
         <div className="cgrm-stats-row">
           <div className="cgrm-stat-pill cgrm-stat-pill--gold">
             <span className="cgrm-stat-pill__val">{todayCount}</span>
-            <span className="cgrm-stat-pill__lbl">Today Pending</span>
+            <span className="cgrm-stat-pill__lbl">{t('reminders.today')}</span>
           </div>
           <div className="cgrm-stat-pill cgrm-stat-pill--teal">
             <span className="cgrm-stat-pill__val">{pendingCount}</span>
-            <span className="cgrm-stat-pill__lbl">Total Pending</span>
+            <span className="cgrm-stat-pill__lbl">{t('reminders.title')}</span>
           </div>
           <div className="cgrm-stat-pill cgrm-stat-pill--green">
             <span className="cgrm-stat-pill__val">{completedCount}</span>
-            <span className="cgrm-stat-pill__lbl">Done Today</span>
+            <span className="cgrm-stat-pill__lbl">{t('reminders.done')}</span>
           </div>
         </div>
 
@@ -648,15 +677,15 @@ function CaregiverReminders({ navigate }) {
         <div className="cgrm-top-bar">
           <p className="cgrm-count">
             {reminders.length > 0
-              ? reminders.length + ' reminder' + (reminders.length === 1 ? '' : 's')
-              : 'No reminders yet'}
+              ? t('memories.count.many', { count: reminders.length })
+              : t('caregiverRem.empty')}
           </p>
           <button
             id="cgrm-btn-add"
             className="cgrm-btn cgrm-btn--primary cgrm-btn--add"
             onClick={handleAddClick}
           >
-            + Add Reminder
+            {t('caregiverRem.add')}
           </button>
         </div>
 
@@ -664,12 +693,12 @@ function CaregiverReminders({ navigate }) {
         {reminders.length === 0 && (
           <div className="cgrm-empty">
             <span className="cgrm-empty__emoji" aria-hidden="true">⏰</span>
-            <p className="cgrm-empty__msg">No reminders yet.</p>
+            <p className="cgrm-empty__msg">{t('caregiverRem.empty')}</p>
             <p className="cgrm-empty__hint">
               Add a reminder to help keep important things on track.
             </p>
             <button className="cgrm-btn cgrm-btn--primary" onClick={handleAddClick}>
-              + Add Reminder
+              {t('caregiverRem.add')}
             </button>
           </div>
         )}
@@ -685,6 +714,8 @@ function CaregiverReminders({ navigate }) {
                   onEdit={handleEdit}
                   onDelete={handleDeleteClick}
                   onToggleComplete={handleToggleComplete}
+                  t={t}
+                  bcp47={bcp47}
                 />
               </li>
             ))}
@@ -699,6 +730,7 @@ function CaregiverReminders({ navigate }) {
           initial={formInitial}
           onSave={handleSave}
           onCancel={handleCancel}
+          t={t}
         />
       )}
 
@@ -707,6 +739,7 @@ function CaregiverReminders({ navigate }) {
           reminder={deletingReminder}
           onConfirm={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
+          t={t}
         />
       )}
 

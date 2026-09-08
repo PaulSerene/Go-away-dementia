@@ -16,7 +16,8 @@
 
 import './PatientProgress.css';
 import CulturalBackground from './CulturalBackground';
-import { useLanguage } from '../locales/index.js';
+import { useLanguage, LOCALE_BCP47 } from '../locales/index.js';
+import { levelLabel } from '../utils/gameUtils.js';
 
 
 /* ── LOCALSTORAGE READERS ────────────────────────────────────────
@@ -84,77 +85,54 @@ function calcBestAccuracy(results) {
   return Math.max(...results.map((r) => r.accuracy ?? 0));
 }
 
-/** Human-readable label for a difficulty number (1 → "Level 1", etc.) */
-function diffLabel(num) {
-  return `Level ${num}`;
-}
-
-/**
- * Format an ISO timestamp string into a friendly date + time string.
- * Example: "2 Sep 2026, 10:45 PM"
- * Falls back to the raw string if parsing fails.
- */
-function formatDate(isoString) {
-  try {
-    return new Date(isoString).toLocaleString('en-IN', {
-      day:    'numeric',
-      month:  'short',
-      year:   'numeric',
-      hour:   '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return isoString ?? '—';
-  }
-}
-
 /* ── BOTTOM NAVIGATION ───────────────────────────────────────────
  *
  * Identical nav bar to PatientHome and PatientPlaceholder,
  * with "activities" marked as the active tab.
  * ─────────────────────────────────────────────────────────────── */
 function ProgressNav({ navigate }) {
+  const { t } = useLanguage();
   return (
     <nav className="ph-nav" aria-label="Main navigation">
       <button
         id="prog-nav-home"
         className="ph-nav__btn"
         onClick={() => navigate('patient-home')}
-        aria-label="Home"
+        aria-label={t('memories.nav.home')}
       >
         <span className="ph-nav__icon" aria-hidden="true">🏠</span>
-        <span className="ph-nav__label">Home</span>
+        <span className="ph-nav__label">{t('memories.nav.home')}</span>
       </button>
 
       <button
         id="prog-nav-activities"
         className="ph-nav__btn ph-nav__btn--active"
         aria-current="page"
-        aria-label="Activities"
+        aria-label={t('memories.nav.games')}
         onClick={() => navigate('patient-activities')}
       >
         <span className="ph-nav__icon" aria-hidden="true">🧠</span>
-        <span className="ph-nav__label">Activities</span>
+        <span className="ph-nav__label">{t('memories.nav.games')}</span>
       </button>
 
       <button
         id="prog-nav-memories"
         className="ph-nav__btn"
-        aria-label="Memories"
+        aria-label={t('memories.nav.memories')}
         onClick={() => navigate('patient-memories')}
       >
         <span className="ph-nav__icon" aria-hidden="true">❤️</span>
-        <span className="ph-nav__label">Memories</span>
+        <span className="ph-nav__label">{t('memories.nav.memories')}</span>
       </button>
 
       <button
         id="prog-nav-reminders"
         className="ph-nav__btn"
-        aria-label="Reminders"
+        aria-label={t('memories.nav.reminders')}
         onClick={() => navigate('patient-reminders')}
       >
         <span className="ph-nav__icon" aria-hidden="true">⏰</span>
-        <span className="ph-nav__label">Reminders</span>
+        <span className="ph-nav__label">{t('memories.nav.reminders')}</span>
       </button>
     </nav>
   );
@@ -169,7 +147,8 @@ function ProgressNav({ navigate }) {
  * up-to-date without any polling or refresh.
  * ─────────────────────────────────────────────────────────────── */
 function PatientProgress({ navigate }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+
   /*
    * Read data at render time — no useState/useEffect needed here
    * because the values don't change while the screen is open.
@@ -188,16 +167,47 @@ function PatientProgress({ navigate }) {
 
   const hasGames       = gamesPlayed > 0;
 
+  /**
+   * Format an ISO timestamp using the active locale's BCP47 tag,
+   * so dates render correctly in each language.
+   */
+  function formatDate(isoString) {
+    try {
+      const bcp47 = LOCALE_BCP47[lang] || 'en-IN';
+      return new Date(isoString).toLocaleString(bcp47, {
+        day:    'numeric',
+        month:  'short',
+        year:   'numeric',
+        hour:   '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return isoString ?? '—';
+    }
+  }
+
+  /**
+   * Map a stored gameType string to a localised display label.
+   * Falls back to the raw key if unrecognised.
+   */
+  function gameTypeLabel(gameType) {
+    if (!gameType) return t('progress.gameType.memory-match');
+    const key = `progress.gameType.${gameType}`;
+    const translated = t(key);
+    // If the key was not found, t() returns the key itself — fall back to English game name
+    return translated !== key ? translated : gameType;
+  }
+
   /* ── RENDER ─────────────────────────────────────────────── */
   return (
     <CulturalBackground variant="progress">
       <div className="ph-screen ph-screen--transparent">
 
         {/* ── PAGE HEADER ──────────────────────────────────── */}
-        <header className="prog-header" aria-label="My Progress">
-          <p className="prog-header__title">My Progress 🌱</p>
+        <header className="prog-header" aria-label={t('progress.title')}>
+          <p className="prog-header__title">{t('progress.title')} 🌱</p>
           <p className="prog-header__sub">
-            Here is how you've been doing with your activities.
+            {t('progress.subheading')}
           </p>
         </header>
 
@@ -205,56 +215,56 @@ function PatientProgress({ navigate }) {
         <main className="prog-content">
 
           {/* ── 4 SUMMARY CARDS ────────────────────────────── */}
-          <section className="prog-summary-grid" aria-label="Summary statistics">
+          <section className="prog-summary-grid" aria-label={t('progress.heading')}>
 
             {/* Card 1 — Games Played */}
             <div className="prog-stat-card prog-stat-card--warm">
               <span className="prog-stat-card__icon" aria-hidden="true">🎮</span>
               <span className="prog-stat-card__value">{gamesPlayed}</span>
-              <span className="prog-stat-card__label">Games Played</span>
+              <span className="prog-stat-card__label">{t('progress.totalGames')}</span>
             </div>
 
             {/* Card 2 — Average Accuracy */}
             <div className="prog-stat-card prog-stat-card--teal">
               <span className="prog-stat-card__icon" aria-hidden="true">🎯</span>
               <span className="prog-stat-card__value">{avgAccuracy}%</span>
-              <span className="prog-stat-card__label">Average Accuracy</span>
+              <span className="prog-stat-card__label">{t('progress.avgAccuracy')}</span>
             </div>
 
             {/* Card 3 — Current Level */}
             <div className="prog-stat-card prog-stat-card--rose">
               <span className="prog-stat-card__icon" aria-hidden="true">📊</span>
-              <span className="prog-stat-card__value">{diffLabel(currentLevel)}</span>
-              <span className="prog-stat-card__label">Current Level</span>
+              <span className="prog-stat-card__value">{levelLabel(currentLevel, t)}</span>
+              <span className="prog-stat-card__label">{t('progress.currentLevel')}</span>
             </div>
 
             {/* Card 4 — Best Accuracy */}
             <div className="prog-stat-card prog-stat-card--gold">
               <span className="prog-stat-card__icon" aria-hidden="true">🌟</span>
               <span className="prog-stat-card__value">{bestAccuracy}%</span>
-              <span className="prog-stat-card__label">Best Accuracy</span>
+              <span className="prog-stat-card__label">{t('progress.bestAccuracy')}</span>
             </div>
 
           </section>
 
           {/* ── RECENT ACTIVITY ─────────────────────────────── */}
-          <section className="prog-recent" aria-label="Recent activities">
-            <h2 className="prog-section-heading">Recent Activities</h2>
+          <section className="prog-recent" aria-label={t('progress.recentActivity')}>
+            <h2 className="prog-section-heading">{t('progress.recentActivity')}</h2>
 
             {/* EMPTY STATE — no games played yet */}
             {!hasGames && (
               <div className="prog-empty">
                 <span className="prog-empty__emoji" aria-hidden="true">🌱</span>
-                <p className="prog-empty__msg">No activities completed yet 🌱</p>
+                <p className="prog-empty__msg">{t('progress.noActivity')}</p>
                 <p className="prog-empty__hint">
-                  Start your first memory activity to see your progress here.
+                  {t('progress.noActivity.sub')}
                 </p>
                 <button
                   id="btn-progress-start-activity"
                   className="ph-btn ph-btn--warm prog-empty__btn"
                   onClick={() => navigate('patient-activity')}
                 >
-                  ▶&nbsp; Start Activity
+                  {t('progress.noActivity.btn')}
                 </button>
               </div>
             )}
@@ -275,9 +285,9 @@ function PatientProgress({ navigate }) {
                     {/* Game title row */}
                     <div className="prog-item__title-row">
                       <span className="prog-item__icon" aria-hidden="true">🧠</span>
-                      <span className="prog-item__title">Remember the Objects</span>
+                      <span className="prog-item__title">{gameTypeLabel(game.gameType)}</span>
                       <span className="prog-item__level">
-                        {diffLabel(game.difficulty ?? 1)}
+                        {levelLabel(game.difficulty ?? 1, t)}
                       </span>
                     </div>
 
@@ -285,18 +295,12 @@ function PatientProgress({ navigate }) {
                     <div className="prog-item__stats">
                       <span className="prog-item__stat">
                         <span className="prog-item__stat-icon" aria-hidden="true">🎯</span>
-                        <span><strong>{game.accuracy ?? 0}%</strong> accuracy</span>
+                        <span><strong>{game.accuracy ?? 0}%</strong> {t('progress.accuracy', { value: '' }).replace('%', '').trim() || t('caregiver.accuracy.label')}</span>
                       </span>
                       <span className="prog-item__stat">
                         <span className="prog-item__stat-icon" aria-hidden="true">✅</span>
                         <span>
-                          <strong>{game.correct ?? 0} / {game.total ?? 0}</strong> objects
-                        </span>
-                      </span>
-                      <span className="prog-item__stat">
-                        <span className="prog-item__stat-icon" aria-hidden="true">⏱️</span>
-                        <span>
-                          Response time: <strong>{game.responseTime ?? '—'}s</strong>
+                          <strong>{game.correct ?? 0} / {game.total ?? 0}</strong> {t('game.score.correct')}
                         </span>
                       </span>
                     </div>

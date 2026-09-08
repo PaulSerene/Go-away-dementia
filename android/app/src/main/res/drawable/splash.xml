@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Capacitor SplashScreen plugin uses this as the window background -->
+<!-- The actual splash content (logo, text) is overlaid by the plugin -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/colorBackground" />
+</layer-list>

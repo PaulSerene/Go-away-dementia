@@ -135,28 +135,28 @@ function GamesHub({ navigate }) {
     {
       id: 'memory', emoji: '🧠', label: t('hub.cat.memory'), color: 'warm',
       games: [
-        { id: 'game-word-chain',   icon: '🔤', name: t('game.wordChain.name'),   tagline: t('game.wordChain.tagline'),   duration: '5–8 min', level: 'All Levels' },
-        { id: 'game-story-recall', icon: '📖', name: t('game.storyRecall.name'), tagline: t('game.storyRecall.tagline'), duration: '5–10 min', level: 'All Levels' },
-        { id: 'game-remember-me',  icon: '❤️', name: t('game.rememberMe.name'),  tagline: t('game.rememberMe.tagline'),  duration: '4–7 min', level: 'All Levels' },
+        { id: 'game-word-chain',   icon: '🔤', name: t('game.wordChain.name'),   tagline: t('game.wordChain.tagline'),   duration: '5–8 min', level: t('game.level.easy') },
+        { id: 'game-story-recall', icon: '📖', name: t('game.storyRecall.name'), tagline: t('game.storyRecall.tagline'), duration: '5–10 min', level: t('game.level.easy') },
+        { id: 'game-remember-me',  icon: '❤️', name: t('game.rememberMe.name'),  tagline: t('game.rememberMe.tagline'),  duration: '4–7 min', level: t('game.level.easy') },
       ],
     },
     {
       id: 'attention', emoji: '👀', label: t('hub.cat.attention'), color: 'teal',
       games: [
-        { id: 'game-rearrange',    icon: '🪑', name: t('game.rearrange.name'),   tagline: t('game.rearrange.tagline'),   duration: '5–8 min', level: 'All Levels' },
-        { id: 'game-path-tracer',  icon: '🗺️', name: t('game.pathTracer.name'),  tagline: t('game.pathTracer.tagline'),  duration: '5–8 min', level: 'All Levels' },
+        { id: 'game-rearrange',    icon: '🪑', name: t('game.rearrange.name'),   tagline: t('game.rearrange.tagline'),   duration: '5–8 min', level: t('game.level.easy') },
+        { id: 'game-path-tracer',  icon: '🗺️', name: t('game.pathTracer.name'),  tagline: t('game.pathTracer.tagline'),  duration: '5–8 min', level: t('game.level.easy') },
       ],
     },
     {
       id: 'movement', emoji: '🤸', label: t('hub.cat.movement'), color: 'rose',
       games: [
-        { id: 'game-movement',     icon: '🙌', name: t('game.movement.name'),    tagline: t('game.movement.tagline'),    duration: '3–6 min', level: 'All Levels' },
+        { id: 'game-movement',     icon: '🙌', name: t('game.movement.name'),    tagline: t('game.movement.tagline'),    duration: '3–6 min', level: t('game.level.easy') },
       ],
     },
     {
       id: 'music', emoji: '🎵', label: t('hub.cat.music'), color: 'gold',
       games: [
-        { id: 'game-music-memory', icon: '🎶', name: t('game.musicMemory.name'), tagline: t('game.musicMemory.tagline'), duration: '5–8 min', level: 'All Levels' },
+        { id: 'game-music-memory', icon: '🎶', name: t('game.musicMemory.name'), tagline: t('game.musicMemory.tagline'), duration: '5–8 min', level: t('game.level.easy') },
       ],
     },
   ];
@@ -220,7 +220,7 @@ function GamesHub({ navigate }) {
                   <p className="ghub-game-card__tagline">{t('game.memoryMatch.tagline')}</p>
                   <div className="ghub-game-card__meta">
                     <span className="ghub-meta-pill">⏱ 3–5 min</span>
-                    <span className="ghub-meta-pill">📊 Adaptive</span>
+                    <span className="ghub-meta-pill">📊 {t('game.level.label', { n: '' }).replace('{n}', '').trim() || t('game.score.level')}</span>
                   </div>
                 </div>
                 <span className="ghub-game-card__arrow" aria-hidden="true">›</span>

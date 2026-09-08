@@ -13,11 +13,48 @@
  *
  * Language is persisted to localStorage: memora_lang
  * document.documentElement.lang is updated on every language change.
+ *
+ * ARCHITECTURE: All locale files are imported statically at the top of
+ * this module. This eliminates the Vite dynamic-import analysis warning
+ * and guarantees all 11 locale bundles are included in the production build
+ * for full offline availability. The trade-off is a slightly larger initial
+ * bundle, which is acceptable for this offline-first PWA.
  */
 
 import { createContext, useContext, useState, useCallback } from 'react';
 import React from 'react';
 
+/* ── STATIC LOCALE IMPORTS ────────────────────────────────────────
+ * Import every locale file explicitly. Vite can statically analyse
+ * these and include them in the production bundle without warnings.
+ * NOTE: 'as' is a JS reserved word, so we alias it as as_.
+ * ─────────────────────────────────────────────────────────────── */
+import en   from './en.js';
+import as_  from './as.js';
+import bn   from './bn.js';
+import mni  from './mni.js';
+import lus  from './lus.js';
+import kha  from './kha.js';
+import grt  from './grt.js';
+import brx  from './brx.js';
+import ne   from './ne.js';
+import hi   from './hi.js';
+import te   from './te.js';
+
+/** Static registry: maps locale code → dictionary object. */
+const LOCALE_REGISTRY = {
+  en,
+  as:  as_,
+  bn,
+  mni,
+  lus,
+  kha,
+  grt,
+  brx,
+  ne,
+  hi,
+  te,
+};
 
 /* ── 11-LANGUAGE REGISTRY ─────────────────────────────────────────
  * Single source of truth for all language metadata.
@@ -54,32 +91,19 @@ export const LOCALE_BCP47 = {
   te:  'te-IN',
 };
 
-/* ── LAZY LOCALE LOADER ───────────────────────────────────────────
- * Locale dictionaries are loaded lazily so non-English locales do
- * not increase initial JS parse time. English is always pre-loaded.
+/* ── MODULE-LEVEL DICT STATE ──────────────────────────────────────
+ * These module-level variables hold the currently active dictionary
+ * and English fallback. They are set synchronously — no async needed
+ * since all locales are statically bundled.
  * ─────────────────────────────────────────────────────────────── */
-const _cache = {};
-
-async function loadLocale(code) {
-  if (_cache[code]) return _cache[code];
-  try {
-    const mod = await import(`./${code}.js`);
-    _cache[code] = mod.default || mod;
-    return _cache[code];
-  } catch {
-    // Locale file not yet created — return empty so English fallback takes over.
-    _cache[code] = {};
-    return {};
-  }
-}
+let _enDict     = en;              // English is always available
+let _activeDict = en;              // Default to English until provider initialises
+let _activeLang = 'en';
 
 /* ── SYNC TRANSLATE ───────────────────────────────────────────────
- * Used inside components. Dictionaries must be pre-loaded by the
- * LanguageProvider before components render.
+ * Used inside components. All dictionaries are pre-loaded at module
+ * parse time — no async required.
  * ─────────────────────────────────────────────────────────────── */
-let _enDict = {};
-let _activeDict = {};
-let _activeLang = 'en';
 
 /**
  * translate(key, vars?)
@@ -114,40 +138,30 @@ function getInitialLang() {
 /**
  * LanguageProvider — wrap your entire App with this.
  * Uses createElement instead of JSX so this file stays .js (no Vite config change needed).
+ *
+ * Language switching is now fully synchronous — no loading states, no flicker.
+ * All 11 locale dictionaries are available immediately from the static bundle.
  */
 export function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState(getInitialLang);
-  const [ready, setReady] = useState(false);
-
-  // Load English on mount (always needed for fallback)
-  // Then load selected lang if different.
-  useState(() => {
+  const [lang, setLangState] = useState(() => {
+    // Initialise synchronously — no async needed
     const initialLang = getInitialLang();
-    import('./en.js').then((mod) => {
-      _enDict = mod.default || mod;
-      _cache['en'] = _enDict;
-      if (initialLang === 'en') {
-        _activeDict = _enDict;
-        _activeLang = 'en';
-        setReady(true);
-      } else {
-        loadLocale(initialLang).then((dict) => {
-          _activeDict = dict;
-          _activeLang = initialLang;
-          setReady(true);
-        });
-      }
-    });
+    const dict = LOCALE_REGISTRY[initialLang] || en;
+    _activeDict = dict;
+    _activeLang = initialLang;
+    // Set document lang/dir on initial mount
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = LOCALE_BCP47[initialLang] || initialLang;
+      const meta = LOCALE_META.find(m => m.code === initialLang);
+      document.documentElement.dir  = meta?.dir || 'ltr';
+    }
+    return initialLang;
   });
 
-  const setLang = useCallback(async (code) => {
+  const setLang = useCallback((code) => {
     if (!LOCALE_CODES.includes(code)) return;
-    if (code !== 'en') {
-      const dict = await loadLocale(code);
-      _activeDict = dict;
-    } else {
-      _activeDict = _enDict;
-    }
+    const dict = LOCALE_REGISTRY[code] || en;
+    _activeDict = dict;
     _activeLang = code;
     try { localStorage.setItem(LS_KEY, code); } catch { /* ignore */ }
     if (typeof document !== 'undefined') {
@@ -160,7 +174,8 @@ export function LanguageProvider({ children }) {
 
   const t = useCallback((key, vars) => translate(key, vars), [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const value = { lang, setLang, t, ready, meta: LOCALE_META };
+  // ready is always true since everything is synchronously loaded
+  const value = { lang, setLang, t, ready: true, meta: LOCALE_META };
 
   return React.createElement(LanguageContext.Provider, { value }, children);
 }

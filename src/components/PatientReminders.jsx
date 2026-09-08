@@ -37,31 +37,31 @@ import {
   todayStr,
 } from '../utils/reminderStorage';
 import CulturalBackground from './CulturalBackground';
-import { useLanguage } from '../locales/index.js';
+import { useLanguage, LOCALE_BCP47 } from '../locales/index.js';
 import './PatientReminders.css';
 
 
 /* ----------------------------------------------------------------
    HELPERS
 ---------------------------------------------------------------- */
-function formatDisplayTime(timeStr) {
+function formatDisplayTime(timeStr, bcp47) {
   if (!timeStr) return '';
   try {
     const [h, m] = timeStr.split(':').map(Number);
     const date = new Date();
     date.setHours(h, m, 0, 0);
-    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(bcp47 || 'en-IN', { hour: '2-digit', minute: '2-digit' });
   } catch {
     return timeStr;
   }
 }
 
-function formatDisplayDate(dateStr) {
+function formatDisplayDate(dateStr, bcp47) {
   if (!dateStr) return '';
   try {
     const [y, mo, d] = dateStr.split('-').map(Number);
     const date = new Date(y, mo - 1, d);
-    return date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+    return date.toLocaleDateString(bcp47 || 'en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
   } catch {
     return dateStr;
   }
@@ -70,21 +70,26 @@ function formatDisplayDate(dateStr) {
 /* ----------------------------------------------------------------
    REMINDER CARD (elderly-friendly — large touch target)
 ---------------------------------------------------------------- */
-function PatientReminderCard({ reminder, isDone, onToggleComplete }) {
+function PatientReminderCard({ reminder, isDone, onToggleComplete, t, bcp47 }) {
   const emoji = CATEGORY_EMOJI[reminder.category] ?? '📝';
   const isDaily = reminder.type === 'daily';
+
+  // Category uses dynamic mapping if available, falling back to English key
+  const categoryLabel = t(`caregiver.reminders.category.${reminder.category?.toLowerCase()}`);
+  const displayCategory = categoryLabel !== `caregiver.reminders.category.${reminder.category?.toLowerCase()}` 
+                          ? categoryLabel : reminder.category;
 
   return (
     <article
       className={'prm-card' + (isDone ? ' prm-card--done' : '')}
-      aria-label={'Reminder: ' + reminder.title}
+      aria-label={`${t('reminders.heading')}: ${reminder.title}`}
     >
       {/* Category badge + Daily badge */}
       <div className="prm-card__top">
         <span className="prm-card__emoji" aria-hidden="true">{emoji}</span>
-        <span className="prm-card__category">{reminder.category}</span>
-        {isDaily && <span className="prm-daily-badge">Every Day</span>}
-        {isDone && <span className="prm-done-badge">✅ Done</span>}
+        <span className="prm-card__category">{displayCategory}</span>
+        {isDaily && <span className="prm-daily-badge">{t('reminders.everyDay')}</span>}
+        {isDone && <span className="prm-done-badge">{t('reminders.done')}</span>}
       </div>
 
       {/* Title */}
@@ -99,12 +104,12 @@ function PatientReminderCard({ reminder, isDone, onToggleComplete }) {
 
       {/* Time */}
       {reminder.time && (
-        <p className="prm-card__time">⏰ {formatDisplayTime(reminder.time)}</p>
+        <p className="prm-card__time">⏰ {formatDisplayTime(reminder.time, bcp47)}</p>
       )}
 
       {/* Daily: note it resets tomorrow */}
       {isDaily && isDone && (
-        <p className="prm-card__reset-note">This reminder will appear again tomorrow.</p>
+        <p className="prm-card__reset-note">{t('reminders.resetNote')}</p>
       )}
 
       {/* Complete button — large touch target */}
@@ -112,9 +117,9 @@ function PatientReminderCard({ reminder, isDone, onToggleComplete }) {
         className={'prm-complete-btn' + (isDone ? ' prm-complete-btn--done' : '')}
         onClick={() => onToggleComplete(reminder)}
         aria-pressed={isDone}
-        aria-label={isDone ? 'Mark as not done' : 'Mark as done'}
+        aria-label={isDone ? t('reminders.doneUndo') : t('reminders.markDone')}
       >
-        {isDone ? '✅  Done — Tap to undo' : '⭕  Mark as Done'}
+        {isDone ? t('reminders.doneUndo') : `⭕ ${t('reminders.markDone').replace('✓ ', '')}`}
       </button>
     </article>
   );
@@ -124,7 +129,9 @@ function PatientReminderCard({ reminder, isDone, onToggleComplete }) {
    MAIN COMPONENT
 ---------------------------------------------------------------- */
 function PatientReminders({ navigate }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const bcp47 = LOCALE_BCP47[lang] || 'en-IN';
+  
   const [reminders, setReminders]             = useState(() => loadReminders());
   const [dailyCompletions, setDailyCompletions] = useState(() => loadDailyCompletions());
 
@@ -245,9 +252,9 @@ function PatientReminders({ navigate }) {
       <div className="prm-screen prm-screen--transparent">
 
         {/* ── HEADER ──────────────────────────────────────── */}
-        <header className="prm-header" aria-label="Reminders header">
-          <h1 className="prm-header__title">Today's Reminders ⏰</h1>
-          <p className="prm-header__sub">Here are the things to remember today.</p>
+        <header className="prm-header" aria-label={t('reminders.heading')}>
+          <h1 className="prm-header__title">{t('reminders.title')} ⏰</h1>
+          <p className="prm-header__sub">{t('reminders.empty.sub')}</p>
         </header>
 
         {/* ── CONTENT ─────────────────────────────────────── */}
@@ -257,8 +264,8 @@ function PatientReminders({ navigate }) {
           {!hasAny && (
             <div className="prm-empty">
               <span className="prm-empty__emoji" aria-hidden="true">🌱</span>
-              <p className="prm-empty__msg">No reminders for now 🌱</p>
-              <p className="prm-empty__hint">You're all caught up.</p>
+              <p className="prm-empty__msg">{t('reminders.empty')} 🌱</p>
+              <p className="prm-empty__hint">{t('reminders.allCaughtUp')}</p>
             </div>
           )}
 
@@ -266,15 +273,15 @@ function PatientReminders({ navigate }) {
           {hasAny && todayReminders.length === 0 && (
             <div className="prm-empty">
               <span className="prm-empty__emoji" aria-hidden="true">☀️</span>
-              <p className="prm-empty__msg">Nothing scheduled for today.</p>
-              <p className="prm-empty__hint">Check back tomorrow for upcoming reminders.</p>
+              <p className="prm-empty__msg">{t('reminders.noneToday')}</p>
+              <p className="prm-empty__hint">{t('reminders.allCaughtUp')}</p>
             </div>
           )}
 
           {/* Today's reminders */}
           {todaySorted.length > 0 && (
             <section aria-labelledby="prm-today-heading">
-              <h2 id="prm-today-heading" className="prm-section-heading">📅 Today</h2>
+              <h2 id="prm-today-heading" className="prm-section-heading">📅 {t('reminders.today')}</h2>
               <ul className="prm-list" role="list">
                 {todaySorted.map((rem) => (
                   <li key={rem.id}>
@@ -282,6 +289,8 @@ function PatientReminders({ navigate }) {
                       reminder={rem}
                       isDone={isReminderDoneToday(rem, dailyCompletions)}
                       onToggleComplete={handleToggleComplete}
+                      t={t}
+                      bcp47={bcp47}
                     />
                   </li>
                 ))}
@@ -292,29 +301,34 @@ function PatientReminders({ navigate }) {
           {/* Upcoming specific-date reminders */}
           {upcomingSorted.length > 0 && (
             <section aria-labelledby="prm-upcoming-heading">
-              <h2 id="prm-upcoming-heading" className="prm-section-heading">🔜 Coming Up</h2>
+              <h2 id="prm-upcoming-heading" className="prm-section-heading">🔜 {t('reminders.comingUp')}</h2>
               <ul className="prm-list" role="list">
-                {upcomingSorted.map((rem) => (
-                  <li key={rem.id}>
-                    <article
-                      className={'prm-card prm-card--upcoming' + (rem.completed ? ' prm-card--done' : '')}
-                      aria-label={'Upcoming reminder: ' + rem.title}
-                    >
-                      <div className="prm-card__top">
-                        <span className="prm-card__emoji" aria-hidden="true">
-                          {CATEGORY_EMOJI[rem.category] ?? '📝'}
-                        </span>
-                        <span className="prm-card__category">{rem.category}</span>
-                      </div>
-                      <h3 className={'prm-card__title' + (rem.completed ? ' prm-card__title--done' : '')}>
-                        {rem.title}
-                      </h3>
-                      <p className="prm-card__time">
-                        📅 {formatDisplayDate(rem.date)}{rem.time ? '  ⏰ ' + formatDisplayTime(rem.time) : ''}
-                      </p>
-                    </article>
-                  </li>
-                ))}
+                {upcomingSorted.map((rem) => {
+                  const categoryLabel = t(`caregiver.reminders.category.${rem.category?.toLowerCase()}`);
+                  const displayCategory = categoryLabel !== `caregiver.reminders.category.${rem.category?.toLowerCase()}` 
+                                          ? categoryLabel : rem.category;
+                  return (
+                    <li key={rem.id}>
+                      <article
+                        className={'prm-card prm-card--upcoming' + (rem.completed ? ' prm-card--done' : '')}
+                        aria-label={`${t('reminders.comingUp')}: ${rem.title}`}
+                      >
+                        <div className="prm-card__top">
+                          <span className="prm-card__emoji" aria-hidden="true">
+                            {CATEGORY_EMOJI[rem.category] ?? '📝'}
+                          </span>
+                          <span className="prm-card__category">{displayCategory}</span>
+                        </div>
+                        <h3 className={'prm-card__title' + (rem.completed ? ' prm-card__title--done' : '')}>
+                          {rem.title}
+                        </h3>
+                        <p className="prm-card__time">
+                          📅 {formatDisplayDate(rem.date, bcp47)}{rem.time ? '  ⏰ ' + formatDisplayTime(rem.time, bcp47) : ''}
+                        </p>
+                      </article>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
@@ -325,39 +339,39 @@ function PatientReminders({ navigate }) {
         <nav className="ph-nav" aria-label="Main navigation">
           <button
             className="ph-nav__btn"
-            aria-label="Home"
+            aria-label={t('reminders.nav.home')}
             onClick={() => navigate('patient-home')}
           >
             <span className="ph-nav__icon" aria-hidden="true">🏠</span>
-            <span className="ph-nav__label">Home</span>
+            <span className="ph-nav__label">{t('reminders.nav.home')}</span>
           </button>
 
           <button
             className="ph-nav__btn"
-            aria-label="Activities"
+            aria-label={t('reminders.nav.games')}
             onClick={() => navigate('patient-activities')}
           >
             <span className="ph-nav__icon" aria-hidden="true">🧠</span>
-            <span className="ph-nav__label">Activities</span>
+            <span className="ph-nav__label">{t('reminders.nav.games')}</span>
           </button>
 
           <button
             className="ph-nav__btn"
-            aria-label="Memories"
+            aria-label={t('reminders.nav.memories')}
             onClick={() => navigate('patient-memories')}
           >
             <span className="ph-nav__icon" aria-hidden="true">❤️</span>
-            <span className="ph-nav__label">Memories</span>
+            <span className="ph-nav__label">{t('reminders.nav.memories')}</span>
           </button>
 
           <button
             id="prm-nav-reminders"
             className="ph-nav__btn ph-nav__btn--active"
             aria-current="page"
-            aria-label="Reminders"
+            aria-label={t('reminders.nav.reminders')}
           >
             <span className="ph-nav__icon" aria-hidden="true">⏰</span>
-            <span className="ph-nav__label">Reminders</span>
+            <span className="ph-nav__label">{t('reminders.nav.reminders')}</span>
           </button>
         </nav>
 

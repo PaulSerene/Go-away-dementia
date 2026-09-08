@@ -24,8 +24,8 @@ import { useLanguage } from '../../locales/index.js';
 import './MusicMemory.css';
 import '../games/GameShared.css';
 
-
 /* ── MUSIC DATABASE ───────────────────────────────────────────── */
+// Content stays in English by default, but UI is translated.
 const MUSIC_ITEMS = [
   {
     id: 'bihu',
@@ -127,6 +127,7 @@ export default function MusicMemory({ navigate }) {
   const [playing, setPlaying]       = useState(false); // simulate "playing" audio
 
   const currentItem = items[qIndex];
+  const DEMO_NAME = "Mrs. Das";
 
   function handleSimulatePlay() {
     setPlaying(true);
@@ -141,8 +142,8 @@ export default function MusicMemory({ navigate }) {
     setFeedback({
       correct: isCorrect,
       message: isCorrect
-        ? '🎵 Excellent! You identified it correctly!'
-        : `💪 It was ${currentItem.category}. ${currentItem.extra || 'Keep practising!'}`,
+        ? t('game.feedback.correct')
+        : t('game.feedback.tryAgain').replace('Keep going.', `It was ${t(currentItem.category, currentItem.category)}. ${currentItem.extra || 'Keep practising!'}`)
     });
     setPhase(PHASE.FEEDBACK);
   }
@@ -151,7 +152,7 @@ export default function MusicMemory({ navigate }) {
     if (hintShown) return;
     setHintShown(true);
     setTotalHints(h => h + 1);
-    setFeedback({ correct: null, message: `💡 Hint: ${currentItem.extra || currentItem.feature}` });
+    setFeedback({ correct: null, message: `💡 ${t('game.hint.btn').replace('Show a Hint', 'Hint')}: ${currentItem.extra || currentItem.feature}` });
   }
 
   function handleNext() {
@@ -193,31 +194,33 @@ export default function MusicMemory({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">🎶 Music Memory</p>
-            <p className="gs-header__sub">Cultural Music · Identification</p>
+            <p className="gs-header__title">🎶 {t('musicMemory.title')}</p>
+            <p className="gs-header__sub">{t('musicMemory.sub') || 'Cultural Music · Identification'}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">🎵</span>
-            <h1 className="gs-intro__title">Music Memory</h1>
+            <h1 className="gs-intro__title">{t('musicMemory.intro.title')}</h1>
             <p className="gs-intro__desc">
-              A music style from Northeast India or nearby regions will be described.
-              Listen to the description carefully and identify what type of music it is!
+              {t('musicMemory.intro.desc1')}
             </p>
             <p className="gs-intro__desc">
-              <strong>{config.rounds} rounds</strong> · No audio equipment needed.
+              {t('musicMemory.intro.desc2')}
+            </p>
+            <p className="gs-intro__desc">
+              <strong>{config.rounds} {t('game.round', { n: 1, total: 1 }).split(' ')[0] + 's'}</strong> · No audio equipment needed.
             </p>
             <div className="mm-categories">
               {['Assamese Folk', 'Bengali Classical', 'Manipuri', 'Mizo Choir', 'Bodo Folk', 'Nepali Folk'].map(c => (
-                <span key={c} className="mm-cat-pill">{c}</span>
+                <span key={c} className="mm-cat-pill">{t(c, c)}</span>
               ))}
             </div>
             <button className="gs-btn gs-btn--primary" onClick={() => setPhase(PHASE.QUESTION)}>
-              🎵 Start Listening
+              {t('musicMemory.intro.begin')}
             </button>
           </div>
         </div>
@@ -230,39 +233,39 @@ export default function MusicMemory({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">🎶 Music Memory</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">🎶 {t('musicMemory.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">{finalAccuracy >= 80 ? '🎵' : '🎶'}</span>
-            <h1 className="gs-complete__title">Bravo!</h1>
-            <p className="gs-complete__sub">You have a wonderful ear for music, Mrs. Das.</p>
+            <h1 className="gs-complete__title">{t('musicMemory.complete.bravo')}</h1>
+            <p className="gs-complete__sub">{t('musicMemory.complete.sub', { name: DEMO_NAME })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Accuracy</span>
+                <span className="gs-score-card__label">{t('game.score.accuracy')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{correct}/{config.rounds}</span>
-                <span className="gs-score-card__label">Correct</span>
+                <span className="gs-score-card__label">{t('game.score.correct')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{totalHints}</span>
-                <span className="gs-score-card__label">Hints Used</span>
+                <span className="gs-score-card__label">{t('game.score.hints')}</span>
               </div>
               <div className="gs-score-card">
-                <span className="gs-score-card__value">{levelLabel(level)}</span>
-                <span className="gs-score-card__label">Level</span>
+                <span className="gs-score-card__value">{levelLabel(level, t)}</span>
+                <span className="gs-score-card__label">{t('game.score.level')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
               <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setQIndex(0); setCorrect(0); setSelected(null); setFeedback(null); setHintShown(false); setTotalHints(0); setPhase(PHASE.INTRO); }}>
-                🔄 Play Again
+                {t('game.btn.playAgain')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -275,12 +278,12 @@ export default function MusicMemory({ navigate }) {
   return (
     <div className="gs-screen">
       <header className="gs-header">
-        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">🎶 Music Memory</p>
-          <p className="gs-header__sub">Round {qIndex + 1} of {config.rounds}</p>
+          <p className="gs-header__title">🎶 {t('musicMemory.title')}</p>
+          <p className="gs-header__sub">{t('musicMemory.round.of', { n: qIndex + 1, total: config.rounds })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -289,13 +292,13 @@ export default function MusicMemory({ navigate }) {
         </div>
 
         <div className="mm-question">
-          <p className="gs-phase-label">🎵 What type of music is this?</p>
+          <p className="gs-phase-label">🎵 {t('musicMemory.phase.question')}</p>
 
           {/* Simulated audio player */}
           <div className="mm-player">
             <span className="mm-player__emoji">{currentItem.emoji}</span>
             <div className="mm-player__body">
-              <p className="mm-player__label">Music Description</p>
+              <p className="mm-player__label">{t('musicMemory.player.label')}</p>
               {playing ? (
                 <div className="mm-player__wave">
                   <span></span><span></span><span></span><span></span><span></span>
@@ -311,12 +314,12 @@ export default function MusicMemory({ navigate }) {
 
           {config.showExtra && (
             <div className="gs-instruction">
-              <strong>Additional detail:</strong> {currentItem.extra}
+              <strong>{t('musicMemory.additional.detail')}</strong> {currentItem.extra}
             </div>
           )}
 
           {!hintShown && phase === PHASE.QUESTION && (
-            <button className="gs-hint-btn" onClick={handleHint}>💡 Show a Hint</button>
+            <button className="gs-hint-btn" onClick={handleHint}>{t('game.hint.btn')}</button>
           )}
           {feedback && feedback.correct === null && (
             <div className="gs-feedback gs-feedback--neutral">{feedback.message}</div>
@@ -338,7 +341,7 @@ export default function MusicMemory({ navigate }) {
                   onClick={() => handleAnswer(opt)}
                   disabled={phase === PHASE.FEEDBACK}
                 >
-                  {opt}
+                  {t(opt, opt)}
                 </button>
               );
             })}
@@ -350,7 +353,7 @@ export default function MusicMemory({ navigate }) {
                 {feedback.message}
               </div>
               <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-                {qIndex + 1 >= config.rounds ? 'See Results' : 'Next Round →'}
+                {qIndex + 1 >= config.rounds ? t('game.btn.seeResults') : t('game.btn.next')}
               </button>
             </>
           )}

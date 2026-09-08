@@ -27,6 +27,8 @@ import "./CaregiverMemories.css";
 ---------------------------------------------------------------- */
 const STORAGE_KEY = "smriti_memories";
 
+// We keep the internal category names in English so logic/DB matches,
+// but we will translate them for display.
 const CATEGORIES = ["Family", "Places", "Events", "Special Moments"];
 
 const CATEGORY_EMOJI = {
@@ -84,6 +86,8 @@ const SAMPLE_MEMORIES = [
   },
 ];
 
+const DEMO_PATIENT = { name: "Mrs. Das", age: 72 };
+
 /* ----------------------------------------------------------------
    LOCALSTORAGE HELPERS
    All wrapped in try/catch — never crash on bad data.
@@ -139,7 +143,7 @@ const EMPTY_FORM = {
    FORM COMPONENT
    Used for both Add and Edit. Pre-filled when editing.
 ---------------------------------------------------------------- */
-function MemoryForm({ initial, onSave, onCancel }) {
+function MemoryForm({ initial, onSave, onCancel, t }) {
   const [form, setForm] = useState(initial ?? EMPTY_FORM);
   const [errors, setErrors] = useState({});
 
@@ -151,9 +155,9 @@ function MemoryForm({ initial, onSave, onCancel }) {
 
   function validate() {
     const errs = {};
-    if (!form.title.trim())       errs.title       = "Please enter a memory title.";
-    if (!form.category)           errs.category    = "Please select a category.";
-    if (!form.description.trim()) errs.description = "Please add a short description.";
+    if (!form.title.trim())       errs.title       = t('caregiverMem.form.err.title');
+    if (!form.category)           errs.category    = t('caregiverMem.form.err.category');
+    if (!form.description.trim()) errs.description = t('caregiverMem.form.err.desc');
     return errs;
   }
 
@@ -167,11 +171,22 @@ function MemoryForm({ initial, onSave, onCancel }) {
     onSave(form);
   }
 
+  // category translation helper for form
+  const getCategoryLabel = (cat) => {
+    switch (cat) {
+      case 'Family': return t('memories.categories.family');
+      case 'Places': return t('memories.categories.places');
+      case 'Events': return t('memories.categories.events');
+      case 'Special Moments': return t('memories.categories.specialMoments');
+      default: return cat;
+    }
+  };
+
   return (
-    <div className="cgm-form-overlay" role="dialog" aria-modal="true" aria-label="Memory form">
+    <div className="cgm-form-overlay" role="dialog" aria-modal="true" aria-label={initial ? t('caregiverMem.form.update') : t('caregiverMem.add')}>
       <div className="cgm-form-card">
         <h2 className="cgm-form-title">
-          {initial ? "Edit Memory" : "Add Memory"}
+          {initial ? t('caregiverMem.form.update') : t('caregiverMem.add')}
         </h2>
 
         <form onSubmit={handleSubmit} noValidate>
@@ -179,7 +194,7 @@ function MemoryForm({ initial, onSave, onCancel }) {
           {/* Title */}
           <div className="cgm-field">
             <label className="cgm-label" htmlFor="cgm-title">
-              Memory Title <span aria-hidden="true" className="cgm-required">*</span>
+              {t('caregiverMem.form.title')} <span aria-hidden="true" className="cgm-required">*</span>
             </label>
             <input
               id="cgm-title"
@@ -197,7 +212,7 @@ function MemoryForm({ initial, onSave, onCancel }) {
           {/* Category */}
           <div className="cgm-field">
             <label className="cgm-label" htmlFor="cgm-category">
-              Category <span aria-hidden="true" className="cgm-required">*</span>
+              {t('caregiverMem.form.category')} <span aria-hidden="true" className="cgm-required">*</span>
             </label>
             <select
               id="cgm-category"
@@ -207,7 +222,7 @@ function MemoryForm({ initial, onSave, onCancel }) {
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
-                  {CATEGORY_EMOJI[cat]} {cat}
+                  {CATEGORY_EMOJI[cat]} {getCategoryLabel(cat)}
                 </option>
               ))}
             </select>
@@ -217,14 +232,14 @@ function MemoryForm({ initial, onSave, onCancel }) {
           {/* Description */}
           <div className="cgm-field">
             <label className="cgm-label" htmlFor="cgm-description">
-              Description <span aria-hidden="true" className="cgm-required">*</span>
+              {t('caregiverMem.form.desc')} <span aria-hidden="true" className="cgm-required">*</span>
             </label>
             <textarea
               id="cgm-description"
               className={"cgm-input cgm-textarea" + (errors.description ? " cgm-input--error" : "")}
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
-              placeholder="Describe this special memory..."
+              placeholder="..."
               maxLength={400}
               rows={4}
             />
@@ -234,7 +249,7 @@ function MemoryForm({ initial, onSave, onCancel }) {
           {/* Date (optional) */}
           <div className="cgm-field">
             <label className="cgm-label" htmlFor="cgm-date">
-              Date <span className="cgm-optional">(optional)</span>
+              {t('caregiverMem.form.date')} <span className="cgm-optional">(optional)</span>
             </label>
             <input
               id="cgm-date"
@@ -250,9 +265,9 @@ function MemoryForm({ initial, onSave, onCancel }) {
           {/* Visual / Emoji */}
           <div className="cgm-field">
             <p className="cgm-label">
-              Visual <span className="cgm-optional">(optional)</span>
+              Visual <span className="cgm-optional">({t('caregiverMem.form.date').replace('Date','').trim() || 'optional'})</span>
             </p>
-            <div className="cgm-emoji-grid" role="group" aria-label="Select a visual">
+            <div className="cgm-emoji-grid" role="group" aria-label={t('caregiverMem.form.title')}>
               {VISUAL_EMOJIS.map((emoji) => (
                 <button
                   key={emoji}
@@ -271,10 +286,10 @@ function MemoryForm({ initial, onSave, onCancel }) {
           {/* Buttons */}
           <div className="cgm-form-actions">
             <button type="button" className="cgm-btn cgm-btn--secondary" onClick={onCancel}>
-              Cancel
+              {t('caregiverMem.form.cancel')}
             </button>
             <button type="submit" className="cgm-btn cgm-btn--primary">
-              {initial ? "Save Changes" : "Save Memory"}
+              {initial ? t('caregiverMem.form.update') : t('caregiverMem.form.save')}
             </button>
           </div>
 
@@ -287,17 +302,17 @@ function MemoryForm({ initial, onSave, onCancel }) {
 /* ----------------------------------------------------------------
    DELETE CONFIRMATION DIALOG
 ---------------------------------------------------------------- */
-function DeleteConfirm({ memory, onConfirm, onCancel }) {
+function DeleteConfirm({ memory, onConfirm, onCancel, t }) {
   return (
-    <div className="cgm-form-overlay" role="dialog" aria-modal="true" aria-label="Delete confirmation">
+    <div className="cgm-form-overlay" role="dialog" aria-modal="true" aria-label={t('caregiverMem.deleteConfirm.aria')}>
       <div className="cgm-confirm-card">
         <p className="cgm-confirm-emoji" aria-hidden="true">🗑️</p>
-        <h2 className="cgm-confirm-title">Delete this memory?</h2>
+        <h2 className="cgm-confirm-title">{t('caregiverMem.deleteConfirm.title')}</h2>
         <p className="cgm-confirm-name">"{memory.title}"</p>
-        <p className="cgm-confirm-msg">This cannot be undone.</p>
+        <p className="cgm-confirm-msg">{t('confirm.irreversible')}</p>
         <div className="cgm-form-actions">
-          <button className="cgm-btn cgm-btn--secondary" onClick={onCancel}>Cancel</button>
-          <button className="cgm-btn cgm-btn--danger" onClick={onConfirm}>Delete</button>
+          <button className="cgm-btn cgm-btn--secondary" onClick={onCancel}>{t('caregiverMem.form.cancel')}</button>
+          <button className="cgm-btn cgm-btn--danger" onClick={onConfirm}>{t('caregiverMem.delete')}</button>
         </div>
       </div>
     </div>
@@ -307,9 +322,19 @@ function DeleteConfirm({ memory, onConfirm, onCancel }) {
 /* ----------------------------------------------------------------
    MEMORY CARD (caregiver view — denser than patient view)
 ---------------------------------------------------------------- */
-function MemoryCard({ memory, onEdit, onDelete, onToggleFavorite }) {
+function MemoryCard({ memory, onEdit, onDelete, onToggleFavorite, t }) {
   const emoji = CATEGORY_EMOJI[memory.category] ?? "📖";
   const visual = memory.image; // may be an emoji string or null
+
+  const getCategoryLabel = (cat) => {
+    switch (cat) {
+      case 'Family': return t('memories.categories.family');
+      case 'Places': return t('memories.categories.places');
+      case 'Events': return t('memories.categories.events');
+      case 'Special Moments': return t('memories.categories.specialMoments');
+      default: return cat;
+    }
+  };
 
   return (
     <article className="cgm-card" aria-label={"Memory: " + memory.title}>
@@ -323,7 +348,7 @@ function MemoryCard({ memory, onEdit, onDelete, onToggleFavorite }) {
         {/* Header row */}
         <div className="cgm-card__header-row">
           <span className="cgm-card__category">
-            <span aria-hidden="true">{emoji}</span> {memory.category}
+            <span aria-hidden="true">{emoji}</span> {getCategoryLabel(memory.category)}
           </span>
           <button
             className={"cgm-fav-btn" + (memory.favorite ? " cgm-fav-btn--active" : "")}
@@ -360,7 +385,7 @@ function MemoryCard({ memory, onEdit, onDelete, onToggleFavorite }) {
             onClick={() => onDelete(memory)}
             aria-label={"Delete memory: " + memory.title}
           >
-            🗑️ Delete
+            🗑️ {t('caregiverMem.delete')}
           </button>
         </div>
       </div>
@@ -630,20 +655,20 @@ function CaregiverMemories({ navigate }) {
     <div className="cgm-screen">
 
       {/* ── HEADER ─────────────────────────────────────── */}
-      <header className="cgm-header" aria-label="Manage Memories header">
+      <header className="cgm-header" aria-label={t('caregiverMem.heading')}>
 
         <button
           className="cgm-header-back-btn"
           onClick={() => navigate("caregiver-dashboard")}
-          aria-label="Back to Dashboard"
+          aria-label={t('nav.back')}
         >
-          ← Dashboard
+          {t('caregiver.nav.dashboard') ? `← ${t('caregiver.nav.dashboard')}` : `← Dashboard`}
         </button>
 
         <div className="cgm-header__titles">
-          <p className="cgm-header__title">Manage Memories ❤️</p>
+          <p className="cgm-header__title">{t('caregiverMem.heading')} ❤️</p>
           <p className="cgm-header__subtitle">
-            Add and manage special memories for Mrs. Das.
+            {t('caregiverMem.sub', { name: DEMO_PATIENT.name })}
           </p>
         </div>
       </header>
@@ -655,16 +680,18 @@ function CaregiverMemories({ navigate }) {
         <div className="cgm-top-bar">
           <p className="cgm-count">
             {hasMemories
-              ? memories.length + " memor" + (memories.length === 1 ? "y" : "ies")
-              : "No memories yet"}
+              ? memories.length === 1 
+                  ? t('memories.count.one') 
+                  : t('memories.count.many', { count: memories.length })
+              : t('caregiverMem.empty')}
           </p>
           <button
             id="cgm-btn-add"
             className="cgm-btn cgm-btn--primary cgm-btn--add"
             onClick={handleAddClick}
-            aria-label="Add a new memory"
+            aria-label={t('caregiverMem.add')}
           >
-            + Add Memory
+            {t('caregiverMem.add')}
           </button>
         </div>
 
@@ -672,16 +699,16 @@ function CaregiverMemories({ navigate }) {
         {!hasMemories && (
           <div className="cgm-empty">
             <span className="cgm-empty__emoji" aria-hidden="true">❤️</span>
-            <p className="cgm-empty__msg">No memories yet.</p>
+            <p className="cgm-empty__msg">{t('caregiverMem.empty')}</p>
             <p className="cgm-empty__hint">
-              Add a special memory to begin building Mrs. Das&apos;s memory collection.
+              {t('caregiverMem.empty.sub', { name: DEMO_PATIENT.name })}
             </p>
             <button
               id="cgm-btn-add-empty"
               className="cgm-btn cgm-btn--primary"
               onClick={handleAddClick}
             >
-              + Add Memory
+              {t('caregiverMem.add')}
             </button>
           </div>
         )}
@@ -696,6 +723,7 @@ function CaregiverMemories({ navigate }) {
                   onEdit={handleEdit}
                   onDelete={handleDeleteClick}
                   onToggleFavorite={handleToggleFavorite}
+                  t={t}
                 />
               </li>
             ))}
@@ -710,6 +738,7 @@ function CaregiverMemories({ navigate }) {
           initial={formInitial}
           onSave={handleSave}
           onCancel={handleCancel}
+          t={t}
         />
       )}
 
@@ -718,6 +747,7 @@ function CaregiverMemories({ navigate }) {
           memory={deletingMemory}
           onConfirm={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
+          t={t}
         />
       )}
 

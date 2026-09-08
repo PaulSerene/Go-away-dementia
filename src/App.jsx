@@ -47,6 +47,7 @@ import { processQueue } from './utils/syncQueue.js';
 import { LanguageProvider, useLanguage } from './locales/index.js';
 import { AccessibilityProvider } from './contexts/AccessibilityContext.jsx';
 import AccessibilityPanel from './components/AccessibilityPanel.jsx';
+import { useAndroidBack } from './hooks/useAndroidBack.js';
 import './App.css';
 import './components/PatientHome.css';
 
@@ -151,6 +152,57 @@ function App() {
 
   const { t } = useLanguage();
 
+  // ── ANDROID BACK BUTTON ─────────────────────────────────────────
+  // Map each screen to where Android back should go.
+  // Game screens during active play show a confirmation dialog instead.
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+
+  // Screens that are "game" screens — back shows confirmation
+  const GAME_SCREENS = [
+    'patient-activity', 'game-word-chain', 'game-movement',
+    'game-story-recall', 'game-rearrange', 'game-music-memory',
+    'game-remember-me', 'game-path-tracer',
+  ];
+
+  // Back navigation map: screen → previous screen
+  const BACK_MAP = {
+    'patient-home':         'landing',
+    'games-hub':            'patient-home',
+    'patient-activity':     'games-hub',
+    'game-word-chain':      'games-hub',
+    'game-movement':        'games-hub',
+    'game-story-recall':    'games-hub',
+    'game-rearrange':       'games-hub',
+    'game-music-memory':    'games-hub',
+    'game-remember-me':     'games-hub',
+    'game-path-tracer':     'games-hub',
+    'patient-activities':   'patient-home',
+    'patient-memories':     'patient-home',
+    'patient-reminders':    'patient-home',
+    'caregiver-dashboard':  'landing',
+    'caregiver-memories':   'caregiver-dashboard',
+    'caregiver-reminders':  'caregiver-dashboard',
+  };
+
+  useAndroidBack(() => {
+    // Close exit confirmation dialog first if open
+    if (showExitConfirm) {
+      setShowExitConfirm(false);
+      return;
+    }
+    // Game screens: show confirmation before leaving
+    if (GAME_SCREENS.includes(currentScreen)) {
+      setShowExitConfirm(true);
+      return;
+    }
+    const prev = BACK_MAP[currentScreen];
+    if (prev) {
+      navigate(prev);
+    } else if (currentScreen === 'landing') {
+      // On landing page: allow Android to exit the app
+      // (Capacitor handles this by default when no listener consumes the event)
+    }
+  }, [currentScreen, showExitConfirm]);
   /* Data for the two mode cards — stored as an array of objects */
   const modes = [
     {
@@ -172,6 +224,37 @@ function App() {
   /* Offline banner shown on ALL screens when connectivity is lost */
   const banner = !isOnline ? <OfflineBanner /> : null;
 
+  /* ── ANDROID GAME EXIT CONFIRMATION DIALOG ─────────────────────
+   * Overlays on top of whatever game is currently showing.
+   * Only appears when Android back is pressed during an active game.
+   * ─────────────────────────────────────────────────────────────── */
+  const exitConfirmDialog = showExitConfirm ? (
+    <div className="android-exit-overlay" role="dialog" aria-modal="true" aria-label={t('game.exit.stay')}>
+      <div className="android-exit-dialog">
+        <p className="android-exit-dialog__msg">
+          {t('game.exit.confirm')}
+        </p>
+        <div className="android-exit-dialog__actions">
+          <button
+            className="android-exit-dialog__btn android-exit-dialog__btn--stay"
+            onClick={() => setShowExitConfirm(false)}
+          >
+            {t('game.exit.stay')}
+          </button>
+          <button
+            className="android-exit-dialog__btn android-exit-dialog__btn--leave"
+            onClick={() => {
+              setShowExitConfirm(false);
+              navigate('games-hub');
+            }}
+          >
+            {t('game.exit.leave')}
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   /* Patient Home */
   if (currentScreen === 'patient-home') {
     return <>{banner}<PatientHome navigate={navigate} /></>;
@@ -179,7 +262,7 @@ function App() {
 
   /* Today's Activity — "Remember the Objects" memory game */
   if (currentScreen === 'patient-activity') {
-    return <>{banner}<MemoryGame navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<MemoryGame navigate={navigate} /></>;
   }
 
   /* Activities tab — My Progress */
@@ -219,31 +302,31 @@ function App() {
 
   /* ── INDIVIDUAL GAMES ────────────────────────────────── */
   if (currentScreen === 'game-word-chain') {
-    return <>{banner}<WordChain navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<WordChain navigate={navigate} /></>;
   }
 
   if (currentScreen === 'game-movement') {
-    return <>{banner}<MovementGame navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<MovementGame navigate={navigate} /></>;
   }
 
   if (currentScreen === 'game-story-recall') {
-    return <>{banner}<StoryRecall navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<StoryRecall navigate={navigate} /></>;
   }
 
   if (currentScreen === 'game-rearrange') {
-    return <>{banner}<RearrangeGame navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<RearrangeGame navigate={navigate} /></>;
   }
 
   if (currentScreen === 'game-music-memory') {
-    return <>{banner}<MusicMemory navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<MusicMemory navigate={navigate} /></>;
   }
 
   if (currentScreen === 'game-remember-me') {
-    return <>{banner}<RememberMe navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<RememberMe navigate={navigate} /></>;
   }
 
   if (currentScreen === 'game-path-tracer') {
-    return <>{banner}<PathTracer navigate={navigate} /></>;
+    return <>{banner}{exitConfirmDialog}<PathTracer navigate={navigate} /></>;
   }
 
   /* ── LANDING PAGE (default) ───────────────────────────── */
@@ -257,7 +340,7 @@ function App() {
         <main className="hero">
 
           {/* Small decorative tag */}
-          <span className="hero__tag">🇮🇳 North Eastern India</span>
+          <span className="hero__tag">🇮🇳 {t('app.badge')}</span>
 
           {/* Main title */}
           <h1 className="hero__title">{t('app.name')}</h1>

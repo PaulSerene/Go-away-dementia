@@ -141,8 +141,8 @@ export default function StoryRecall({ navigate }) {
     setFeedback({
       correct: isCorrect,
       message: isCorrect
-        ? '✅ That\'s right! Well remembered!'
-        : `💪 The answer was "${currentQ.answer}". Keep going!`,
+        ? t('game.feedback.correct')
+        : t('game.feedback.tryAgain').replace('Keep going.', `The answer was "${currentQ.answer}". Keep going!`)
     });
     setPhase(PHASE.FEEDBACK);
   }
@@ -194,28 +194,30 @@ export default function StoryRecall({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">📖 Story Time</p>
-            <p className="gs-header__sub">Memory · Comprehension</p>
+            <p className="gs-header__title">📖 {t('storyRecall.title')}</p>
+            <p className="gs-header__sub">{t('storyRecall.sub')}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">📖</span>
-            <h1 className="gs-intro__title">Story Time</h1>
+            <h1 className="gs-intro__title">{t('storyRecall.intro.title')}</h1>
+            <p className="gs-intro__desc">{t('storyRecall.intro.desc1')}</p>
+            <p className="gs-intro__desc">{t('storyRecall.intro.desc2')}</p>
             <p className="gs-intro__desc">
-              Read a short story at your own pace. Then answer some simple questions about what you read.
+              <strong>{t('storyRecall.intro.todaysStory')}</strong> "{story.title}"
             </p>
             <p className="gs-intro__desc">
-              <strong>Today's story:</strong> "{story.title}"
-            </p>
-            <p className="gs-intro__desc">
-              <strong>{config.questions} question{config.questions > 1 ? 's' : ''}</strong> after the story.
+              <strong>{t('storyRecall.intro.questions2', {
+                count: config.questions,
+                plural: config.questions > 1 ? 's' : ''
+              })}</strong>
             </p>
             <button className="gs-btn gs-btn--primary" onClick={() => setPhase(PHASE.READ)}>
-              📖 Read the Story
+              {t('storyRecall.btn.readStory')}
             </button>
           </div>
         </div>
@@ -230,24 +232,24 @@ export default function StoryRecall({ navigate }) {
         <header className="gs-header">
           <button className="gs-back-btn" onClick={() => setPhase(PHASE.INTRO)}>← Intro</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">📖 Story Time</p>
+            <p className="gs-header__title">📖 {t('storyRecall.title')}</p>
             <p className="gs-header__sub">{story.title}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="sr-story">
-            <p className="gs-phase-label">📖 Read the Story</p>
+            <p className="gs-phase-label">{t('storyRecall.phase.read')}</p>
             <h2 className="sr-story__title">{story.title}</h2>
             <div className="sr-story__text">{story.text}</div>
             <p className="sr-story__tip">
-              💡 Take your time reading. You can scroll back up if needed.
+              {t('storyRecall.tip')}
             </p>
             <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setPhase(PHASE.QUESTION); setQIndex(0); }}>
-              I've read it → Answer Questions
+              {t('storyRecall.btn.ready')}
             </button>
             <button className="gs-btn gs-btn--outline gs-btn--full gs-btn--sm" onClick={() => setPhase(PHASE.READ)}>
-              🔁 Read Again
+              {t('storyRecall.btn.readAgain')}
             </button>
           </div>
         </div>
@@ -260,31 +262,31 @@ export default function StoryRecall({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">📖 Story Time</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">📖 {t('storyRecall.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">{finalAccuracy >= 80 ? '🌟' : '💪'}</span>
-            <h1 className="gs-complete__title">Story Complete!</h1>
-            <p className="gs-complete__sub">You remembered "{story.title}" very well!</p>
+            <h1 className="gs-complete__title">{t('storyRecall.complete.title')}</h1>
+            <p className="gs-complete__sub">{t('storyRecall.complete.remembered', { title: story.title })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Accuracy</span>
+                <span className="gs-score-card__label">{t('game.score.accuracy')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{correct}/{questions.length}</span>
-                <span className="gs-score-card__label">Correct</span>
+                <span className="gs-score-card__label">{t('game.score.correct')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
               <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setQIndex(0); setCorrect(0); setSelected(null); setFeedback(null); setHintShown(false); setTotalHints(0); setPhase(PHASE.INTRO); }}>
-                🔄 Play Again
+                {t('game.btn.playAgain')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -299,10 +301,10 @@ export default function StoryRecall({ navigate }) {
       <header className="gs-header">
         <button className="gs-back-btn" onClick={() => setPhase(PHASE.READ)}>← Story</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">📖 Story Time</p>
-          <p className="gs-header__sub">Question {qIndex + 1} of {questions.length}</p>
+          <p className="gs-header__title">📖 {t('storyRecall.title')}</p>
+          <p className="gs-header__sub">{t('storyRecall.phase.question', { n: qIndex + 1, total: questions.length })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -311,11 +313,11 @@ export default function StoryRecall({ navigate }) {
         </div>
 
         <div className="sr-question">
-          <p className="gs-phase-label">🤔 Question {qIndex + 1}</p>
+          <p className="gs-phase-label">{t('storyRecall.question.label', { n: qIndex + 1 })}</p>
           <h2 className="sr-question__text">{currentQ.q}</h2>
 
           {!hintShown && phase === PHASE.QUESTION && (
-            <button className="gs-hint-btn" onClick={handleHint}>💡 Show a Hint</button>
+            <button className="gs-hint-btn" onClick={handleHint}>{t('game.hint.btn')}</button>
           )}
           {feedback && feedback.correct === null && (
             <div className="gs-feedback gs-feedback--neutral">{feedback.message}</div>
@@ -349,7 +351,7 @@ export default function StoryRecall({ navigate }) {
                 {feedback.message}
               </div>
               <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-                {qIndex + 1 >= questions.length ? 'See Results' : 'Next Question →'}
+                {qIndex + 1 >= questions.length ? t('game.btn.seeResults') : t('game.btn.next')}
               </button>
             </>
           )}

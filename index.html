@@ -3,14 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Memora — AI Cognitive &amp; Memory Companion for elderly dementia patients. Providing cognitive activities, memory assistance, and caregiver support." />
+
+    <!-- Mobile viewport: no user scaling — app controls its own zoom levels -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Theme color for browser chrome / Android status bar -->
+    <meta name="theme-color" content="#1a0a2e" />
+
+    <!-- PWA / Android home screen meta -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Memora" />
+
+    <!-- SEO -->
+    <meta name="description" content="Memora — AI Cognitive &amp; Memory Companion for elderly users and their caregivers. Providing cognitive wellness activities, memory assistance, and caregiver support for Northeast India." />
+    <meta name="application-name" content="Memora" />
+
     <title>Memora — AI Cognitive &amp; Memory Companion</title>
+
     <!--
       Fonts: Inter (body) + Noto Serif (brand) + Noto script fonts for
       Bengali (as, bn), Devanagari (hi, ne, brx), Meetei Mayek (mni), Telugu (te).
       Mizo, Khasi, Garo use Latin — covered by Inter / Noto Sans.
       System fonts are defined as fallbacks so the app works offline.
+      NOTE: On Android, Google Fonts require network access.
+            System fonts provide acceptable fallback when offline.
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

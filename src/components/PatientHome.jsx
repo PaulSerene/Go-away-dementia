@@ -174,37 +174,37 @@ function PatientHome({ navigate }) {
             onClick={() => navigate('patient-home')}
           >
             <span className="ph-nav__icon" aria-hidden="true">🏠</span>
-            <span className="ph-nav__label">Home</span>
+            <span className="ph-nav__label">{t('memories.nav.home')}</span>
           </button>
 
           <button
             id="nav-activities"
             className="ph-nav__btn"
-            aria-label="Activities"
+            aria-label={t('memories.nav.games')}
             onClick={() => navigate('patient-activities')}
           >
             <span className="ph-nav__icon" aria-hidden="true">🧠</span>
-            <span className="ph-nav__label">Activities</span>
+            <span className="ph-nav__label">{t('memories.nav.games')}</span>
           </button>
 
           <button
             id="nav-memories"
             className="ph-nav__btn"
-            aria-label="Memories"
+            aria-label={t('memories.nav.memories')}
             onClick={() => navigate('patient-memories')}
           >
             <span className="ph-nav__icon" aria-hidden="true">❤️</span>
-            <span className="ph-nav__label">Memories</span>
+            <span className="ph-nav__label">{t('memories.nav.memories')}</span>
           </button>
 
           <button
             id="nav-reminders"
             className="ph-nav__btn"
-            aria-label="Reminders"
+            aria-label={t('memories.nav.reminders')}
             onClick={() => navigate('patient-reminders')}
           >
             <span className="ph-nav__icon" aria-hidden="true">⏰</span>
-            <span className="ph-nav__label">Reminders</span>
+            <span className="ph-nav__label">{t('memories.nav.reminders')}</span>
           </button>
         </nav>
 

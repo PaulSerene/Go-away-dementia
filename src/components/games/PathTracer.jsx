@@ -26,19 +26,19 @@ import '../games/GameShared.css';
 
 /* ── ROUTE LANDMARK POOL ─────────────────────────────────────── */
 const LANDMARK_POOL = [
-  { id: 'home',      emoji: '🏠', name: 'Home',           type: 'start' },
-  { id: 'gate',      emoji: '🚪', name: 'Front Gate',     type: 'point' },
-  { id: 'tea-shop',  emoji: '🍵', name: 'Tea Shop',       type: 'point' },
-  { id: 'big-tree',  emoji: '🌳', name: 'Big Banyan Tree',type: 'point' },
-  { id: 'pond',      emoji: '💧', name: 'Village Pond',   type: 'point' },
-  { id: 'post-off',  emoji: '📮', name: 'Post Office',    type: 'point' },
-  { id: 'market',    emoji: '🏪', name: 'Weekly Market',  type: 'point' },
-  { id: 'school',    emoji: '🏫', name: 'School',         type: 'point' },
-  { id: 'temple',    emoji: '🛕', name: 'Temple',         type: 'point' },
-  { id: 'bridge',    emoji: '🌉', name: 'Old Bridge',     type: 'point' },
-  { id: 'grocery',   emoji: '🛒', name: 'Grocery Store',  type: 'end' },
-  { id: 'clinic',    emoji: '🏥', name: 'Clinic',         type: 'end' },
-  { id: 'bus-stop',  emoji: '🚌', name: 'Bus Stop',       type: 'end' },
+  { id: 'home',      emoji: '🏠', type: 'start' },
+  { id: 'gate',      emoji: '🚪', type: 'point' },
+  { id: 'tea-shop',  emoji: '🍵', type: 'point' },
+  { id: 'big-tree',  emoji: '🌳', type: 'point' },
+  { id: 'pond',      emoji: '💧', type: 'point' },
+  { id: 'post-off',  emoji: '📮', type: 'point' },
+  { id: 'market',    emoji: '🏪', type: 'point' },
+  { id: 'school',    emoji: '🏫', type: 'point' },
+  { id: 'temple',    emoji: '🛕', type: 'point' },
+  { id: 'bridge',    emoji: '🌉', type: 'point' },
+  { id: 'grocery',   emoji: '🛒', type: 'end' },
+  { id: 'clinic',    emoji: '🏥', type: 'end' },
+  { id: 'bus-stop',  emoji: '🚌', type: 'end' },
 ];
 
 const LEVEL_CONFIG = {
@@ -128,8 +128,8 @@ export default function PathTracer({ navigate }) {
       hits,
       total: route.length,
       message: isCorrect
-        ? '🗺️ Perfect route! You remembered the way!'
-        : `💪 You got ${hits} of ${route.length} stops right. The correct route is shown below.`,
+        ? t('pathTracer.feedback.perfect')
+        : t('pathTracer.feedback.partial', { hits, total: route.length }),
     });
     setShowResult(true);
   }
@@ -166,29 +166,29 @@ export default function PathTracer({ navigate }) {
   const finalAccuracy = calcAccuracy(correct, config.rounds);
   const nextLevel = calcNextDifficulty(level, finalAccuracy);
 
+  const DEMO_NAME = "Mrs. Das";
+
   // ── INTRO ─────────────────────────────────────────────────────────
   if (phase === PHASE.INTRO) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
           <div className="gs-header__info">
-            <p className="gs-header__title">🗺️ PathTracer</p>
-            <p className="gs-header__sub">Attention · Spatial Memory</p>
+            <p className="gs-header__title">🗺️ {t('pathTracer.title')}</p>
+            <p className="gs-header__sub">{t('pathTracer.sub')}</p>
           </div>
-          <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+          <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
         </header>
         <div className="gs-content">
           <div className="gs-intro">
             <span className="gs-intro__emoji">🗺️</span>
-            <h1 className="gs-intro__title">PathTracer</h1>
+            <h1 className="gs-intro__title">{t('pathTracer.intro.title')}</h1>
             <p className="gs-intro__desc">
-              A fictional route through a village will be shown. 
-              Memorise the <strong>order of landmarks</strong>!
-              Then they will be shuffled — tap them back in the correct route order.
+              {t('pathTracer.intro.desc1')}
             </p>
             <p className="gs-intro__desc">
-              <strong>{config.stops} stops</strong> on the route · <strong>{config.rounds} rounds</strong>
+              {t('pathTracer.intro.desc2', { stops: config.stops, rounds: config.rounds })}
             </p>
             <div className="pt-example">
               <span>🏠</span><span className="pt-arrow">→</span>
@@ -196,7 +196,7 @@ export default function PathTracer({ navigate }) {
               <span>🛒</span>
             </div>
             <button className="gs-btn gs-btn--primary" onClick={() => { setRound(0); setCorrect(0); startRound(); }}>
-              🗺️ Start Tracing
+              🗺️ {t('pathTracer.btn.start')}
             </button>
           </div>
         </div>
@@ -209,39 +209,39 @@ export default function PathTracer({ navigate }) {
     return (
       <div className="gs-screen">
         <header className="gs-header">
-          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
-          <div className="gs-header__info"><p className="gs-header__title">🗺️ PathTracer</p></div>
+          <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
+          <div className="gs-header__info"><p className="gs-header__title">🗺️ {t('pathTracer.title')}</p></div>
         </header>
         <div className="gs-content">
           <div className="gs-complete">
             <span className="gs-complete__emoji">{finalAccuracy >= 80 ? '🗺️' : '💪'}</span>
-            <h1 className="gs-complete__title">Activity Complete!</h1>
-            <p className="gs-complete__sub">You know your village well, Mrs. Das!</p>
+            <h1 className="gs-complete__title">{t('game.complete.title')}</h1>
+            <p className="gs-complete__sub">{t('game.complete.wonderful', { name: DEMO_NAME })}</p>
             <div className="gs-score-grid">
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{finalAccuracy}%</span>
-                <span className="gs-score-card__label">Accuracy</span>
+                <span className="gs-score-card__label">{t('game.score.accuracy')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{correct}/{config.rounds}</span>
-                <span className="gs-score-card__label">Perfect Routes</span>
+                <span className="gs-score-card__label">{t('pathTracer.complete.routes')}</span>
               </div>
               <div className="gs-score-card">
                 <span className="gs-score-card__value">{config.stops}</span>
-                <span className="gs-score-card__label">Stops</span>
+                <span className="gs-score-card__label">{t('pathTracer.complete.stops')}</span>
               </div>
               <div className="gs-score-card">
-                <span className="gs-score-card__value">{levelLabel(level)}</span>
-                <span className="gs-score-card__label">Level</span>
+                <span className="gs-score-card__value">{levelLabel(level, t)}</span>
+                <span className="gs-score-card__label">{t('game.score.level')}</span>
               </div>
             </div>
-            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel)}</div>
+            <div className="gs-level-msg">{nextLevelMessage(level, nextLevel, t)}</div>
             <div className="gs-actions">
               <button className="gs-btn gs-btn--primary gs-btn--full" onClick={() => { setRound(0); setCorrect(0); setPhase(PHASE.INTRO); }}>
-                🔄 Play Again
+                {t('game.btn.playAgain')}
               </button>
               <button className="gs-btn gs-btn--outline gs-btn--full" onClick={() => navigate('games-hub')}>
-                ← Back to Games
+                {t('game.btn.backToGames')}
               </button>
             </div>
           </div>
@@ -253,12 +253,12 @@ export default function PathTracer({ navigate }) {
   return (
     <div className="gs-screen">
       <header className="gs-header">
-        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>← Games</button>
+        <button className="gs-back-btn" onClick={() => navigate('games-hub')}>{t('nav.games')}</button>
         <div className="gs-header__info">
-          <p className="gs-header__title">🗺️ PathTracer</p>
-          <p className="gs-header__sub">Round {round + 1} of {config.rounds}</p>
+          <p className="gs-header__title">🗺️ {t('pathTracer.title')}</p>
+          <p className="gs-header__sub">{t('game.round', { n: round + 1, total: config.rounds })}</p>
         </div>
-        <span className="gs-difficulty-badge">{levelLabel(level)}</span>
+        <span className="gs-difficulty-badge">{levelLabel(level, t)}</span>
       </header>
 
       <div className="gs-content">
@@ -269,20 +269,20 @@ export default function PathTracer({ navigate }) {
         {/* MEMORISE phase */}
         {phase === PHASE.MEMORISE && (
           <div className="pt-memorise">
-            <p className="gs-phase-label">🧭 Memorise the Route</p>
+            <p className="gs-phase-label">🧭 {t('pathTracer.phase.memorize')}</p>
             {countdown !== null && (
               <div className={`gs-timer ${countdown <= 2 ? 'gs-timer--warning' : ''}`}>
-                ⏱ {countdown}s remaining
+                ⏱ {t('pathTracer.timer.remaining', { s: countdown })}
               </div>
             )}
-            <p className="pt-instruction">Remember the order of these landmarks from top to bottom:</p>
+            <p className="pt-instruction">{t('pathTracer.instruction.memorize')}</p>
             <div className="pt-route">
               {route.map((lm, i) => (
                 <div key={lm.id} className="pt-route-row">
                   <div className={`pt-landmark pt-landmark--memorise ${i === 0 ? 'pt-landmark--start' : i === route.length - 1 ? 'pt-landmark--end' : ''}`}>
                     <span className="pt-landmark__num">{i + 1}</span>
                     <span className="pt-landmark__emoji">{lm.emoji}</span>
-                    <span className="pt-landmark__name">{lm.name}</span>
+                    <span className="pt-landmark__name">{t(`pathTracer.obj.${lm.id}`)}</span>
                   </div>
                   {i < route.length - 1 && (
                     <div className="pt-connector">↓</div>
@@ -296,10 +296,10 @@ export default function PathTracer({ navigate }) {
         {/* RECALL phase */}
         {phase === PHASE.RECALL && (
           <div className="pt-recall">
-            <p className="gs-phase-label">🤔 Tap in the Correct Route Order</p>
+            <p className="gs-phase-label">🤔 {t('pathTracer.phase.recall')}</p>
             <p className="pt-instruction">
-              Tap landmarks in order: 1st stop first, then 2nd, 3rd...
-              {selected.length > 0 && ` (${selected.length}/${route.length} placed)`}
+              {t('pathTracer.instruction.recall')}
+              {selected.length > 0 && ` ${t('pathTracer.recall.placed', { n: selected.length, total: route.length })}`}
             </p>
 
             {/* Current sequence */}
@@ -332,11 +332,11 @@ export default function PathTracer({ navigate }) {
                     className={`pt-landmark-btn ${isSel ? 'pt-landmark-btn--selected' : ''}`}
                     onClick={() => handleTap(lm)}
                     disabled={showResult}
-                    aria-label={lm.name}
+                    aria-label={t(`pathTracer.obj.${lm.id}`)}
                   >
                     {isSel && <span className="pt-landmark-btn__num">{selIdx + 1}</span>}
                     <span className="pt-landmark__emoji">{lm.emoji}</span>
-                    <span className="pt-landmark__name">{lm.name}</span>
+                    <span className="pt-landmark__name">{t(`pathTracer.obj.${lm.id}`)}</span>
                   </button>
                 );
               })}
@@ -350,14 +350,14 @@ export default function PathTracer({ navigate }) {
                 </div>
                 {!feedback.correct && (
                   <div className="pt-correct-route">
-                    <p className="gs-section-heading">The correct route was:</p>
+                    <p className="gs-section-heading">{t('pathTracer.feedback.correctRoute')}</p>
                     <div className="pt-route pt-route--compact">
                       {route.map((lm, i) => (
                         <div key={lm.id} className="pt-route-row">
                           <div className="pt-landmark pt-landmark--answer">
                             <span className="pt-landmark__num">{i + 1}</span>
                             <span className="pt-landmark__emoji">{lm.emoji}</span>
-                            <span className="pt-landmark__name">{lm.name}</span>
+                            <span className="pt-landmark__name">{t(`pathTracer.obj.${lm.id}`)}</span>
                           </div>
                           {i < route.length - 1 && <div className="pt-connector">↓</div>}
                         </div>
@@ -366,14 +366,14 @@ export default function PathTracer({ navigate }) {
                   </div>
                 )}
                 <button className="gs-btn gs-btn--primary" onClick={handleNext}>
-                  {round + 1 >= config.rounds ? 'See Results' : 'Next Round →'}
+                  {round + 1 >= config.rounds ? t('game.btn.seeResults') : t('game.btn.next')}
                 </button>
               </div>
             )}
 
             {!showResult && selected.length > 0 && (
               <button className="gs-btn gs-btn--outline gs-btn--sm" onClick={() => setSelected([])}>
-                🔄 Reset
+                {t('pathTracer.btn.reset')}
               </button>
             )}
           </div>
